@@ -6,35 +6,36 @@
 
 {% block content %}
 {{ ui.page_header(
-    title="Dashboard & Credit Ledger",
-    subtitle="Track your platform credit balance, uploads, and download history",
-    action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn-sm"><i class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Upload Material</a>'
+title="Dashboard & Credit Ledger",
+subtitle="Track your platform credit balance, uploads, and download history",
+action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn-sm"><i class="ti ti-cloud-upload me-1"
+        aria-hidden="true"></i>Upload Material</a>'
 ) }}
 
 <!-- Stat Cards Row (Neutral-first) -->
 <div class="row g-4 mb-4">
     <div class="col-md-4">
         {{ ui.stat_card(
-            label="Platform Balance",
-            value='<span class="credit-balance-val">' + current_user.credits|string + '</span> credits',
-            subtext="Earn +" + config.UPLOAD_REWARD|string + " for each verified upload",
-            icon="ti-coin"
+        label="Platform Balance",
+        value=current_user.credits|string + ' credits',
+        subtext="Earn +" + config.UPLOAD_REWARD|string + " for each verified upload",
+        icon="ti-coin"
         ) }}
     </div>
     <div class="col-md-4">
         {{ ui.stat_card(
-            label="My Uploads",
-            value=uploads|length|string,
-            subtext="Shared with students at " + current_user.university_name,
-            icon="ti-folder-up"
+        label="My Uploads",
+        value=uploads|length|string,
+        subtext="Shared with students at " + current_user.university_name,
+        icon="ti-folder-up"
         ) }}
     </div>
     <div class="col-md-4">
         {{ ui.stat_card(
-            label="My Downloads",
-            value=downloads|length|string,
-            subtext="Unlocked materials (free to re-download)",
-            icon="ti-folder-down"
+        label="My Downloads",
+        value=downloads|length|string,
+        subtext="Unlocked materials (free to re-download)",
+        icon="ti-folder-down"
         ) }}
     </div>
 </div>
@@ -44,17 +45,22 @@
     <div class="card-header p-0">
         <ul class="nav nav-tabs card-header-tabs m-0 px-3 pt-2" id="dashboardTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active fw-medium" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger-pane" type="button" role="tab" aria-controls="ledger-pane" aria-selected="true">
+                <button class="nav-link active fw-medium" id="ledger-tab" data-bs-toggle="tab"
+                    data-bs-target="#ledger-pane" type="button" role="tab" aria-controls="ledger-pane"
+                    aria-selected="true">
                     <i class="ti ti-receipt-2 me-1" aria-hidden="true"></i>Credit History
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-medium" id="uploads-tab" data-bs-toggle="tab" data-bs-target="#uploads-pane" type="button" role="tab" aria-controls="uploads-pane" aria-selected="false">
+                <button class="nav-link fw-medium" id="uploads-tab" data-bs-toggle="tab" data-bs-target="#uploads-pane"
+                    type="button" role="tab" aria-controls="uploads-pane" aria-selected="false">
                     <i class="ti ti-cloud-upload me-1" aria-hidden="true"></i>My Uploads ({{ uploads|length }})
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-medium" id="downloads-tab" data-bs-toggle="tab" data-bs-target="#downloads-pane" type="button" role="tab" aria-controls="downloads-pane" aria-selected="false">
+                <button class="nav-link fw-medium" id="downloads-tab" data-bs-toggle="tab"
+                    data-bs-target="#downloads-pane" type="button" role="tab" aria-controls="downloads-pane"
+                    aria-selected="false">
                     <i class="ti ti-download me-1" aria-hidden="true"></i>My Downloads ({{ downloads|length }})
                 </button>
             </li>
@@ -81,40 +87,40 @@
                                 <td class="text-body-secondary small">{{ item.created_at }}</td>
                                 <td>
                                     {% if item.reason == 'signup' %}
-                                        <span class="badge text-bg-light border text-body-secondary">
-                                            Signup Bonus
-                                        </span>
+                                    <span class="badge border text-body">
+                                        Signup Bonus
+                                    </span>
                                     {% elif item.reason == 'upload' %}
-                                        <span class="badge text-bg-light border text-body-secondary">
-                                            Material Upload
-                                        </span>
+                                    <span class="badge border  text-body">
+                                        Material Upload
+                                    </span>
                                     {% elif item.reason == 'download' %}
-                                        <span class="badge text-bg-light border text-body-secondary">
-                                            Material Download
-                                        </span>
+                                    <span class="badge border  text-body">
+                                        Material Download
+                                    </span>
                                     {% elif item.reason == 'reversal' %}
-                                        <span class="badge text-bg-light border text-danger">
-                                            Reward Reversal
-                                        </span>
+                                    <span class="badge border text-danger">
+                                        Reward Reversal
+                                    </span>
                                     {% endif %}
                                 </td>
                                 <td>
                                     {% if item.file_id and item.file_title %}
-                                        <a href="{{ url_for('file_detail', file_id=item.file_id) }}" class="text-decoration-none">
-                                            {{ item.file_title }}
-                                        </a>
+                                    <a href="{{ url_for('file_detail', file_id=item.file_id) }}"
+                                        class="text-decoration-none">
+                                        {{ item.file_title }}
+                                    </a>
                                     {% else %}
-                                        <span class="text-body-secondary">&mdash;</span>
+                                    <span class="text-body-secondary">&dash; &dash;</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-end fw-semibold">
                                     {% if item.amount > 0 %}
-                                        <span class="text-success">+{{ item.amount }}</span>
-                                    {% elif item.amount < 0 %}
-                                        <span class="text-danger">{{ item.amount }}</span>
-                                    {% else %}
+                                    <span class="text-success">+{{ item.amount }}</span>
+                                    {% elif item.amount < 0 %} <span class="text-danger">{{ item.amount }}</span>
+                                        {% else %}
                                         <span class="text-body-secondary">0</span>
-                                    {% endif %}
+                                        {% endif %}
                                 </td>
                             </tr>
                             {% else %}
@@ -149,27 +155,31 @@
                             {% for u in uploads %}
                             <tr>
                                 <td class="fw-medium">
-                                    <a href="{{ url_for('file_detail', file_id=u.id) }}" class="text-decoration-none text-body">
+                                    <a href="{{ url_for('file_detail', file_id=u.id) }}"
+                                        class="text-decoration-none text-body">
                                         {{ u.title }}
                                     </a>
                                 </td>
                                 <td class="small">{{ u.subject }} (Sem {{ u.semester }})</td>
-                                <td><span class="badge text-bg-light border text-body-secondary small">{{ u.type }}</span></td>
+                                <td><span class="badge border text-body-secondary small">{{ u.type
+                                        }}</span></td>
                                 <td>
-                                    <span class="text-warning small"><i class="ti ti-star-filled" aria-hidden="true"></i></span>
+                                    <span class="text-warning small"><i class="ti ti-star-filled"
+                                            aria-hidden="true"></i></span>
                                     <span class="small fw-medium">{{ "%.1f"|format(u.avg_rating) }}</span>
                                 </td>
                                 <td class="small">{{ u.download_count }}</td>
                                 <td>
                                     {% if u.status == 'active' %}
-                                        <span class="badge text-bg-light border text-success">Active</span>
+                                    <span class="badge border text-success">Active</span>
                                     {% else %}
-                                        <span class="badge text-bg-light border text-danger">Removed</span>
+                                    <span class="badge border text-danger">Removed</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-end">
                                     {% if u.status == 'active' %}
-                                    <a href="{{ url_for('download_file', file_id=u.id) }}" class="btn btn-sm btn-outline-secondary" title="Download">
+                                    <a href="{{ url_for('download_file', file_id=u.id) }}"
+                                        class="btn btn-sm btn-outline-secondary" title="Download">
                                         <i class="ti ti-download" aria-hidden="true"></i>
                                     </a>
                                     {% endif %}
@@ -181,11 +191,11 @@
                 </div>
                 {% else %}
                 {{ ui.empty_state(
-                    icon="ti-cloud-upload",
-                    title="No uploads yet",
-                    message="You haven't uploaded any study materials yet. Upload your first file to earn credits.",
-                    action_url=url_for('upload_file'),
-                    action_text="Upload Material"
+                icon="ti-cloud-upload",
+                title="No uploads yet",
+                message="You haven't uploaded any study materials yet. Upload your first file to earn credits.",
+                action_url=url_for('upload_file'),
+                action_text="Upload Material"
                 ) }}
                 {% endif %}
             </div>
@@ -208,7 +218,8 @@
                             {% for d in downloads %}
                             <tr>
                                 <td class="fw-medium">
-                                    <a href="{{ url_for('file_detail', file_id=d.file_id) }}" class="text-decoration-none text-body">
+                                    <a href="{{ url_for('file_detail', file_id=d.file_id) }}"
+                                        class="text-decoration-none text-body">
                                         {{ d.title }}
                                     </a>
                                 </td>
@@ -217,11 +228,12 @@
                                 <td class="text-body-secondary small">{{ d.downloaded_at }}</td>
                                 <td class="text-end">
                                     {% if d.status == 'active' %}
-                                    <a href="{{ url_for('download_file', file_id=d.file_id) }}" class="btn btn-sm btn-outline-secondary">
+                                    <a href="{{ url_for('download_file', file_id=d.file_id) }}"
+                                        class="btn btn-sm btn-outline-secondary">
                                         <i class="ti ti-download me-1" aria-hidden="true"></i>Re-download
                                     </a>
                                     {% else %}
-                                    <span class="badge text-bg-light border text-body-secondary">Removed</span>
+                                    <span class="badge border text-body-secondary">Removed</span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -231,11 +243,11 @@
                 </div>
                 {% else %}
                 {{ ui.empty_state(
-                    icon="ti-download",
-                    title="No downloads yet",
-                    message="You have not unlocked any materials yet. Browse available documents to get started.",
-                    action_url=url_for('browse'),
-                    action_text="Browse Materials"
+                icon="ti-download",
+                title="No downloads yet",
+                message="You have not unlocked any materials yet. Browse available documents to get started.",
+                action_url=url_for('browse'),
+                action_text="Browse Materials"
                 ) }}
                 {% endif %}
             </div>

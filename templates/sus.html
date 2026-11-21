@@ -38,7 +38,8 @@
                         <span class="small text-body-secondary">System Usability Scale</span>
                     </div>
                     <div class="progress" style="height: 6px;">
-                        <div id="sus-progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div id="sus-progress-bar" class="progress-bar bg-primary" role="progressbar"
+                            style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
 
@@ -48,9 +49,10 @@
                     <!-- 10 Question Cards -->
                     {% for item in items %}
                     {% set q_num = loop.index %}
-                    <div class="sus-question-card" data-step="{{ q_num }}" {% if not loop.first %}style="display: none;"{% endif %}>
+                    <div class="sus-question-card" data-step="{{ q_num }}" {% if not loop.first %}style="display: none;"
+                        {% endif %}>
                         <div class="mb-4">
-                            <span class="badge text-bg-light border text-body-secondary mb-2">Item {{ q_num }}</span>
+                            <span class="badge border text-body-secondary mb-2">Item {{ q_num }}</span>
                             <h2 class="h5 fw-semibold text-body lh-base mb-0">{{ item }}</h2>
                         </div>
 
@@ -58,18 +60,19 @@
                         <div class="mb-4">
                             <div class="row row-cols-1 row-cols-sm-5 g-2">
                                 {% set labels = [
-                                    (1, "Strongly disagree"),
-                                    (2, "Disagree"),
-                                    (3, "Neutral"),
-                                    (4, "Agree"),
-                                    (5, "Strongly agree")
+                                (1, "Strongly disagree"),
+                                (2, "Disagree"),
+                                (3, "Neutral"),
+                                (4, "Agree"),
+                                (5, "Strongly agree")
                                 ] %}
                                 {% for val, label_text in labels %}
                                 <div class="col">
-                                    <label class="sus-option-btn w-100 p-3 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100 cursor-pointer"
-                                           for="q{{ q_num }}_{{ val }}" tabindex="0" role="button">
-                                        <input class="form-check-input visually-hidden" type="radio"
-                                               name="q{{ q_num }}" id="q{{ q_num }}_{{ val }}" value="{{ val }}" required>
+                                    <label
+                                        class="sus-option-btn w-100 p-3 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100 cursor-pointer"
+                                        for="q{{ q_num }}_{{ val }}" tabindex="0" role="button">
+                                        <input class="form-check-input visually-hidden" type="radio" name="q{{ q_num }}"
+                                            id="q{{ q_num }}_{{ val }}" value="{{ val }}" required>
                                         <span class="fw-semibold text-body mb-1">{{ val }}</span>
                                         <span class="small text-body-secondary">{{ label_text }}</span>
                                     </label>
@@ -89,7 +92,8 @@
                             <button type="button" id="sus-next-btn" class="btn btn-primary btn-sm">
                                 Next<i class="ti ti-arrow-right ms-1" aria-hidden="true"></i>
                             </button>
-                            <button type="submit" id="sus-submit-btn" class="btn btn-primary btn-sm" style="display: none;">
+                            <button type="submit" id="sus-submit-btn" class="btn btn-primary btn-sm"
+                                style="display: none;">
                                 Submit Survey
                             </button>
                         </div>
@@ -104,107 +108,107 @@
 
 {% block extra_scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const totalSteps = 10;
-    let currentStep = 1;
+    document.addEventListener('DOMContentLoaded', function () {
+        const totalSteps = 10;
+        let currentStep = 1;
 
-    const progressBar = document.getElementById('sus-progress-bar');
-    const stepIndicator = document.getElementById('sus-step-indicator');
-    const prevBtn = document.getElementById('sus-prev-btn');
-    const nextBtn = document.getElementById('sus-next-btn');
-    const submitBtn = document.getElementById('sus-submit-btn');
+        const progressBar = document.getElementById('sus-progress-bar');
+        const stepIndicator = document.getElementById('sus-step-indicator');
+        const prevBtn = document.getElementById('sus-prev-btn');
+        const nextBtn = document.getElementById('sus-next-btn');
+        const submitBtn = document.getElementById('sus-submit-btn');
 
-    function updateStepView() {
-        document.querySelectorAll('.sus-question-card').forEach(function (card) {
-            const step = parseInt(card.getAttribute('data-step'), 10);
-            if (step === currentStep) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
+        function updateStepView() {
+            document.querySelectorAll('.sus-question-card').forEach(function (card) {
+                const step = parseInt(card.getAttribute('data-step'), 10);
+                if (step === currentStep) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const pct = Math.round((currentStep / totalSteps) * 100);
+            if (progressBar) {
+                progressBar.style.width = pct + '%';
+                progressBar.setAttribute('aria-valuenow', pct);
             }
+            if (stepIndicator) {
+                stepIndicator.textContent = 'Question ' + currentStep + ' of ' + totalSteps;
+            }
+
+            if (prevBtn) {
+                prevBtn.disabled = (currentStep === 1);
+            }
+
+            if (currentStep === totalSteps) {
+                if (nextBtn) nextBtn.style.display = 'none';
+                if (submitBtn) submitBtn.style.display = 'inline-block';
+            } else {
+                if (nextBtn) nextBtn.style.display = 'inline-block';
+                if (submitBtn) submitBtn.style.display = 'none';
+            }
+        }
+
+        // Handle radio changes & option card highlighting
+        document.querySelectorAll('.sus-option-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const input = btn.querySelector('input[type="radio"]');
+                if (input) {
+                    input.checked = true;
+                    // Update parent row styles
+                    const row = btn.closest('.row');
+                    if (row) {
+                        row.querySelectorAll('.sus-option-btn').forEach(function (other) {
+                            other.classList.remove('border-primary', 'bg-body-tertiary', 'shadow-sm');
+                        });
+                    }
+                    btn.classList.add('border-primary', 'bg-body-tertiary', 'shadow-sm');
+
+                    // Auto-advance after 200ms if not on last step
+                    if (currentStep < totalSteps) {
+                        setTimeout(function () {
+                            currentStep++;
+                            updateStepView();
+                        }, 220);
+                    }
+                }
+            });
+
+            // Keyboard navigation (Enter or Space)
+            btn.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
         });
 
-        const pct = Math.round((currentStep / totalSteps) * 100);
-        if (progressBar) {
-            progressBar.style.width = pct + '%';
-            progressBar.setAttribute('aria-valuenow', pct);
-        }
-        if (stepIndicator) {
-            stepIndicator.textContent = 'Question ' + currentStep + ' of ' + totalSteps;
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                // Check if current question answered
+                const checked = document.querySelector('input[name="q' + currentStep + '"]:checked');
+                if (!checked) {
+                    alert('Please select an option to continue.');
+                    return;
+                }
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateStepView();
+                }
+            });
         }
 
         if (prevBtn) {
-            prevBtn.disabled = (currentStep === 1);
+            prevBtn.addEventListener('click', function () {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepView();
+                }
+            });
         }
 
-        if (currentStep === totalSteps) {
-            if (nextBtn) nextBtn.style.display = 'none';
-            if (submitBtn) submitBtn.style.display = 'inline-block';
-        } else {
-            if (nextBtn) nextBtn.style.display = 'inline-block';
-            if (submitBtn) submitBtn.style.display = 'none';
-        }
-    }
-
-    // Handle radio changes & option card highlighting
-    document.querySelectorAll('.sus-option-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            const input = btn.querySelector('input[type="radio"]');
-            if (input) {
-                input.checked = true;
-                // Update parent row styles
-                const row = btn.closest('.row');
-                if (row) {
-                    row.querySelectorAll('.sus-option-btn').forEach(function (other) {
-                        other.classList.remove('border-primary', 'bg-body-tertiary', 'shadow-sm');
-                    });
-                }
-                btn.classList.add('border-primary', 'bg-body-tertiary', 'shadow-sm');
-
-                // Auto-advance after 200ms if not on last step
-                if (currentStep < totalSteps) {
-                    setTimeout(function () {
-                        currentStep++;
-                        updateStepView();
-                    }, 220);
-                }
-            }
-        });
-
-        // Keyboard navigation (Enter or Space)
-        btn.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                btn.click();
-            }
-        });
+        updateStepView();
     });
-
-    if (nextBtn) {
-        nextBtn.addEventListener('click', function () {
-            // Check if current question answered
-            const checked = document.querySelector('input[name="q' + currentStep + '"]:checked');
-            if (!checked) {
-                alert('Please select an option to continue.');
-                return;
-            }
-            if (currentStep < totalSteps) {
-                currentStep++;
-                updateStepView();
-            }
-        });
-    }
-
-    if (prevBtn) {
-        prevBtn.addEventListener('click', function () {
-            if (currentStep > 1) {
-                currentStep--;
-                updateStepView();
-            }
-        });
-    }
-
-    updateStepView();
-});
 </script>
 {% endblock %}

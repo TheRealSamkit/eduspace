@@ -6,15 +6,15 @@
 
 {% block content %}
 {{ ui.page_header(
-    title="Usability Evaluation Tasks",
-    subtitle="Complete timed resource-retrieval tasks to evaluate platform efficiency"
+title="Usability Evaluation Tasks",
+subtitle="Complete timed resource-retrieval tasks to evaluate platform efficiency"
 ) }}
 
 <!-- Task Controller Card -->
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span class="fw-semibold text-body">Task Execution</span>
-        <span class="badge text-bg-light border text-body-secondary fw-medium">
+        <span class="badge border text-body-secondary fw-medium">
             <i class="ti ti-device-analytics me-1" aria-hidden="true"></i>Automated Telemetry
         </span>
     </div>
@@ -26,10 +26,11 @@
                 {% for pt in predefined_tasks %}
                 <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3">
                     <input class="form-check-input flex-shrink-0" type="radio" name="selected_task_name"
-                           value="{{ pt.name }}" {% if loop.first %}checked{% endif %}>
+                        value="{{ pt.name }}" {% if loop.first %}checked{% endif %}>
                     <span class="form-checked-content">
                         <span class="d-block fw-semibold text-body">Task {{ pt.id }}: {{ pt.name }}</span>
-                        <small class="text-body-secondary">Navigate the repository to locate the specified material.</small>
+                        <small class="text-body-secondary">Navigate the repository to locate the specified
+                            material.</small>
                     </span>
                 </label>
                 {% endfor %}
@@ -37,7 +38,8 @@
 
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <span class="text-body-secondary small">
-                    <i class="ti ti-info-circle me-1" aria-hidden="true"></i>Starting begins the evaluation timer and counts clicks/errors as you navigate.
+                    <i class="ti ti-info-circle me-1" aria-hidden="true"></i>Starting begins the evaluation timer and
+                    counts clicks/errors as you navigate.
                 </span>
                 <button type="button" id="start-task-btn" class="btn btn-primary">
                     <i class="ti ti-player-play me-1" aria-hidden="true"></i>Start Task
@@ -136,9 +138,9 @@
                         <td>{{ t.errors }}</td>
                         <td>
                             {% if t.success == 1 %}
-                                <span class="badge text-bg-light border text-success">Success</span>
+                            <span class="badge border text-success">Success</span>
                             {% else %}
-                                <span class="badge text-bg-light border text-body-secondary">Abandoned</span>
+                            <span class="badge border text-body-secondary">Abandoned</span>
                             {% endif %}
                         </td>
                         <td class="text-body-secondary small">{{ t.started_at }}</td>
@@ -158,86 +160,86 @@
 
 {% block extra_scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const selectContainer = document.getElementById('task-select-container');
-    const runningContainer = document.getElementById('task-running-container');
-    const startBtn = document.getElementById('start-task-btn');
-    const foundBtn = document.getElementById('found-task-btn');
-    const giveupBtn = document.getElementById('giveup-task-btn');
-    const nameDisplay = document.getElementById('active-task-display-name');
-    const timerDisplay = document.getElementById('active-timer');
-    const clicksDisplay = document.getElementById('active-clicks');
-    const errorsDisplay = document.getElementById('active-errors');
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectContainer = document.getElementById('task-select-container');
+        const runningContainer = document.getElementById('task-running-container');
+        const startBtn = document.getElementById('start-task-btn');
+        const foundBtn = document.getElementById('found-task-btn');
+        const giveupBtn = document.getElementById('giveup-task-btn');
+        const nameDisplay = document.getElementById('active-task-display-name');
+        const timerDisplay = document.getElementById('active-timer');
+        const clicksDisplay = document.getElementById('active-clicks');
+        const errorsDisplay = document.getElementById('active-errors');
 
-    let timerInterval = null;
+        let timerInterval = null;
 
-    function formatTime(seconds) {
-        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-        const s = (seconds % 60).toString().padStart(2, '0');
-        return m + ':' + s;
-    }
-
-    function checkActiveTask() {
-        const active = TaskTracker.get();
-        if (active) {
-            selectContainer.style.display = 'none';
-            runningContainer.style.display = 'block';
-            nameDisplay.textContent = active.task_name;
-            clicksDisplay.textContent = active.clicks || 0;
-            errorsDisplay.textContent = active.errors || 0;
-
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(function () {
-                const current = TaskTracker.get();
-                if (current) {
-                    const elapsed = Math.floor((Date.now() - current.started_at) / 1000);
-                    timerDisplay.textContent = formatTime(elapsed);
-                    clicksDisplay.textContent = current.clicks || 0;
-                    errorsDisplay.textContent = current.errors || 0;
-                }
-            }, 500);
-        } else {
-            selectContainer.style.display = 'block';
-            runningContainer.style.display = 'none';
-            if (timerInterval) clearInterval(timerInterval);
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return m + ':' + s;
         }
-    }
 
-    if (startBtn) {
-        startBtn.addEventListener('click', function () {
-            const selectedRadio = document.querySelector('input[name="selected_task_name"]:checked');
-            const taskName = selectedRadio ? selectedRadio.value : "Find and download study material";
-            TaskTracker.start(taskName);
-            checkActiveTask();
-        });
-    }
+        function checkActiveTask() {
+            const active = TaskTracker.get();
+            if (active) {
+                selectContainer.style.display = 'none';
+                runningContainer.style.display = 'block';
+                nameDisplay.textContent = active.task_name;
+                clicksDisplay.textContent = active.clicks || 0;
+                errorsDisplay.textContent = active.errors || 0;
 
-    function submitFinishedTask(success) {
-        const result = TaskTracker.finish(success);
-        if (!result) return;
-        document.getElementById('form-task-name').value = result.task_name;
-        document.getElementById('form-started-at').value = result.started_at;
-        document.getElementById('form-ended-at').value = result.ended_at;
-        document.getElementById('form-duration-sec').value = result.duration_sec;
-        document.getElementById('form-clicks').value = result.clicks;
-        document.getElementById('form-errors').value = result.errors;
-        document.getElementById('form-success').value = result.success;
-        document.getElementById('task-submit-form').submit();
-    }
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(function () {
+                    const current = TaskTracker.get();
+                    if (current) {
+                        const elapsed = Math.floor((Date.now() - current.started_at) / 1000);
+                        timerDisplay.textContent = formatTime(elapsed);
+                        clicksDisplay.textContent = current.clicks || 0;
+                        errorsDisplay.textContent = current.errors || 0;
+                    }
+                }, 500);
+            } else {
+                selectContainer.style.display = 'block';
+                runningContainer.style.display = 'none';
+                if (timerInterval) clearInterval(timerInterval);
+            }
+        }
 
-    if (foundBtn) {
-        foundBtn.addEventListener('click', function () {
-            submitFinishedTask(true);
-        });
-    }
+        if (startBtn) {
+            startBtn.addEventListener('click', function () {
+                const selectedRadio = document.querySelector('input[name="selected_task_name"]:checked');
+                const taskName = selectedRadio ? selectedRadio.value : "Find and download study material";
+                TaskTracker.start(taskName);
+                checkActiveTask();
+            });
+        }
 
-    if (giveupBtn) {
-        giveupBtn.addEventListener('click', function () {
-            submitFinishedTask(false);
-        });
-    }
+        function submitFinishedTask(success) {
+            const result = TaskTracker.finish(success);
+            if (!result) return;
+            document.getElementById('form-task-name').value = result.task_name;
+            document.getElementById('form-started-at').value = result.started_at;
+            document.getElementById('form-ended-at').value = result.ended_at;
+            document.getElementById('form-duration-sec').value = result.duration_sec;
+            document.getElementById('form-clicks').value = result.clicks;
+            document.getElementById('form-errors').value = result.errors;
+            document.getElementById('form-success').value = result.success;
+            document.getElementById('task-submit-form').submit();
+        }
 
-    checkActiveTask();
-});
+        if (foundBtn) {
+            foundBtn.addEventListener('click', function () {
+                submitFinishedTask(true);
+            });
+        }
+
+        if (giveupBtn) {
+            giveupBtn.addEventListener('click', function () {
+                submitFinishedTask(false);
+            });
+        }
+
+        checkActiveTask();
+    });
 </script>
 {% endblock %}

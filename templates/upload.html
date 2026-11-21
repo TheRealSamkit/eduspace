@@ -8,20 +8,22 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         {{ ui.page_header(
-            title="Upload Study Material",
-            subtitle="Earn +" + config.UPLOAD_REWARD|string + " credits. Uploads are strictly available to students of " + current_user.university_name
+        title="Upload Study Material",
+        subtitle="Earn +" + config.UPLOAD_REWARD|string + " credits. Uploads are strictly available to students of " +
+        current_user.university_name
         ) }}
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span class="fw-semibold text-body">Document Metadata & Verification</span>
-                <span class="badge text-bg-light border text-body-secondary fw-medium">
+                <span class="badge border text-body-secondary fw-medium">
                     +{{ config.UPLOAD_REWARD }} Credits
                 </span>
             </div>
 
             <div class="card-body p-4 p-md-5">
-                <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data"
+                    class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <!-- Title -->
@@ -30,7 +32,7 @@
                             Document Title <span class="text-danger" aria-hidden="true">*</span>
                         </label>
                         <input type="text" class="form-control" id="title" name="title"
-                               placeholder="e.g. CS201 Midterm Complete Revision Notes" required>
+                            placeholder="e.g. CS201 Midterm Complete Revision Notes" required>
                         <div class="invalid-feedback">Please provide a clear descriptive title.</div>
                     </div>
 
@@ -41,7 +43,7 @@
                                 Subject / Course <span class="text-danger" aria-hidden="true">*</span>
                             </label>
                             <input type="text" class="form-control" id="subject" name="subject"
-                                   placeholder="e.g. Data Structures & Algorithms" required>
+                                placeholder="e.g. Data Structures & Algorithms" required>
                             <div class="invalid-feedback">Please enter the subject name.</div>
                         </div>
 
@@ -52,7 +54,7 @@
                             <select class="form-select" id="semester" name="semester" required>
                                 <option value="" disabled selected>Select semester...</option>
                                 {% for s in range(1, 9) %}
-                                    <option value="{{ s }}">Semester {{ s }}</option>
+                                <option value="{{ s }}">Semester {{ s }}</option>
                                 {% endfor %}
                             </select>
                             <div class="invalid-feedback">Please select the applicable semester.</div>
@@ -77,9 +79,10 @@
 
                     <!-- Description -->
                     <div class="mb-3">
-                        <label for="description" class="form-label fw-medium text-body">Description & Topics Covered</label>
+                        <label for="description" class="form-label fw-medium text-body">Description & Topics
+                            Covered</label>
                         <textarea class="form-control" id="description" name="description" rows="3"
-                                  placeholder="Describe the topics covered, professor name, or textbook references..."></textarea>
+                            placeholder="Describe the topics covered, professor name, or textbook references..."></textarea>
                     </div>
 
                     <!-- File Picker -->
@@ -88,19 +91,23 @@
                             File Attachment <span class="text-danger" aria-hidden="true">*</span>
                         </label>
                         <input class="form-control" type="file" id="file" name="file"
-                               accept=".pdf,.pptx,.docx,.png,.jpg" required>
+                            accept=".pdf,.pptx,.docx,.png,.jpg" required>
                         <div class="invalid-feedback">Please choose a valid file to upload.</div>
                         <div class="form-text small text-body-secondary mt-1">
-                            Accepted formats: <code>pdf, pptx, docx, png, jpg</code>. Maximum file size: <strong>{{ config.MAX_FILE_MB }}MB</strong>.
+                            Accepted formats: <code>pdf, pptx, docx, png, jpg</code>. Maximum file size: <strong>{{
+                                config.MAX_FILE_MB }}MB</strong>.
                         </div>
                     </div>
 
                     <!-- Copyright & Ownership Confirmation -->
                     <div class="mb-4 p-3 border rounded-3 bg-body-tertiary">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="confirm_copyright" name="confirm_copyright" value="1" required>
+                            <input class="form-check-input" type="checkbox" id="confirm_copyright"
+                                name="confirm_copyright" value="1" required>
                             <label class="form-check-label small text-body fw-medium" for="confirm_copyright">
-                                <i class="ti ti-shield-check text-success me-1" aria-hidden="true"></i>I confirm I own this material or have the right to share it, and it does not violate copyright or university honor codes.
+                                <i class="ti ti-shield-check text-success me-1" aria-hidden="true"></i>I confirm I own
+                                this material or have the right to share it, and it does not violate copyright or
+                                university honor codes.
                             </label>
                             <div class="invalid-feedback">You must verify copyright ownership before publishing.</div>
                         </div>

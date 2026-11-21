@@ -5,9 +5,10 @@
 
 {% block content %}
 {{ ui.page_header(
-    "Administrator Control Panel",
-    "Supervise content moderation, view usage metrics, and export evaluation data.",
-    action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-secondary btn-sm"><i class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
+"Administrator Control Panel",
+"Supervise content moderation, view usage metrics, and export evaluation data.",
+action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-secondary btn-sm"><i
+        class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
 ) }}
 
 <!-- Stats Grid -->
@@ -42,7 +43,8 @@
     </div>
     <div class="card-body p-4">
         <p class="text-body-secondary small mb-3">
-            Download raw CSV datasets for academic research, statistical testing, and usability modeling. The users dataset is strictly anonymized (user emails and password hashes are never exported).
+            Download raw CSV datasets for academic research, statistical testing, and usability modeling. The users
+            dataset is strictly anonymized (user emails and password hashes are never exported).
         </p>
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ url_for('admin_export_csv', table_name='events') }}" class="btn btn-outline-secondary btn-sm">
@@ -51,19 +53,22 @@
             <a href="{{ url_for('admin_export_csv', table_name='tasks') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Tasks Performance CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='sus_responses') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin_export_csv', table_name='sus_responses') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>SUS Responses CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='feedback') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Feedback CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='users_anonymized') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin_export_csv', table_name='users_anonymized') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Anonymized Users CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='files') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Files Metadata CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='downloads') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin_export_csv', table_name='downloads') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Downloads CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='ledger') }}" class="btn btn-outline-secondary btn-sm">
@@ -103,9 +108,10 @@
                     {% for r in reports %}
                     <tr>
                         <td class="ps-4 text-body-secondary small">{{ r.created_at[:16] if r.created_at else '' }}</td>
-                        <td><span class="badge text-bg-light border text-body-secondary">{{ r.university_name }}</span></td>
+                        <td><span class="badge border text-body-secondary">{{ r.university_name }}</span></td>
                         <td>
-                            <a href="{{ url_for('file_detail', file_id=r.file_id) }}" class="fw-semibold text-decoration-none">
+                            <a href="{{ url_for('file_detail', file_id=r.file_id) }}"
+                                class="fw-semibold text-decoration-none">
                                 {{ r.file_title }}
                             </a>
                         </td>
@@ -116,12 +122,13 @@
                             <div class="d-inline-flex gap-2">
                                 <form action="{{ url_for('resolve_report', report_id=r.id) }}" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Dismiss / Resolve report without changes">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary"
+                                        title="Dismiss / Resolve report without changes">
                                         <i class="ti ti-check me-1" aria-hidden="true"></i>Dismiss
                                     </button>
                                 </form>
                                 <form action="{{ url_for('remove_file_admin', file_id=r.file_id) }}" method="POST"
-                                      onsubmit="return confirm('Are you sure you want to remove this file and reverse the uploader\'s reward credits?');">
+                                    onsubmit="return confirm('Are you sure you want to remove this file and reverse the uploader\'s reward credits?');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">
                                         <i class="ti ti-trash me-1" aria-hidden="true"></i>Remove & Reverse
@@ -135,7 +142,8 @@
             </table>
         </div>
         {% else %}
-        {{ ui.empty_state("ti-circle-check", "No Open Reports", "All uploaded materials are clear and compliant with university policies.") }}
+        {{ ui.empty_state("ti-circle-check", "No Open Reports", "All uploaded materials are clear and compliant with
+        university policies.") }}
         {% endif %}
     </div>
 </div>
