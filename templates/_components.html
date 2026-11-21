@@ -1,0 +1,148 @@
+{# Reusable Jinja UI Components for StudyExchange #}
+
+{# 1. Page Header: Consistent title, subtitle, and primary/secondary action #}
+{% macro page_header(title, subtitle=None, action_html=None) %}
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1 class="page-title text-body mb-1">{{ title }}</h1>
+        {% if subtitle %}
+        <p class="page-subtitle text-body-secondary mb-0">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    {% if action_html %}
+    <div class="d-flex align-items-center gap-2">
+        {{ action_html|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 2. Stat Card: Neutral-first analytics card with 1px border and 24px padding #}
+{% macro stat_card(label, value, subtext=None, icon=None) %}
+<div class="card stat-card h-100">
+    <div class="card-body p-4 d-flex flex-column justify-content-between">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="stat-label text-body-secondary">{{ label }}</span>
+            {% if icon %}
+            <i class="ti {{ icon }} fs-4 text-body-secondary" aria-hidden="true"></i>
+            {% endif %}
+        </div>
+        <div>
+            <div class="stat-value text-body">{{ value }}</div>
+            {% if subtext %}
+            <div class="stat-subtext text-body-secondary mt-1">{{ subtext }}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# 3. Empty State: Clear, polite invitation to act #}
+{% macro empty_state(icon, title, message, action_url=None, action_text=None) %}
+<div class="empty-state-card text-center p-4 p-md-5 my-4">
+    <div class="empty-state-icon mb-3">
+        <i class="ti {{ icon }}" aria-hidden="true"></i>
+    </div>
+    <h3 class="h5 fw-semibold text-body mb-2">{{ title }}</h3>
+    <p class="text-body-secondary mb-4 mx-auto" style="max-width: 480px;">{{ message }}</p>
+    {% if action_url and action_text %}
+    <div>
+        <a href="{{ action_url }}" class="btn btn-primary">
+            {{ action_text }}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 4. File Card: Standardized, accessible study material card #}
+{% macro file_card(f, config) %}
+<div class="card file-card h-100">
+    <div class="card-body p-4 d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+            <span class="badge text-bg-light border text-body-secondary fw-medium">
+                {{ f.type }}
+            </span>
+            <span class="small text-body-secondary">
+                Sem {{ f.semester }}
+            </span>
+        </div>
+
+        <h2 class="h6 fw-semibold mb-1 text-truncate" title="{{ f.title }}">
+            <a href="{{ url_for('file_detail', file_id=f.id) }}" class="text-body text-decoration-none">
+                {{ f.title }}
+            </a>
+        </h2>
+
+        <div class="small text-body-secondary mb-2">
+            <span>{{ f.subject }}</span>
+        </div>
+
+        <p class="small text-body-secondary flex-grow-1 mb-3 text-break" style="min-height: 40px;">
+            {% if f.description %}
+                {{ f.description[:110] }}{% if f.description|length > 110 %}...{% endif %}
+            {% else %}
+                <span class="fst-italic">No description provided.</span>
+            {% endif %}
+        </p>
+
+        <!-- Meta footer -->
+        <div class="pt-3 border-top small text-body-secondary mt-auto">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span><i class="ti ti-user me-1" aria-hidden="true"></i>{{ f.uploader_username }}</span>
+                <span><i class="ti ti-download me-1" aria-hidden="true"></i>{{ f.download_count }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-1">
+                    <span class="text-warning"><i class="ti ti-star-filled" aria-hidden="true"></i></span>
+                    <span class="fw-medium text-body">{{ "%.1f"|format(f.avg_rating) }}</span>
+                    <span class="text-body-secondary">({{ f.rating_count }})</span>
+                </div>
+                <span class="badge text-bg-light border text-body fw-medium">
+                    {{ config.DOWNLOAD_COST }} credits
+                </span>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('file_detail', file_id=f.id) }}" class="btn btn-outline-secondary w-100 btn-sm">
+                View & Download
+            </a>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# 5. Form Field: Standardized Bootstrap 5 form input with label and feedback #}
+{% macro form_field(name, label, type='text', value='', placeholder='', required=False, feedback=None, options=None, rows=3, help_text=None) %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label fw-medium text-body">
+        {{ label }} {% if required %}<span class="text-danger" aria-hidden="true">*</span>{% endif %}
+    </label>
+
+    {% if type == 'select' %}
+        <select class="form-select" id="{{ name }}" name="{{ name }}" {% if required %}required{% endif %}>
+            {% if placeholder %}
+            <option value="" disabled {% if not value %}selected{% endif %}>{{ placeholder }}</option>
+            {% endif %}
+            {% for opt_val, opt_lbl in options %}
+            <option value="{{ opt_val }}" {% if value|string == opt_val|string %}selected{% endif %}>{{ opt_lbl }}</option>
+            {% endfor %}
+        </select>
+    {% elif type == 'textarea' %}
+        <textarea class="form-control" id="{{ name }}" name="{{ name }}" rows="{{ rows }}"
+                  placeholder="{{ placeholder }}" {% if required %}required{% endif %}>{{ value }}</textarea>
+    {% else %}
+        <input type="{{ type }}" class="form-control" id="{{ name }}" name="{{ name }}"
+               value="{{ value }}" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>
+    {% endif %}
+
+    {% if help_text %}
+    <div class="form-text text-body-secondary small">{{ help_text }}</div>
+    {% endif %}
+
+    {% if feedback %}
+    <div class="invalid-feedback">{{ feedback }}</div>
+    {% endif %}
+</div>
+{% endmacro %}
