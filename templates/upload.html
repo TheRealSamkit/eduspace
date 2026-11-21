@@ -1,52 +1,54 @@
 {% extends "base.html" %}
+{% import "_components.html" as ui %}
 
 {% block title %}Upload Study Material - StudyExchange{% endblock %}
+{% block topbar_title %}Upload Material{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-3">
+<div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0 d-flex align-items-center gap-2">
-                    <i class="ti ti-upload text-warning fs-3"></i>
-                    <span>Upload Study Material</span>
-                </h4>
-                <span class="badge bg-success py-2 px-3 fw-bold">
-                    <i class="ti ti-coin me-1"></i>Earn +{{ config.UPLOAD_REWARD }} Credits
+        {{ ui.page_header(
+            title="Upload Study Material",
+            subtitle="Earn +" + config.UPLOAD_REWARD|string + " credits. Uploads are strictly available to students of " + current_user.university_name
+        ) }}
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold text-body">Document Metadata & Verification</span>
+                <span class="badge text-bg-light border text-body-secondary fw-medium">
+                    +{{ config.UPLOAD_REWARD }} Credits
                 </span>
             </div>
 
             <div class="card-body p-4 p-md-5">
-                <div class="alert alert-light border small text-muted mb-4">
-                    <div class="d-flex align-items-center gap-2 mb-1 text-dark fw-bold">
-                        <i class="ti ti-info-circle text-primary fs-5"></i>
-                        <span>Institutional Repository: {{ current_user.university_name }}</span>
-                    </div>
-                    Uploaded documents are accessible strictly to verified students of your university. You earn <strong>+{{ config.UPLOAD_REWARD }} credits</strong> for the first {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} uploads each day.
-                </div>
-
                 <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <!-- Title -->
                     <div class="mb-3">
-                        <label for="title" class="form-label fw-semibold">Document Title <span class="text-danger">*</span></label>
+                        <label for="title" class="form-label fw-medium text-body">
+                            Document Title <span class="text-danger" aria-hidden="true">*</span>
+                        </label>
                         <input type="text" class="form-control" id="title" name="title"
                                placeholder="e.g. CS201 Midterm Complete Revision Notes" required>
                         <div class="invalid-feedback">Please provide a clear descriptive title.</div>
                     </div>
 
                     <!-- Subject & Semester -->
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label for="subject" class="form-label fw-semibold">Subject / Course <span class="text-danger">*</span></label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="subject" class="form-label fw-medium text-body">
+                                Subject / Course <span class="text-danger" aria-hidden="true">*</span>
+                            </label>
                             <input type="text" class="form-control" id="subject" name="subject"
                                    placeholder="e.g. Data Structures & Algorithms" required>
                             <div class="invalid-feedback">Please enter the subject name.</div>
                         </div>
 
                         <div class="col-md-6">
-                            <label for="semester" class="form-label fw-semibold">Semester <span class="text-danger">*</span></label>
+                            <label for="semester" class="form-label fw-medium text-body">
+                                Semester <span class="text-danger" aria-hidden="true">*</span>
+                            </label>
                             <select class="form-select" id="semester" name="semester" required>
                                 <option value="" disabled selected>Select semester...</option>
                                 {% for s in range(1, 9) %}
@@ -59,7 +61,9 @@
 
                     <!-- Material Type -->
                     <div class="mb-3">
-                        <label for="type" class="form-label fw-semibold">Material Type <span class="text-danger">*</span></label>
+                        <label for="type" class="form-label fw-medium text-body">
+                            Material Type <span class="text-danger" aria-hidden="true">*</span>
+                        </label>
                         <select class="form-select" id="type" name="type" required>
                             <option value="" disabled selected>Select category...</option>
                             <option value="Lecture Notes">Lecture Notes</option>
@@ -73,39 +77,41 @@
 
                     <!-- Description -->
                     <div class="mb-3">
-                        <label for="description" class="form-label fw-semibold">Description / Topics Covered</label>
+                        <label for="description" class="form-label fw-medium text-body">Description & Topics Covered</label>
                         <textarea class="form-control" id="description" name="description" rows="3"
                                   placeholder="Describe the topics covered, professor name, or textbook references..."></textarea>
                     </div>
 
                     <!-- File Picker -->
                     <div class="mb-4">
-                        <label for="file" class="form-label fw-semibold">File Attachment <span class="text-danger">*</span></label>
+                        <label for="file" class="form-label fw-medium text-body">
+                            File Attachment <span class="text-danger" aria-hidden="true">*</span>
+                        </label>
                         <input class="form-control" type="file" id="file" name="file"
                                accept=".pdf,.pptx,.docx,.png,.jpg" required>
                         <div class="invalid-feedback">Please choose a valid file to upload.</div>
-                        <div class="form-text small text-muted">
-                            Supported extensions: <code>pdf, pptx, docx, png, jpg</code>. Maximum size: <strong>{{ config.MAX_FILE_MB }}MB</strong>.
+                        <div class="form-text small text-body-secondary mt-1">
+                            Accepted formats: <code>pdf, pptx, docx, png, jpg</code>. Maximum file size: <strong>{{ config.MAX_FILE_MB }}MB</strong>.
                         </div>
                     </div>
 
                     <!-- Copyright & Ownership Confirmation -->
-                    <div class="mb-4 p-3 bg-light rounded-3 border">
+                    <div class="mb-4 p-3 border rounded-3 bg-body-tertiary">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="confirm_copyright" name="confirm_copyright" value="1" required>
-                            <label class="form-check-label small fw-semibold text-dark" for="confirm_copyright">
-                                <i class="ti ti-shield-check text-success me-1"></i>I confirm I own this material or have the right to share it, and it does not violate copyright or university honor codes.
+                            <label class="form-check-label small text-body fw-medium" for="confirm_copyright">
+                                <i class="ti ti-shield-check text-success me-1" aria-hidden="true"></i>I confirm I own this material or have the right to share it, and it does not violate copyright or university honor codes.
                             </label>
                             <div class="invalid-feedback">You must verify copyright ownership before publishing.</div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                         <a href="{{ url_for('browse') }}" class="btn btn-outline-secondary">
-                            <i class="ti ti-arrow-left me-1"></i>Cancel
+                            Cancel
                         </a>
-                        <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm">
-                            <i class="ti ti-cloud-upload me-1"></i>Publish & Earn {{ config.UPLOAD_REWARD }} Credits
+                        <button type="submit" class="btn btn-primary">
+                            Publish & Earn {{ config.UPLOAD_REWARD }} Credits
                         </button>
                     </div>
                 </form>

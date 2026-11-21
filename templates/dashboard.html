@@ -1,76 +1,61 @@
 {% extends "base.html" %}
+{% import "_components.html" as ui %}
 
-{% block title %}Dashboard & Credits - StudyExchange{% endblock %}
+{% block title %}Dashboard - StudyExchange{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
 
 {% block content %}
+{{ ui.page_header(
+    title="Dashboard & Credit Ledger",
+    subtitle="Track your platform credit balance, uploads, and download history",
+    action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn-sm"><i class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Upload Material</a>'
+) }}
+
+<!-- Stat Cards Row (Neutral-first) -->
 <div class="row g-4 mb-4">
-    <!-- Credit Balance Card -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-0 rounded-3 bg-primary text-white h-100">
-            <div class="card-body p-4 d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-white-50 small text-uppercase fw-bold">Platform Balance</span>
-                        <i class="ti ti-coin fs-1 text-warning"></i>
-                    </div>
-                    <h1 class="display-4 fw-bold mb-0 credit-balance-val">{{ current_user.credits }}</h1>
-                    <p class="text-white-50 small mb-0">Study Credits</p>
-                </div>
-                <div class="pt-3 border-top border-white-50 mt-3 d-flex justify-content-between align-items-center">
-                    <span class="small">Upload files to earn +{{ config.UPLOAD_REWARD }} credits</span>
-                    <a href="{{ url_for('upload_file') }}" class="btn btn-warning btn-sm text-dark fw-bold">
-                        <i class="ti ti-upload me-1"></i>Upload
-                    </a>
-                </div>
-            </div>
-        </div>
+        {{ ui.stat_card(
+            label="Platform Balance",
+            value='<span class="credit-balance-val">' + current_user.credits|string + '</span> credits',
+            subtext="Earn +" + config.UPLOAD_REWARD|string + " for each verified upload",
+            icon="ti-coin"
+        ) }}
     </div>
-
-    <!-- Quick Stats Cards -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-0 rounded-3 h-100 bg-white">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small text-uppercase fw-bold">My Uploads</span>
-                    <i class="ti ti-folder-up fs-2 text-success"></i>
-                </div>
-                <h2 class="display-6 fw-bold mb-1">{{ uploads|length }}</h2>
-                <p class="text-muted small mb-0">Shared materials helping fellow students</p>
-            </div>
-        </div>
+        {{ ui.stat_card(
+            label="My Uploads",
+            value=uploads|length|string,
+            subtext="Shared with students at " + current_user.university_name,
+            icon="ti-folder-up"
+        ) }}
     </div>
-
     <div class="col-md-4">
-        <div class="card shadow-sm border-0 rounded-3 h-100 bg-white">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small text-uppercase fw-bold">My Downloads</span>
-                    <i class="ti ti-folder-down fs-2 text-info"></i>
-                </div>
-                <h2 class="display-6 fw-bold mb-1">{{ downloads|length }}</h2>
-                <p class="text-muted small mb-0">Downloaded materials (always free to re-download)</p>
-            </div>
-        </div>
+        {{ ui.stat_card(
+            label="My Downloads",
+            value=downloads|length|string,
+            subtext="Unlocked materials (free to re-download)",
+            icon="ti-folder-down"
+        ) }}
     </div>
 </div>
 
 <!-- Tabs Navigation for Activity -->
-<div class="card shadow-sm border-0 rounded-3 mb-4">
-    <div class="card-header bg-white border-bottom p-0">
+<div class="card mb-4">
+    <div class="card-header p-0">
         <ul class="nav nav-tabs card-header-tabs m-0 px-3 pt-2" id="dashboardTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active fw-semibold" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger-pane" type="button" role="tab" aria-controls="ledger-pane" aria-selected="true">
-                    <i class="ti ti-receipt-2 me-1"></i>Credit Ledger History
+                <button class="nav-link active fw-medium" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger-pane" type="button" role="tab" aria-controls="ledger-pane" aria-selected="true">
+                    <i class="ti ti-receipt-2 me-1" aria-hidden="true"></i>Credit History
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-semibold" id="uploads-tab" data-bs-toggle="tab" data-bs-target="#uploads-pane" type="button" role="tab" aria-controls="uploads-pane" aria-selected="false">
-                    <i class="ti ti-upload me-1"></i>My Uploads ({{ uploads|length }})
+                <button class="nav-link fw-medium" id="uploads-tab" data-bs-toggle="tab" data-bs-target="#uploads-pane" type="button" role="tab" aria-controls="uploads-pane" aria-selected="false">
+                    <i class="ti ti-cloud-upload me-1" aria-hidden="true"></i>My Uploads ({{ uploads|length }})
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-semibold" id="downloads-tab" data-bs-toggle="tab" data-bs-target="#downloads-pane" type="button" role="tab" aria-controls="downloads-pane" aria-selected="false">
-                    <i class="ti ti-download me-1"></i>My Downloads ({{ downloads|length }})
+                <button class="nav-link fw-medium" id="downloads-tab" data-bs-toggle="tab" data-bs-target="#downloads-pane" type="button" role="tab" aria-controls="downloads-pane" aria-selected="false">
+                    <i class="ti ti-download me-1" aria-hidden="true"></i>My Downloads ({{ downloads|length }})
                 </button>
             </li>
         </ul>
@@ -82,9 +67,9 @@
             <div class="tab-pane fade show active" id="ledger-pane" role="tabpanel" aria-labelledby="ledger-tab">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">Date & Time</th>
+                        <thead>
+                            <tr class="text-body-secondary small">
+                                <th scope="col">Date</th>
                                 <th scope="col">Transaction Reason</th>
                                 <th scope="col">Associated Material</th>
                                 <th scope="col" class="text-end">Credit Change</th>
@@ -93,23 +78,23 @@
                         <tbody>
                             {% for item in ledger %}
                             <tr>
-                                <td class="text-muted small">{{ item.created_at }}</td>
+                                <td class="text-body-secondary small">{{ item.created_at }}</td>
                                 <td>
                                     {% if item.reason == 'signup' %}
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
-                                            <i class="ti ti-gift me-1"></i>Signup Bonus
+                                        <span class="badge text-bg-light border text-body-secondary">
+                                            Signup Bonus
                                         </span>
                                     {% elif item.reason == 'upload' %}
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                                            <i class="ti ti-upload me-1"></i>Material Upload
+                                        <span class="badge text-bg-light border text-body-secondary">
+                                            Material Upload
                                         </span>
                                     {% elif item.reason == 'download' %}
-                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
-                                            <i class="ti ti-download me-1"></i>Material Download
+                                        <span class="badge text-bg-light border text-body-secondary">
+                                            Material Download
                                         </span>
                                     {% elif item.reason == 'reversal' %}
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
-                                            <i class="ti ti-arrow-back-up me-1"></i>Reward Reversal
+                                        <span class="badge text-bg-light border text-danger">
+                                            Reward Reversal
                                         </span>
                                     {% endif %}
                                 </td>
@@ -119,23 +104,23 @@
                                             {{ item.file_title }}
                                         </a>
                                     {% else %}
-                                        <span class="text-muted">&mdash;</span>
+                                        <span class="text-body-secondary">&mdash;</span>
                                     {% endif %}
                                 </td>
-                                <td class="text-end fw-bold">
+                                <td class="text-end fw-semibold">
                                     {% if item.amount > 0 %}
                                         <span class="text-success">+{{ item.amount }}</span>
                                     {% elif item.amount < 0 %}
                                         <span class="text-danger">{{ item.amount }}</span>
                                     {% else %}
-                                        <span class="text-muted">0</span>
+                                        <span class="text-body-secondary">0</span>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">
-                                    No ledger transactions recorded yet.
+                                <td colspan="4" class="text-center py-4 text-body-secondary small">
+                                    No credit transactions recorded yet.
                                 </td>
                             </tr>
                             {% endfor %}
@@ -149,10 +134,10 @@
                 {% if uploads %}
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
+                        <thead>
+                            <tr class="text-body-secondary small">
                                 <th scope="col">Title</th>
-                                <th scope="col">Subject & Semester</th>
+                                <th scope="col">Subject</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Rating</th>
                                 <th scope="col">Downloads</th>
@@ -163,29 +148,29 @@
                         <tbody>
                             {% for u in uploads %}
                             <tr>
-                                <td class="fw-semibold">
-                                    <a href="{{ url_for('file_detail', file_id=u.id) }}" class="text-decoration-none">
+                                <td class="fw-medium">
+                                    <a href="{{ url_for('file_detail', file_id=u.id) }}" class="text-decoration-none text-body">
                                         {{ u.title }}
                                     </a>
                                 </td>
-                                <td>{{ u.subject }} (Sem {{ u.semester }})</td>
-                                <td><span class="badge bg-light text-dark border">{{ u.type }}</span></td>
+                                <td class="small">{{ u.subject }} (Sem {{ u.semester }})</td>
+                                <td><span class="badge text-bg-light border text-body-secondary small">{{ u.type }}</span></td>
                                 <td>
-                                    <span class="star-rating text-warning"><i class="ti ti-star-filled"></i></span>
-                                    {{ "%.1f"|format(u.avg_rating) }} ({{ u.rating_count }})
+                                    <span class="text-warning small"><i class="ti ti-star-filled" aria-hidden="true"></i></span>
+                                    <span class="small fw-medium">{{ "%.1f"|format(u.avg_rating) }}</span>
                                 </td>
-                                <td>{{ u.download_count }}</td>
+                                <td class="small">{{ u.download_count }}</td>
                                 <td>
                                     {% if u.status == 'active' %}
-                                        <span class="badge bg-success-subtle text-success border">Active</span>
+                                        <span class="badge text-bg-light border text-success">Active</span>
                                     {% else %}
-                                        <span class="badge bg-danger-subtle text-danger border">Removed</span>
+                                        <span class="badge text-bg-light border text-danger">Removed</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-end">
                                     {% if u.status == 'active' %}
-                                    <a href="{{ url_for('download_file', file_id=u.id) }}" class="btn btn-sm btn-outline-primary" title="Download">
-                                        <i class="ti ti-download"></i>
+                                    <a href="{{ url_for('download_file', file_id=u.id) }}" class="btn btn-sm btn-outline-secondary" title="Download">
+                                        <i class="ti ti-download" aria-hidden="true"></i>
                                     </a>
                                     {% endif %}
                                 </td>
@@ -195,11 +180,13 @@
                     </table>
                 </div>
                 {% else %}
-                <div class="empty-state py-4">
-                    <i class="ti ti-upload fs-1 text-muted d-block mb-2"></i>
-                    <p class="text-muted mb-3">You haven't uploaded any study materials yet.</p>
-                    <a href="{{ url_for('upload_file') }}" class="btn btn-primary btn-sm">Upload Material</a>
-                </div>
+                {{ ui.empty_state(
+                    icon="ti-cloud-upload",
+                    title="No uploads yet",
+                    message="You haven't uploaded any study materials yet. Upload your first file to earn credits.",
+                    action_url=url_for('upload_file'),
+                    action_text="Upload Material"
+                ) }}
                 {% endif %}
             </div>
 
@@ -208,33 +195,33 @@
                 {% if downloads %}
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
+                        <thead>
+                            <tr class="text-body-secondary small">
                                 <th scope="col">Material Title</th>
-                                <th scope="col">Subject & Semester</th>
+                                <th scope="col">Subject</th>
                                 <th scope="col">Uploader</th>
-                                <th scope="col">Downloaded Date</th>
-                                <th scope="col" class="text-end">Re-download</th>
+                                <th scope="col">Unlocked Date</th>
+                                <th scope="col" class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for d in downloads %}
                             <tr>
-                                <td class="fw-semibold">
-                                    <a href="{{ url_for('file_detail', file_id=d.file_id) }}" class="text-decoration-none">
+                                <td class="fw-medium">
+                                    <a href="{{ url_for('file_detail', file_id=d.file_id) }}" class="text-decoration-none text-body">
                                         {{ d.title }}
                                     </a>
                                 </td>
-                                <td>{{ d.subject }} (Sem {{ d.semester }})</td>
-                                <td><i class="ti ti-user me-1 text-muted"></i>{{ d.uploader_username }}</td>
-                                <td class="text-muted small">{{ d.downloaded_at }}</td>
+                                <td class="small">{{ d.subject }} (Sem {{ d.semester }})</td>
+                                <td class="small text-body-secondary">{{ d.uploader_username }}</td>
+                                <td class="text-body-secondary small">{{ d.downloaded_at }}</td>
                                 <td class="text-end">
                                     {% if d.status == 'active' %}
-                                    <a href="{{ url_for('download_file', file_id=d.file_id) }}" class="btn btn-sm btn-success fw-bold">
-                                        <i class="ti ti-download me-1"></i>Free Download
+                                    <a href="{{ url_for('download_file', file_id=d.file_id) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="ti ti-download me-1" aria-hidden="true"></i>Re-download
                                     </a>
                                     {% else %}
-                                    <span class="badge bg-secondary">Removed by Admin</span>
+                                    <span class="badge text-bg-light border text-body-secondary">Removed</span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -243,11 +230,13 @@
                     </table>
                 </div>
                 {% else %}
-                <div class="empty-state py-4">
-                    <i class="ti ti-file-download fs-1 text-muted d-block mb-2"></i>
-                    <p class="text-muted mb-3">You haven't downloaded any materials yet.</p>
-                    <a href="{{ url_for('browse') }}" class="btn btn-primary btn-sm">Browse Materials</a>
-                </div>
+                {{ ui.empty_state(
+                    icon="ti-download",
+                    title="No downloads yet",
+                    message="You have not unlocked any materials yet. Browse available documents to get started.",
+                    action_url=url_for('browse'),
+                    action_text="Browse Materials"
+                ) }}
                 {% endif %}
             </div>
         </div>

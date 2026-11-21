@@ -1,171 +1,157 @@
 {% extends "base.html" %}
+{% import "_components.html" as ui %}
 
-{% block title %}Test Mode & Usability Evaluation - StudyExchange{% endblock %}
+{% block title %}Test Mode - StudyExchange{% endblock %}
+{% block topbar_title %}Test Mode (HCI Evaluation){% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-3">
-    <div class="col-lg-10">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="fw-bold mb-1">
-                    <i class="ti ti-clipboard-check text-warning me-2"></i>Test Mode (HCI Evaluation)
-                </h2>
-                <p class="text-muted mb-0">Evaluate prototype usability by completing timed resource-retrieval tasks.</p>
+{{ ui.page_header(
+    title="Usability Evaluation Tasks",
+    subtitle="Complete timed resource-retrieval tasks to evaluate platform efficiency"
+) }}
+
+<!-- Task Controller Card -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold text-body">Task Execution</span>
+        <span class="badge text-bg-light border text-body-secondary fw-medium">
+            <i class="ti ti-device-analytics me-1" aria-hidden="true"></i>Automated Telemetry
+        </span>
+    </div>
+    <div class="card-body p-4 p-md-5">
+        <!-- Idle State: Select & Start -->
+        <div id="task-select-container">
+            <h2 class="h6 fw-semibold text-body mb-3">Select an Evaluation Task:</h2>
+            <div class="list-group mb-4">
+                {% for pt in predefined_tasks %}
+                <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3">
+                    <input class="form-check-input flex-shrink-0" type="radio" name="selected_task_name"
+                           value="{{ pt.name }}" {% if loop.first %}checked{% endif %}>
+                    <span class="form-checked-content">
+                        <span class="d-block fw-semibold text-body">Task {{ pt.id }}: {{ pt.name }}</span>
+                        <small class="text-body-secondary">Navigate the repository to locate the specified material.</small>
+                    </span>
+                </label>
+                {% endfor %}
             </div>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-2 px-3 fw-semibold">
-                <i class="ti ti-device-analytics me-1"></i>Automated Telemetry
-            </span>
-        </div>
 
-        <!-- Task Controller Card -->
-        <div class="card shadow-sm border-0 rounded-3 mb-4">
-            <div class="card-header bg-dark text-white p-3">
-                <h5 class="card-title mb-0 d-flex align-items-center gap-2">
-                    <i class="ti ti-target-arrow text-warning fs-4"></i>
-                    <span>Task Execution Panel</span>
-                </h5>
-            </div>
-            <div class="card-body p-4 p-md-5">
-                <!-- Idle State: Select & Start -->
-                <div id="task-select-container">
-                    <h5 class="fw-bold mb-3">Select an Evaluation Task:</h5>
-                    <div class="list-group mb-4">
-                        {% for pt in predefined_tasks %}
-                        <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3">
-                            <input class="form-check-input flex-shrink-0" type="radio" name="selected_task_name"
-                                   value="{{ pt.name }}" {% if loop.first %}checked{% endif %}>
-                            <span class="pt-1 form-checked-content">
-                                <span class="d-block fw-bold text-dark">Task {{ pt.id }}: {{ pt.name }}</span>
-                                <small class="text-muted">Navigate the repository to locate the specified material.</small>
-                            </span>
-                        </label>
-                        {% endfor %}
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted small">
-                            <i class="ti ti-info-circle me-1"></i>Clicking Start begins the timer and tracks clicks/errors as you navigate.
-                        </span>
-                        <button type="button" id="start-task-btn" class="btn btn-primary btn-lg fw-bold px-4">
-                            <i class="ti ti-player-play me-1"></i>Start Selected Task
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Active State: Running Timer & Finish Form -->
-                <div id="task-running-container" style="display: none;">
-                    <div class="alert alert-warning border-warning d-flex align-items-center gap-3 p-3 mb-4">
-                        <div class="spinner-grow text-warning flex-shrink-0" role="status">
-                            <span class="visually-hidden">Timing...</span>
-                        </div>
-                        <div>
-                            <h5 class="alert-heading fw-bold mb-1">Task in Progress!</h5>
-                            <div class="fw-bold fs-5 text-dark" id="active-task-display-name">Task Name</div>
-                            <small class="text-muted">You can navigate anywhere across StudyExchange to locate the document.</small>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 text-center mb-4">
-                        <div class="col-md-4">
-                            <div class="card bg-light border-0 p-3 rounded-3">
-                                <span class="text-muted small fw-bold">Elapsed Time</span>
-                                <h2 class="display-6 fw-bold mb-0 text-primary" id="active-timer">00:00</h2>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-light border-0 p-3 rounded-3">
-                                <span class="text-muted small fw-bold">Interactions / Clicks</span>
-                                <h2 class="display-6 fw-bold mb-0 text-dark" id="active-clicks">0</h2>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-light border-0 p-3 rounded-3">
-                                <span class="text-muted small fw-bold">Form Errors</span>
-                                <h2 class="display-6 fw-bold mb-0 text-danger" id="active-errors">0</h2>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pt-3 border-top">
-                        <a href="{{ url_for('browse') }}" class="btn btn-outline-secondary">
-                            <i class="ti ti-search me-1"></i>Browse Repository to Find File
-                        </a>
-
-                        <div class="d-flex gap-2">
-                            <button type="button" id="giveup-task-btn" class="btn btn-outline-danger">
-                                <i class="ti ti-flag-off me-1"></i>Give Up
-                            </button>
-                            <button type="button" id="found-task-btn" class="btn btn-success fw-bold px-4">
-                                <i class="ti ti-circle-check me-1"></i>I Found It! (Complete)
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hidden form used to submit completed task telemetry -->
-                <form id="task-submit-form" action="{{ url_for('task_complete') }}" method="POST" style="display: none;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="task_name" id="form-task-name">
-                    <input type="hidden" name="started_at" id="form-started-at">
-                    <input type="hidden" name="ended_at" id="form-ended-at">
-                    <input type="hidden" name="duration_sec" id="form-duration-sec">
-                    <input type="hidden" name="clicks" id="form-clicks">
-                    <input type="hidden" name="errors" id="form-errors">
-                    <input type="hidden" name="success" id="form-success">
-                </form>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <span class="text-body-secondary small">
+                    <i class="ti ti-info-circle me-1" aria-hidden="true"></i>Starting begins the evaluation timer and counts clicks/errors as you navigate.
+                </span>
+                <button type="button" id="start-task-btn" class="btn btn-primary">
+                    <i class="ti ti-player-play me-1" aria-hidden="true"></i>Start Task
+                </button>
             </div>
         </div>
 
-        <!-- Past Completed Tasks -->
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-white p-3 border-bottom">
-                <h5 class="fw-bold mb-0"><i class="ti ti-history me-1 text-primary"></i>My Completed Evaluation Tasks</h5>
+        <!-- Active State: Running Timer & Finish Form -->
+        <div id="task-running-container" style="display: none;">
+            <div class="alert alert-info d-flex align-items-center gap-3 p-3 mb-4" role="status">
+                <div class="spinner-grow spinner-grow-sm text-primary flex-shrink-0" role="status">
+                    <span class="visually-hidden">Timing...</span>
+                </div>
+                <div>
+                    <div class="fw-semibold text-body">Task in Progress</div>
+                    <div class="small text-body-secondary" id="active-task-display-name">Task Name</div>
+                </div>
             </div>
-            <div class="card-body p-0">
-                {% if my_tasks %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">Task Description</th>
-                                <th scope="col">Duration</th>
-                                <th scope="col">Clicks</th>
-                                <th scope="col">Errors</th>
-                                <th scope="col">Outcome</th>
-                                <th scope="col">Timestamp</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for t in my_tasks %}
-                            <tr>
-                                <td class="fw-semibold">{{ t.task_name }}</td>
-                                <td>{{ "%.1f"|format(t.duration_sec) }}s</td>
-                                <td>{{ t.clicks }}</td>
-                                <td>{{ t.errors }}</td>
-                                <td>
-                                    {% if t.success == 1 %}
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
-                                            <i class="ti ti-check me-1"></i>Success
-                                        </span>
-                                    {% else %}
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
-                                            <i class="ti ti-x me-1"></i>Abandoned
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-muted small">{{ t.started_at }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+
+            <div class="row g-3 text-center mb-4">
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 bg-body-tertiary">
+                        <div class="text-body-secondary small fw-medium mb-1">Elapsed Time</div>
+                        <div class="h3 fw-semibold text-body mb-0" id="active-timer">00:00</div>
+                    </div>
                 </div>
-                {% else %}
-                <div class="p-4 text-center text-muted small">
-                    You have not recorded any test mode tasks yet. Start a task above!
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 bg-body-tertiary">
+                        <div class="text-body-secondary small fw-medium mb-1">Interactions / Clicks</div>
+                        <div class="h3 fw-semibold text-body mb-0" id="active-clicks">0</div>
+                    </div>
                 </div>
-                {% endif %}
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 bg-body-tertiary">
+                        <div class="text-body-secondary small fw-medium mb-1">Form Errors</div>
+                        <div class="h3 fw-semibold text-body mb-0" id="active-errors">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pt-3 border-top">
+                <a href="{{ url_for('browse') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-search me-1" aria-hidden="true"></i>Browse Repository
+                </a>
+
+                <div class="d-flex gap-2">
+                    <button type="button" id="giveup-task-btn" class="btn btn-outline-danger btn-sm">
+                        Abandon
+                    </button>
+                    <button type="button" id="found-task-btn" class="btn btn-primary btn-sm">
+                        <i class="ti ti-check me-1" aria-hidden="true"></i>I Found It (Complete)
+                    </button>
+                </div>
             </div>
         </div>
+
+        <!-- Hidden form used to submit completed task telemetry -->
+        <form id="task-submit-form" action="{{ url_for('task_complete') }}" method="POST" style="display: none;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="task_name" id="form-task-name">
+            <input type="hidden" name="started_at" id="form-started-at">
+            <input type="hidden" name="ended_at" id="form-ended-at">
+            <input type="hidden" name="duration_sec" id="form-duration-sec">
+            <input type="hidden" name="clicks" id="form-clicks">
+            <input type="hidden" name="errors" id="form-errors">
+            <input type="hidden" name="success" id="form-success">
+        </form>
+    </div>
+</div>
+
+<!-- Past Completed Tasks -->
+<div class="card">
+    <div class="card-header">
+        <span class="fw-semibold text-body">My Evaluation Records</span>
+    </div>
+    <div class="card-body p-0">
+        {% if my_tasks %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-body-secondary small">
+                        <th scope="col">Task Description</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Clicks</th>
+                        <th scope="col">Errors</th>
+                        <th scope="col">Outcome</th>
+                        <th scope="col">Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in my_tasks %}
+                    <tr>
+                        <td class="fw-medium">{{ t.task_name }}</td>
+                        <td>{{ "%.1f"|format(t.duration_sec) }}s</td>
+                        <td>{{ t.clicks }}</td>
+                        <td>{{ t.errors }}</td>
+                        <td>
+                            {% if t.success == 1 %}
+                                <span class="badge text-bg-light border text-success">Success</span>
+                            {% else %}
+                                <span class="badge text-bg-light border text-body-secondary">Abandoned</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-body-secondary small">{{ t.started_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-body-secondary small">
+            No test tasks completed yet. Select a task above to begin.
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

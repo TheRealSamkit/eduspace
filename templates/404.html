@@ -5,17 +5,17 @@
 {% block content %}
 <div class="row justify-content-center py-5">
     <div class="col-md-7 text-center">
-        <div class="card shadow-sm border-0 rounded-4 p-5 bg-white">
+        <div class="card p-4 p-md-5">
             <div class="mb-3">
-                <i class="ti ti-alert-triangle fs-1 text-warning"></i>
+                <i class="ti ti-alert-triangle fs-1 text-warning" aria-hidden="true"></i>
             </div>
-            <h1 class="display-6 fw-bold mb-3">{{ error_title or "Resource Not Found" }}</h1>
-            <p class="lead text-muted mb-4">
+            <h1 class="h3 fw-bold text-body mb-3">{{ error_title or "Resource Not Found" }}</h1>
+            <p class="text-body-secondary mb-4 mx-auto" style="max-width: 480px;">
                 {{ error_message or "The page or study material you requested could not be located, or access is strictly limited to students of another university." }}
             </p>
             <div>
-                <a href="{{ url_for('browse') if current_user else url_for('index') }}" class="btn btn-primary px-4 fw-bold">
-                    <i class="ti ti-home me-1"></i>Back to Safety
+                <a href="{{ url_for('browse') if current_user else url_for('index') }}" class="btn btn-primary px-4 fw-medium">
+                    <i class="ti ti-home me-1" aria-hidden="true"></i>Back to Safety
                 </a>
             </div>
         </div>

@@ -2,75 +2,76 @@
 
 {% block title %}StudyExchange - Peer-to-Peer Academic Resource Exchange{% endblock %}
 
-{% block content %}
+{% block content_guest %}
 <div class="row align-items-center py-5">
-    <div class="col-lg-7 text-center text-lg-start mb-4 mb-lg-0">
-        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
-            <i class="ti ti-shield-check me-1"></i>Strict Institutional Isolation
-        </span>
-        <h1 class="display-4 fw-bold lh-1 mb-3 text-dark">
-            Share Study Materials. <br>
-            <span class="text-primary">Earn Credits.</span> Ace Exams.
+    <div class="col-lg-7 mb-4 mb-lg-0">
+        <div class="mb-3">
+            <span class="badge text-bg-light border text-body-secondary px-3 py-2 fw-medium">
+                <i class="ti ti-shield-check me-1 text-primary" aria-hidden="true"></i>Institutional Isolation
+            </span>
+        </div>
+        <h1 class="display-5 fw-bold text-body lh-sm mb-3">
+            Exchange study materials with students at your university.
         </h1>
-        <p class="lead text-muted mb-4">
-            StudyExchange connects students within the <strong>same university</strong> to exchange verified lecture notes, exam past papers, and study guides. Upload your materials to earn credits, and spend them to download documents shared by your peers.
+        <p class="lead text-body-secondary mb-4" style="max-width: 580px;">
+            A peer-to-peer repository where verified students upload revision notes, past exams, and study guides. Earn platform credits by contributing, and spend them to access peer material.
         </p>
 
-        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-lg-start mb-4">
-            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 gap-3 fw-bold shadow-sm">
-                <i class="ti ti-user-plus me-2"></i>Get Started (+{{ config.SIGNUP_BONUS }} Bonus Credits)
+        <div class="d-flex flex-wrap gap-3 mb-4">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                Register (+{{ config.SIGNUP_BONUS }} Bonus Credits)
             </a>
-            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">
-                <i class="ti ti-login me-2"></i>Sign In
+            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg">
+                Sign In
             </a>
         </div>
 
-        <div class="small text-muted">
-            <i class="ti ti-check text-success me-1"></i>Available for students with verified <code>@xyz.edu</code> and <code>@abc.edu</code> email addresses.
+        <div class="small text-body-secondary">
+            <i class="ti ti-check me-1 text-success" aria-hidden="true"></i>Supported email domains:
+            {% for domain, name in config.ALLOWED_DOMAINS.items() %}
+                <code>@{{ domain }}</code>{% if not loop.last %}, {% endif %}
+            {% endfor %}
         </div>
     </div>
 
     <div class="col-lg-5">
-        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-dark text-white p-3">
-                <h5 class="card-title mb-0 d-flex align-items-center gap-2">
-                    <i class="ti ti-coins text-warning fs-4"></i>
-                    <span>How the Credit Economy Works</span>
-                </h5>
+        <div class="card">
+            <div class="card-header">
+                <span class="text-body fw-semibold">Platform Credit Rules</span>
             </div>
-            <div class="card-body p-4 bg-white">
-                <ul class="list-unstyled mb-0">
-                    <li class="d-flex align-items-start mb-3 pb-3 border-bottom">
-                        <div class="badge bg-success-subtle text-success p-2 rounded-circle me-3">
-                            <i class="ti ti-gift fs-4"></i>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 d-flex flex-column gap-3">
+                    <li class="d-flex gap-3">
+                        <div class="p-2 border rounded-3 bg-body-tertiary flex-shrink-0 align-self-start">
+                            <i class="ti ti-gift fs-5 text-body" aria-hidden="true"></i>
                         </div>
                         <div>
-                            <h6 class="mb-1 fw-bold">Sign Up Bonus</h6>
-                            <p class="small text-muted mb-0">Receive <strong>{{ config.SIGNUP_BONUS }} credits</strong> immediately upon creating your verified account.</p>
+                            <div class="fw-semibold text-body">Welcome Bonus</div>
+                            <p class="small text-body-secondary mb-0">Receive <strong>{{ config.SIGNUP_BONUS }} credits</strong> immediately upon verifying your institutional email.</p>
                         </div>
                     </li>
-                    <li class="d-flex align-items-start mb-3 pb-3 border-bottom">
-                        <div class="badge bg-primary-subtle text-primary p-2 rounded-circle me-3">
-                            <i class="ti ti-upload fs-4"></i>
+                    <li class="d-flex gap-3">
+                        <div class="p-2 border rounded-3 bg-body-tertiary flex-shrink-0 align-self-start">
+                            <i class="ti ti-cloud-upload fs-5 text-body" aria-hidden="true"></i>
                         </div>
                         <div>
-                            <h6 class="mb-1 fw-bold">Upload Reward</h6>
-                            <p class="small text-muted mb-0">Earn <strong>+{{ config.UPLOAD_REWARD }} credits</strong> per quality document uploaded (up to {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads daily).</p>
+                            <div class="fw-semibold text-body">Upload Reward</div>
+                            <p class="small text-body-secondary mb-0">Earn <strong>+{{ config.UPLOAD_REWARD }} credits</strong> per uploaded document (up to {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads daily).</p>
                         </div>
                     </li>
-                    <li class="d-flex align-items-start">
-                        <div class="badge bg-warning-subtle text-warning p-2 rounded-circle me-3">
-                            <i class="ti ti-download fs-4"></i>
+                    <li class="d-flex gap-3">
+                        <div class="p-2 border rounded-3 bg-body-tertiary flex-shrink-0 align-self-start">
+                            <i class="ti ti-download fs-5 text-body" aria-hidden="true"></i>
                         </div>
                         <div>
-                            <h6 class="mb-1 fw-bold">Download Cost</h6>
-                            <p class="small text-muted mb-0">Spend <strong>{{ config.DOWNLOAD_COST }} credits</strong> to unlock peer materials. Re-downloading and downloading your own files is always <strong>free</strong>.</p>
+                            <div class="fw-semibold text-body">Download Cost</div>
+                            <p class="small text-body-secondary mb-0">Spend <strong>{{ config.DOWNLOAD_COST }} credits</strong> to unlock peer materials. Re-downloading and your own files are free.</p>
                         </div>
                     </li>
                 </ul>
             </div>
-            <div class="card-footer bg-light p-3 text-center border-top">
-                <span class="text-muted small"><i class="ti ti-lock me-1"></i>Cross-university file access is strictly blocked by design.</span>
+            <div class="card-footer small text-body-secondary">
+                <i class="ti ti-lock me-1" aria-hidden="true"></i>Materials are strictly segregated by university domain.
             </div>
         </div>
     </div>

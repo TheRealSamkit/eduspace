@@ -1,131 +1,109 @@
 {% extends "base.html" %}
+{% import "_components.html" as ui %}
 
 {% block title %}Administrator Panel - StudyExchange{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="fw-bold mb-1">
-            <i class="ti ti-shield-check text-danger me-2"></i>Administrator Control Panel
-        </h2>
-        <p class="text-muted mb-0">Supervise content moderation, view usage metrics, and export evaluation data.</p>
-    </div>
-    <div>
-        <a href="{{ url_for('admin_baseline') }}" class="btn btn-outline-primary fw-semibold">
-            <i class="ti ti-adjustments me-1"></i>Record Baseline Data
-        </a>
-    </div>
-</div>
+{{ ui.page_header(
+    "Administrator Control Panel",
+    "Supervise content moderation, view usage metrics, and export evaluation data.",
+    action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-secondary btn-sm"><i class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
+) }}
 
-<!-- Stats Row -->
+<!-- Stats Grid -->
 <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 mb-4">
     <div class="col">
-        <div class="card shadow-sm border-0 rounded-3 p-3 bg-white text-center">
-            <span class="text-muted small fw-bold">Users</span>
-            <h3 class="fw-bold text-dark mb-0">{{ stats.users_count }}</h3>
-        </div>
+        {{ ui.stat_card("Users", stats.users_count, icon="ti-users") }}
     </div>
     <div class="col">
-        <div class="card shadow-sm border-0 rounded-3 p-3 bg-white text-center">
-            <span class="text-muted small fw-bold">Active Files</span>
-            <h3 class="fw-bold text-primary mb-0">{{ stats.files_count }}</h3>
-        </div>
+        {{ ui.stat_card("Active Files", stats.files_count, icon="ti-files") }}
     </div>
     <div class="col">
-        <div class="card shadow-sm border-0 rounded-3 p-3 bg-white text-center">
-            <span class="text-muted small fw-bold">Downloads</span>
-            <h3 class="fw-bold text-success mb-0">{{ stats.downloads_count }}</h3>
-        </div>
+        {{ ui.stat_card("Downloads", stats.downloads_count, icon="ti-download") }}
     </div>
     <div class="col">
-        <div class="card shadow-sm border-0 rounded-3 p-3 bg-white text-center">
-            <span class="text-muted small fw-bold">Open Reports</span>
-            <h3 class="fw-bold text-danger mb-0">{{ stats.reports_count }}</h3>
-        </div>
+        {{ ui.stat_card("Open Reports", stats.reports_count, icon="ti-flag") }}
     </div>
     <div class="col">
-        <div class="card shadow-sm border-0 rounded-3 p-3 bg-white text-center">
-            <span class="text-muted small fw-bold">Tasks Run</span>
-            <h3 class="fw-bold text-info mb-0">{{ stats.tasks_count }}</h3>
-        </div>
+        {{ ui.stat_card("Tasks Run", stats.tasks_count, icon="ti-list-check") }}
     </div>
     <div class="col">
-        <div class="card shadow-sm border-0 rounded-3 p-3 bg-white text-center">
-            <span class="text-muted small fw-bold">SUS Scores</span>
-            <h3 class="fw-bold text-warning mb-0">{{ stats.sus_count }}</h3>
-        </div>
+        {{ ui.stat_card("SUS Responses", stats.sus_count, icon="ti-clipboard-check") }}
     </div>
 </div>
 
 <!-- Data Export Center -->
-<div class="card shadow-sm border-0 rounded-3 mb-4">
-    <div class="card-header bg-dark text-white p-3">
-        <h5 class="card-title mb-0 d-flex align-items-center gap-2">
-            <i class="ti ti-file-spreadsheet text-warning fs-4"></i>
+<div class="card mb-4">
+    <div class="card-header bg-transparent py-3 px-4 border-bottom">
+        <h2 class="h6 fw-semibold mb-0 text-body d-flex align-items-center gap-2">
+            <i class="ti ti-file-spreadsheet fs-5 text-body-secondary" aria-hidden="true"></i>
             <span>Research Data Export Center (CSV)</span>
-        </h5>
+        </h2>
     </div>
     <div class="card-body p-4">
-        <p class="text-muted small mb-3">
+        <p class="text-body-secondary small mb-3">
             Download raw CSV datasets for academic research, statistical testing, and usability modeling. The users dataset is strictly anonymized (user emails and password hashes are never exported).
         </p>
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ url_for('admin_export_csv', table_name='events') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>Events Telemetry CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>Events Telemetry CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='tasks') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>Tasks Performance CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>Tasks Performance CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='sus_responses') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>SUS Responses CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>SUS Responses CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='feedback') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>Feedback CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>Feedback CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='users_anonymized') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>Anonymized Users CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>Anonymized Users CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='files') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>Files Metadata CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>Files Metadata CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='downloads') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>Downloads CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>Downloads CSV
             </a>
             <a href="{{ url_for('admin_export_csv', table_name='ledger') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="ti ti-download me-1"></i>Credit Ledger CSV
+                <i class="ti ti-download me-1" aria-hidden="true"></i>Credit Ledger CSV
             </a>
         </div>
     </div>
 </div>
 
 <!-- Open Content Reports & Moderation -->
-<div class="card shadow-sm border-0 rounded-3 mb-4">
-    <div class="card-header bg-white p-3 border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0 fw-bold">
-            <i class="ti ti-flag text-danger me-2"></i>Open Reports & Content Moderation
-        </h5>
-        <span class="badge bg-danger">{{ reports|length }} Open</span>
+<div class="card mb-4">
+    <div class="card-header bg-transparent py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+        <h2 class="h6 fw-semibold mb-0 text-body d-flex align-items-center gap-2">
+            <i class="ti ti-flag fs-5 text-body-secondary" aria-hidden="true"></i>
+            <span>Open Reports & Content Moderation</span>
+        </h2>
+        {% if reports %}
+        <span class="badge text-bg-secondary">{{ reports|length }} Open</span>
+        {% endif %}
     </div>
     <div class="card-body p-0">
         {% if reports %}
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead>
                     <tr>
-                        <th scope="col">Date</th>
+                        <th scope="col" class="ps-4">Date</th>
                         <th scope="col">Institution</th>
                         <th scope="col">Reported Material</th>
                         <th scope="col">Uploader</th>
                         <th scope="col">Reporter</th>
                         <th scope="col">Reason</th>
-                        <th scope="col" class="text-end">Actions</th>
+                        <th scope="col" class="text-end pe-4">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in reports %}
                     <tr>
-                        <td class="text-muted small">{{ r.created_at[:16] if r.created_at else '' }}</td>
-                        <td><span class="badge bg-light text-dark border">{{ r.university_name }}</span></td>
+                        <td class="ps-4 text-body-secondary small">{{ r.created_at[:16] if r.created_at else '' }}</td>
+                        <td><span class="badge text-bg-light border text-body-secondary">{{ r.university_name }}</span></td>
                         <td>
                             <a href="{{ url_for('file_detail', file_id=r.file_id) }}" class="fw-semibold text-decoration-none">
                                 {{ r.file_title }}
@@ -134,19 +112,19 @@
                         <td>{{ r.uploader_username }}</td>
                         <td>{{ r.reporter_username }}</td>
                         <td class="small text-danger fw-semibold">{{ r.reason }}</td>
-                        <td class="text-end">
+                        <td class="text-end pe-4">
                             <div class="d-inline-flex gap-2">
                                 <form action="{{ url_for('resolve_report', report_id=r.id) }}" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Dismiss / Resolve report without changes">
-                                        <i class="ti ti-check me-1"></i>Dismiss
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Dismiss / Resolve report without changes">
+                                        <i class="ti ti-check me-1" aria-hidden="true"></i>Dismiss
                                     </button>
                                 </form>
                                 <form action="{{ url_for('remove_file_admin', file_id=r.file_id) }}" method="POST"
                                       onsubmit="return confirm('Are you sure you want to remove this file and reverse the uploader\'s reward credits?');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ti ti-trash me-1"></i>Remove & Reverse
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="ti ti-trash me-1" aria-hidden="true"></i>Remove & Reverse
                                     </button>
                                 </form>
                             </div>
@@ -157,11 +135,7 @@
             </table>
         </div>
         {% else %}
-        <div class="p-5 text-center text-muted">
-            <i class="ti ti-circle-check fs-1 text-success d-block mb-2"></i>
-            <h5 class="fw-bold">No Open Reports</h5>
-            <p class="small mb-0">All uploaded materials are clear and compliant with university policies.</p>
-        </div>
+        {{ ui.empty_state("ti-circle-check", "No Open Reports", "All uploaded materials are clear and compliant with university policies.") }}
         {% endif %}
     </div>
 </div>

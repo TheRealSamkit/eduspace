@@ -1,46 +1,44 @@
 {% extends "base.html" %}
+{% import "_components.html" as ui %}
 
-{% block title %}User Feedback & Usability Issues - StudyExchange{% endblock %}
+{% block title %}User Feedback - StudyExchange{% endblock %}
+{% block topbar_title %}Feedback{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-3">
+<div class="row justify-content-center">
     <div class="col-lg-7">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-dark text-white p-3">
-                <h4 class="card-title mb-0 d-flex align-items-center gap-2">
-                    <i class="ti ti-message-dots text-warning fs-3"></i>
-                    <span>Qualitative Feedback & Usability Issues</span>
-                </h4>
-            </div>
+        {{ ui.page_header(
+            title="User Feedback & Usability Issues",
+            subtitle="Help us refine StudyExchange by sharing qualitative insights or reporting friction points"
+        ) }}
 
+        <div class="card">
             <div class="card-body p-4 p-md-5">
-                <p class="text-muted small mb-4">
-                    Share your qualitative insights, suggestions, or report any confusing UI elements or roadblocks encountered during your testing.
-                </p>
-
                 <form action="{{ url_for('feedback_page') }}" method="POST" class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="mb-3">
-                        <label for="feedbackText" class="form-label fw-semibold">Your Thoughts & Experience <span class="text-danger">*</span></label>
+                        <label for="feedbackText" class="form-label fw-medium text-body">
+                            Your Experience & Suggestions <span class="text-danger" aria-hidden="true">*</span>
+                        </label>
                         <textarea class="form-control" id="feedbackText" name="text" rows="5"
                                   placeholder="What worked well? What felt confusing or difficult? How did the credit economy feel?" required></textarea>
-                        <div class="invalid-feedback">Please enter your comments.</div>
+                        <div class="invalid-feedback">Please enter your feedback comments.</div>
                     </div>
 
                     <div class="mb-4">
-                        <label for="usabilityIssue" class="form-label fw-semibold">Specific Usability Issue / Bug Encountered (Optional)</label>
+                        <label for="usabilityIssue" class="form-label fw-medium text-body">Specific Usability Issue / Bug Encountered (Optional)</label>
                         <input type="text" class="form-control" id="usabilityIssue" name="usability_issue"
                                placeholder="e.g. Filter dropdown reset unexpectedly or file button was hard to find">
-                        <div class="form-text text-muted small">Specify any friction points during search, download, or navigation.</div>
+                        <div class="form-text text-body-secondary small">Identify any unexpected behavior during search, download, or navigation.</div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                         <a href="{{ url_for('browse') }}" class="btn btn-outline-secondary">
-                            <i class="ti ti-arrow-left me-1"></i>Back
+                            Cancel
                         </a>
-                        <button type="submit" class="btn btn-primary fw-bold px-4">
-                            <i class="ti ti-send me-1"></i>Submit Feedback
+                        <button type="submit" class="btn btn-primary">
+                            Submit Feedback
                         </button>
                     </div>
                 </form>

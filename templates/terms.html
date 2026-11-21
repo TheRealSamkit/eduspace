@@ -1,57 +1,58 @@
 {% extends "base.html" %}
+{% import "_components.html" as ui %}
 
 {% block title %}Terms of Service & Copyright Policy - StudyExchange{% endblock %}
+{% block topbar_title %}Terms & Copyright{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-4">
+<div class="row justify-content-center">
     <div class="col-lg-9">
-        <div class="card shadow-sm border-0 rounded-3 mb-4">
-            <div class="card-body p-4 p-md-5">
-                <h2 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                    <i class="ti ti-gavel text-primary"></i>
-                    <span>Terms of Service & Copyright Ownership Policy</span>
-                </h2>
-                <p class="text-muted small border-bottom pb-3">Effective Date: Academic Year 2026</p>
+        {{ ui.page_header(
+            title="Terms of Service & Copyright Policy",
+            subtitle="Platform policies, copyright ownership requirements, and administrator takedown procedures"
+        ) }}
 
+        <div class="card mb-4">
+            <div class="card-body p-4 p-md-5">
                 <div class="mb-4">
-                    <h5 class="fw-bold text-dark">1. Academic Resource Ownership</h5>
-                    <p class="text-muted">
+                    <h2 class="h6 fw-semibold text-body">1. Ownership of Academic Materials</h2>
+                    <p class="text-body-secondary small mb-2">
                         StudyExchange is an academic peer-to-peer sharing ecosystem designed solely for students within verified university domains. Users are legally and ethically obligated to upload <strong>only materials they own or have the explicit right to share</strong> (such as original student notes, student study summaries, and personal worked solutions).
                     </p>
-                    <div class="alert alert-warning small">
-                        <i class="ti ti-alert-triangle me-1"></i><strong>Strict Prohibition:</strong> Do not upload copyrighted textbooks, unreleased exam papers, commercial test bank questions, or faculty slides without institutional copyright clearance.
+                    <div class="border rounded-3 p-3 bg-body-tertiary small text-body-secondary">
+                        <i class="ti ti-alert-triangle text-warning me-1" aria-hidden="true"></i><strong>Strict Prohibition:</strong> Do not upload copyrighted textbooks, unreleased exam papers, commercial test bank questions, or faculty slides without institutional copyright clearance.
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <h5 class="fw-bold text-dark">2. Institutional Segregation & Privacy</h5>
-                    <p class="text-muted">
-                        Materials uploaded to StudyExchange are strictly isolated to verified students who hold an email address from the corresponding institutional domain (e.g. <code>@xyz.edu</code>). Students from other institutions can never browse, search, or download your materials.
+                    <h2 class="h6 fw-semibold text-body">2. Institutional Isolation & Privacy</h2>
+                    <p class="text-body-secondary small mb-0">
+                        Materials uploaded to StudyExchange are strictly isolated to verified students who hold an email address from the corresponding institutional domain. Students from other institutions can never browse, search, or download your materials.
                     </p>
                 </div>
 
                 <div class="mb-4">
-                    <h5 class="fw-bold text-dark">3. Reporting Infringements & Inappropriate Content</h5>
-                    <p class="text-muted">
-                        Every study material card includes a <strong>Report</strong> button (<i class="ti ti-flag text-danger"></i>). If you believe a shared document infringes copyright or breaches academic integrity, submit a report directly from the document's page.
+                    <h2 class="h6 fw-semibold text-body">3. Reporting Infringements & Inappropriate Content</h2>
+                    <p class="text-body-secondary small mb-0">
+                        Every study material card includes a <strong>Report</strong> button (<i class="ti ti-flag" aria-hidden="true"></i>). If you believe a shared document infringes copyright or breaches academic integrity, submit a report directly from the document's detail page.
                     </p>
                 </div>
 
                 <div class="mb-4">
-                    <h5 class="fw-bold text-dark">4. Administrator Takedown Policy & Credit Reversal</h5>
-                    <p class="text-muted">
-                        University administrators immediately inspect reported materials. Upon confirming an infringement:
+                    <h2 class="h6 fw-semibold text-body">4. Administrator Takedown Policy & Credit Reversal</h2>
+                    <p class="text-body-secondary small mb-2">
+                        University administrators inspect reported materials. Upon confirming an infringement:
                     </p>
-                    <ul class="text-muted">
+                    <ul class="text-body-secondary small mb-0 d-flex flex-column gap-1">
                         <li>The offending material is immediately removed from the repository.</li>
                         <li>Any upload reward credits earned by the uploader are <strong>fully reversed</strong> in the credit ledger.</li>
                         <li>Repeated infractions may result in account termination under institutional honor codes.</li>
                     </ul>
                 </div>
 
-                <div class="pt-3 border-top text-center">
-                    <a href="{{ url_for('browse') if current_user else url_for('index') }}" class="btn btn-primary fw-semibold">
-                        <i class="ti ti-arrow-left me-1"></i>Return to StudyExchange
+                <div class="pt-3 border-top">
+                    <a href="{{ url_for('browse') if current_user else url_for('index') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="ti ti-arrow-left me-1" aria-hidden="true"></i>Return to Repository
                     </a>
                 </div>
             </div>

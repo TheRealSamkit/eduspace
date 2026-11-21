@@ -1,55 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}Research Participant Consent - StudyExchange{% endblock %}
+{% block title %}Research Ethics Consent - StudyExchange{% endblock %}
+{% block topbar_title %}Participant Consent{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-4">
+<div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-primary text-white p-3">
-                <h4 class="card-title mb-0 d-flex align-items-center gap-2">
-                    <i class="ti ti-file-certificate fs-3"></i>
-                    <span>Academic Research Participation & Privacy Consent</span>
-                </h4>
+        <div class="card">
+            <div class="card-header py-3">
+                <span class="fw-semibold text-body">Academic Research Evaluation & Consent</span>
             </div>
             <div class="card-body p-4 p-md-5">
-                <p class="lead">
-                    Welcome to <strong>StudyExchange</strong>, {{ current_user.username }}! Before you start exploring and sharing study materials, please review this academic study consent information.
+                <h1 class="h5 fw-semibold text-body mb-3">
+                    Welcome to StudyExchange, {{ current_user.username }}
+                </h1>
+                <p class="text-body-secondary mb-4">
+                    Before accessing study materials from <strong>{{ current_user.university_name }}</strong>, please review our anonymized academic evaluation policy.
                 </p>
 
-                <div class="card bg-light border-0 p-3 mb-4 rounded-3">
-                    <h6 class="fw-bold text-dark"><i class="ti ti-info-circle me-1 text-primary"></i>Study Overview & Purpose</h6>
-                    <p class="small text-muted mb-0">
-                        This platform is deployed as part of an HCI and academic computing research evaluation measuring the usability, incentive alignment, and peer-to-peer distribution efficiency of academic notes.
-                    </p>
-                </div>
-
-                <div class="mb-4">
-                    <h6 class="fw-bold">Data Collection & Privacy Guarantees:</h6>
-                    <ul class="text-muted small">
-                        <li class="mb-2"><strong>Anonymised Telemetry:</strong> Interaction events (navigation, clicks, search filters, and task durations) are logged strictly with anonymised identifiers to evaluate platform usability.</li>
-                        <li class="mb-2"><strong>Confidentiality:</strong> Your university email and password hashes are never exported, shared, or displayed publicly. Only your chosen public username is visible to fellow students at {{ current_user.university_name }}.</li>
-                        <li class="mb-2"><strong>Voluntary Surveys:</strong> You may optionally participate in the 10-item System Usability Scale (SUS) survey and user feedback form.</li>
-                        <li class="mb-2"><strong>Institutional Isolation:</strong> Files and student discussions are kept strictly compartmentalized within your university domain.</li>
+                <div class="border rounded-3 p-3 bg-body-tertiary mb-4">
+                    <div class="fw-medium text-body mb-2">Data Protection Guarantees:</div>
+                    <ul class="text-body-secondary small mb-0 d-flex flex-column gap-2">
+                        <li><strong>Anonymised Telemetry:</strong> Interaction durations and click events are measured solely to evaluate system usability.</li>
+                        <li><strong>Strict Confidentiality:</strong> Your email address and password hashes are never exported or disclosed. Only your public username is displayed to peers.</li>
+                        <li><strong>Voluntary Scales:</strong> You may optionally participate in the 10-item System Usability Scale (SUS) survey.</li>
+                        <li><strong>Institutional Compartmentalization:</strong> Materials and exchanges are kept strictly within your university domain.</li>
                     </ul>
                 </div>
 
                 <form action="{{ url_for('consent') }}" method="POST" class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <div class="form-check p-3 bg-white border rounded-3 mb-4">
+                    <div class="form-check p-3 border rounded-3 bg-body mb-4">
                         <input class="form-check-input ms-0 me-3" type="checkbox" id="agree_consent" name="agree_consent" value="1" required>
-                        <label class="form-check-label fw-semibold text-dark" for="agree_consent">
-                            I consent to having my anonymised platform interaction data and survey responses used for academic research evaluation, and I agree to use the platform in accordance with institutional honor codes.
+                        <label class="form-check-label text-body small" for="agree_consent">
+                            I consent to having my anonymized interaction metrics used for academic evaluation, and agree to use StudyExchange in accordance with institutional academic integrity policies.
                         </label>
-                        <div class="invalid-feedback ms-4">You must check this box to complete setup and enter the platform.</div>
+                        <div class="invalid-feedback ms-4">You must confirm consent to enter the repository.</div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold">
-                            <i class="ti ti-check me-2"></i>I Agree & Proceed to StudyExchange
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Confirm Consent & Enter
+                    </button>
                 </form>
             </div>
         </div>
