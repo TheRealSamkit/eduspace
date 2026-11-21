@@ -327,13 +327,15 @@
     <script>
         window.addEventListener('pageshow', function (event) {
             if (event.persisted) {
-                window.location.reload();
-            } else {
                 fetch('/api/me').then(function (r) {
                     if (r.status === 401) {
                         window.location.href = "{{ url_for('login') }}";
+                    } else {
+                        window.location.reload();
                     }
-                }).catch(function () { });
+                }).catch(function () {
+                    window.location.reload();
+                });
             }
         });
     </script>
@@ -356,8 +358,7 @@
                     <i class="ti ti-moon theme-toggle-icon fs-5 flex-shrink-0" aria-hidden="true"></i>
                 </button>
                 <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-secondary">Sign In</a>
-                <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary">Register (+{{ config.SIGNUP_BONUS
-                    }})</a>
+                <a href="{{ url_for('register') }}" class="btn btn-sm btn-outline-secondary">Register (+{{ config.SIGNUP_BONUS }})</a>
             </div>
         </div>
     </header>

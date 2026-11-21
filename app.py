@@ -1257,6 +1257,10 @@ def create_app(test_config=None):
 
         return render_template('feedback.html')
 
+    @app.route('/favicon.ico')
+    def favicon():
+        return ("", 204)
+
     @app.route('/terms')
     def terms_page():
         """Terms of Service, Copyright Ownership Policy, and Takedown Procedures."""
