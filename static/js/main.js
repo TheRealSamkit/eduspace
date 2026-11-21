@@ -1,10 +1,12 @@
 /**
  * StudyExchange Main JavaScript
  * Handles:
- * - Bootstrap form validation
+ * - Bootstrap form validation (without double-submission)
  * - Submit button spinners
  * - Automated usage logging (clicks, form errors) via POST /api/event
  * - Test mode (task timer, click and error tracking across navigation)
+ * - Live credit UI sync (/api/credits)
+ * - Dark mode theme toggle (/api/theme)
  */
 
 (function () {
@@ -54,6 +56,33 @@
                 }
             })
             .catch(function () {});
+    };
+
+    // Theme Toggle Handler
+    window.toggleTheme = function () {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-bs-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-bs-theme', newTheme);
+
+        document.querySelectorAll('.theme-toggle-icon').forEach(function (icon) {
+            if (newTheme === 'dark') {
+                icon.classList.remove('ti-moon');
+                icon.classList.add('ti-sun');
+            } else {
+                icon.classList.remove('ti-sun');
+                icon.classList.add('ti-moon');
+            }
+        });
+
+        fetch('/api/theme', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ theme: newTheme })
+        }).catch(function () {});
     };
 
     // --- Task Test Mode Tracker ---
@@ -156,7 +185,7 @@
                     }
                     form.dataset.submitting = 'true';
 
-                    // Show spinner on submit button
+                    // Show spinner on submit button without re-triggering submit
                     const submitBtn = form.querySelector('button[type="submit"]');
                     if (submitBtn && !submitBtn.dataset.noSpinner) {
                         submitBtn.classList.add('disabled');
@@ -207,6 +236,14 @@
                 if (label) {
                     label.textContent = radio.value + ' star' + (radio.value > 1 ? 's' : '');
                 }
+            });
+        });
+
+        // 5. Theme toggle buttons listener
+        document.querySelectorAll('.btn-theme-toggle').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                window.toggleTheme();
             });
         });
     });

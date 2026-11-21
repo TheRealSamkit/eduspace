@@ -29,7 +29,7 @@ def create_app(test_config=None):
     # ---------------------------------------------------------
     @app.context_processor
     def inject_global_template_data():
-        """Expose current user (with fresh DB credits on every render), csrf token, and config."""
+        """Expose current user (with fresh DB credits on every render), csrf token, current theme, and config."""
         user_id = session.get('user_id')
         fresh_user = None
         if user_id:
@@ -37,7 +37,7 @@ def create_app(test_config=None):
                 db = get_db()
                 fresh_user = db.execute(
                     """
-                    SELECT u.id, u.email, u.username, u.credits, u.is_admin,
+                    SELECT u.id, u.email, u.username, u.credits, u.is_admin, u.theme,
                            u.university_id, un.name as university_name, un.domain as university_domain
                     FROM users u
                     JOIN universities un ON u.university_id = un.id
@@ -49,8 +49,16 @@ def create_app(test_config=None):
             except Exception:
                 fresh_user = getattr(g, 'user', None)
 
+        theme = 'light'
+        if fresh_user and 'theme' in fresh_user and fresh_user['theme']:
+            theme = fresh_user['theme']
+        else:
+            theme = session.get('theme', 'light')
+        g.theme = theme
+
         return {
             'current_user': fresh_user,
+            'current_theme': theme,
             'csrf_token': get_csrf_token,
             'config': app.config
         }
@@ -69,7 +77,7 @@ def create_app(test_config=None):
         """
         Runs before every request:
         1. Tracks anonymous or authenticated user with session_id cookie.
-        2. Loads logged-in user details and university information.
+        2. Loads logged-in user details, theme, and university information.
         3. Enforces consent agreement before platform usage.
         4. Validates CSRF tokens on POST requests.
         5. Logs page view events for research analytics.
@@ -88,7 +96,7 @@ def create_app(test_config=None):
             db = get_db()
             user = db.execute(
                 """
-                SELECT u.id, u.email, u.username, u.credits, u.is_admin,
+                SELECT u.id, u.email, u.username, u.credits, u.is_admin, u.theme,
                        u.university_id, un.name as university_name, un.domain as university_domain
                 FROM users u
                 JOIN universities un ON u.university_id = un.id
@@ -101,6 +109,12 @@ def create_app(test_config=None):
             else:
                 session.clear()
 
+        # Resolve active theme
+        if g.user and 'theme' in g.user and g.user['theme']:
+            g.theme = g.user['theme']
+        else:
+            g.theme = session.get('theme', 'light')
+
         # 3. Check research consent for authenticated users
         if g.user:
             db = get_db()
@@ -111,7 +125,7 @@ def create_app(test_config=None):
             g.has_consented = bool(consent)
 
             # Redirect unconsented users to /consent
-            allowed_endpoints = {'consent', 'logout', 'static', 'api_event', 'api_credits'}
+            allowed_endpoints = {'consent', 'logout', 'static', 'api_event', 'api_credits', 'api_theme'}
             if not g.has_consented and request.endpoint and request.endpoint not in allowed_endpoints:
                 return redirect(url_for('consent'))
         else:
@@ -126,7 +140,7 @@ def create_app(test_config=None):
             if not app.config.get('TESTING'):
                 if not client_token or not expected_token or client_token != expected_token:
                     # Allow json api logging with session if available, else abort
-                    if request.endpoint != 'api_event':
+                    if request.endpoint not in {'api_event', 'api_theme'}:
                         abort(400, description="Invalid or missing CSRF token.")
 
         # 5. Server-side page view event logging (ignore static and api)
@@ -1038,6 +1052,20 @@ def create_app(test_config=None):
     # ---------------------------------------------------------
     # Usage Measurement & Evaluation Routes (Task, SUS, Feedback, API)
     # ---------------------------------------------------------
+    @app.route('/api/theme', methods=['POST'])
+    def api_theme():
+        """Persist theme selection (light/dark) for the session and logged-in user."""
+        data = request.get_json(silent=True) or {}
+        theme = data.get('theme', 'light')
+        if theme not in ['light', 'dark']:
+            theme = 'light'
+        session['theme'] = theme
+        if g.user:
+            db = get_db()
+            db.execute("UPDATE users SET theme = ? WHERE id = ?", (theme, g.user['id']))
+            db.commit()
+        return jsonify({'status': 'ok', 'theme': theme}), 200
+
     @app.route('/api/credits', methods=['GET'])
     def api_credits():
         """Return fresh credit balance for the authenticated user as JSON."""

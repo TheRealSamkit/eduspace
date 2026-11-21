@@ -1,163 +1,321 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100">
+<html lang="en" data-bs-theme="{{ current_theme }}" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{% block title %}StudyExchange - Peer-to-Peer Academic Resource Sharing{% endblock %}</title>
+    <title>{% block title %}StudyExchange - Peer-to-Peer Academic Resource Exchange{% endblock %}</title>
 
-    <!-- CDN Assets strictly loaded only here -->
+    <!-- CDN Assets strictly loaded only in base.html -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" rel="stylesheet">
 
-    <!-- Custom CSS (minimal overrides) -->
+    <!-- Custom CSS (Design System Tokens) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="d-flex flex-column h-100 bg-light">
+<body class="d-flex flex-column h-100 bg-body text-body">
     <!-- Accessibility Skip Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Navigation Header -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-            <div class="container">
-                <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ url_for('browse') if current_user else url_for('index') }}">
-                    <i class="ti ti-school fs-3 text-warning" aria-hidden="true"></i>
-                    <span>StudyExchange</span>
-                </a>
+    {% if current_user %}
+    <!-- ========================================================
+         AUTHENTICATED APPLICATION LAYOUT (Left Sidebar + Slim Topbar)
+         ======================================================== -->
+    <div class="app-layout flex-grow-1">
+        <!-- Desktop Fixed Sidebar -->
+        <aside class="app-sidebar d-none d-lg-flex" aria-label="Primary Desktop Navigation">
+            <a class="sidebar-brand" href="{{ url_for('browse') }}">
+                <i class="ti ti-school text-primary fs-4" aria-hidden="true"></i>
+                <span>StudyExchange</span>
+            </a>
 
-                {% if current_user %}
-                <span class="badge bg-primary text-white border border-light-subtle d-none d-md-inline-block">
-                    <i class="ti ti-building me-1" aria-hidden="true"></i>{{ current_user.university_name }}
-                </span>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item {% if request.endpoint == 'browse' %}active{% endif %}">
+                    <a href="{{ url_for('browse') }}">
+                        <i class="ti ti-compass" aria-hidden="true"></i>
+                        <span>Browse Material</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item {% if request.endpoint == 'upload_file' %}active{% endif %}">
+                    <a href="{{ url_for('upload_file') }}">
+                        <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+                        <span>Upload Material</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}">
+                        <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item {% if request.endpoint == 'task_page' %}active{% endif %}">
+                    <a href="{{ url_for('task_page') }}">
+                        <i class="ti ti-clipboard-check" aria-hidden="true"></i>
+                        <span>Test Mode</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item {% if request.endpoint == 'sus_survey' %}active{% endif %}">
+                    <a href="{{ url_for('sus_survey') }}">
+                        <i class="ti ti-chart-bar" aria-hidden="true"></i>
+                        <span>SUS Survey</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item {% if request.endpoint == 'feedback_page' %}active{% endif %}">
+                    <a href="{{ url_for('feedback_page') }}">
+                        <i class="ti ti-message-circle" aria-hidden="true"></i>
+                        <span>Feedback</span>
+                    </a>
+                </li>
+
+                {% if current_user.is_admin %}
+                <li class="sidebar-section-title">Admin Moderation</li>
+                <li class="sidebar-nav-item {% if request.endpoint == 'admin_panel' %}active{% endif %}">
+                    <a href="{{ url_for('admin_panel') }}">
+                        <i class="ti ti-shield-lock text-danger" aria-hidden="true"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item {% if request.endpoint == 'admin_baseline' %}active{% endif %}">
+                    <a href="{{ url_for('admin_baseline') }}">
+                        <i class="ti ti-adjustments" aria-hidden="true"></i>
+                        <span>Baseline Data</span>
+                    </a>
+                </li>
                 {% endif %}
+            </ul>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
-                        {% if current_user %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'browse' %}active{% endif %}" href="{{ url_for('browse') }}">
-                                <i class="ti ti-search me-1" aria-hidden="true"></i>Browse Material
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'upload_file' %}active{% endif %}" href="{{ url_for('upload_file') }}">
-                                <i class="ti ti-upload me-1" aria-hidden="true"></i>Upload (+{{ config.UPLOAD_REWARD }})
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'task_page' %}active{% endif %}" href="{{ url_for('task_page') }}">
-                                <i class="ti ti-clipboard-check me-1 text-warning" aria-hidden="true"></i>Test Mode
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'sus_survey' %}active{% endif %}" href="{{ url_for('sus_survey') }}">
-                                <i class="ti ti-star me-1" aria-hidden="true"></i>SUS Survey
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'feedback_page' %}active{% endif %}" href="{{ url_for('feedback_page') }}">
-                                <i class="ti ti-message-dots me-1" aria-hidden="true"></i>Feedback
-                            </a>
-                        </li>
-                        {% endif %}
-                    </ul>
-
-                    <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
-                        {% if current_user %}
-                        <!-- Credit Balance Indicator -->
-                        <li class="nav-item">
-                            <a href="{{ url_for('dashboard') }}" class="credit-badge text-decoration-none" title="Your study credit balance">
-                                <i class="ti ti-coin" aria-hidden="true"></i>
-                                <span><span class="credit-balance-val">{{ current_user.credits }}</span> Credits</span>
-                            </a>
-                        </li>
-
-                        <!-- Dashboard / Profile Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-user-circle fs-5" aria-hidden="true"></i>
-                                <span class="fw-semibold">{{ current_user.username }}</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                                <li class="dropdown-header">
-                                    <small class="text-muted d-block">Signed in as</small>
-                                    <strong>{{ current_user.username }}</strong>
-                                    <div class="small text-muted">{{ current_user.university_name }}</div>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('dashboard') }}">
-                                        <i class="ti ti-dashboard me-2 text-primary" aria-hidden="true"></i>Dashboard & Ledger
-                                    </a>
-                                </li>
-                                {% if current_user.is_admin %}
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('admin_panel') }}">
-                                        <i class="ti ti-shield-check me-2 text-danger" aria-hidden="true"></i>Admin Panel
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('admin_baseline') }}">
-                                        <i class="ti ti-adjustments me-2 text-info" aria-hidden="true"></i>Baseline Entry
-                                    </a>
-                                </li>
-                                {% endif %}
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ url_for('logout') }}" method="POST" class="d-inline">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="dropdown-item text-danger border-0 bg-transparent">
-                                            <i class="ti ti-logout me-2" aria-hidden="true"></i>Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">
-                                <i class="ti ti-login me-1" aria-hidden="true"></i>Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-warning btn-sm text-dark fw-bold px-3" href="{{ url_for('register') }}">
-                                <i class="ti ti-user-plus me-1" aria-hidden="true"></i>Register (+{{ config.SIGNUP_BONUS }})
-                            </a>
-                        </li>
-                        {% endif %}
-                    </ul>
+            <div class="sidebar-footer">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="ti ti-building text-body-secondary" aria-hidden="true"></i>
+                    <span class="text-truncate fw-medium small" title="{{ current_user.university_name }}">
+                        {{ current_user.university_name }}
+                    </span>
+                </div>
+                <div class="small">
+                    <a href="{{ url_for('terms_page') }}" class="text-body-secondary text-decoration-none">
+                        Terms & Copyright
+                    </a>
                 </div>
             </div>
-        </nav>
-    </header>
+        </aside>
 
-    <!-- Active Task Mode Banner (rendered inside normal layout flow below navigation, never overlapping) -->
-    <div id="task-active-banner" class="task-active-banner" style="display: none;" role="status" aria-live="polite">
-        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <div>
-                <i class="ti ti-clock-play me-1" aria-hidden="true"></i>
-                <strong>Test Mode Active:</strong>
-                <span id="task-banner-name" class="ms-1">Task</span>
-                <span class="badge bg-white text-dark ms-2"><i class="ti ti-pointer me-1" aria-hidden="true"></i>Clicks: <span id="task-banner-clicks">0</span></span>
-                <span class="badge bg-warning text-dark ms-1"><i class="ti ti-alert-triangle me-1" aria-hidden="true"></i>Errors: <span id="task-banner-errors">0</span></span>
+        <!-- Mobile Offcanvas Sidebar -->
+        <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title d-flex align-items-center gap-2" id="mobileSidebarLabel">
+                    <i class="ti ti-school text-primary fs-4" aria-hidden="true"></i>
+                    <span>StudyExchange</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div>
-                <a href="{{ url_for('task_page') }}" class="btn btn-sm btn-light fw-bold py-0 px-2">
-                    <i class="ti ti-arrow-forward-up me-1" aria-hidden="true"></i>Return to Task
-                </a>
+            <div class="offcanvas-body d-flex flex-column p-0">
+                <ul class="sidebar-nav p-3">
+                    <li class="sidebar-nav-item {% if request.endpoint == 'browse' %}active{% endif %}">
+                        <a href="{{ url_for('browse') }}">
+                            <i class="ti ti-compass" aria-hidden="true"></i>
+                            <span>Browse Material</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.endpoint == 'upload_file' %}active{% endif %}">
+                        <a href="{{ url_for('upload_file') }}">
+                            <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+                            <span>Upload Material</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.endpoint == 'task_page' %}active{% endif %}">
+                        <a href="{{ url_for('task_page') }}">
+                            <i class="ti ti-clipboard-check" aria-hidden="true"></i>
+                            <span>Test Mode</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.endpoint == 'sus_survey' %}active{% endif %}">
+                        <a href="{{ url_for('sus_survey') }}">
+                            <i class="ti ti-chart-bar" aria-hidden="true"></i>
+                            <span>SUS Survey</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.endpoint == 'feedback_page' %}active{% endif %}">
+                        <a href="{{ url_for('feedback_page') }}">
+                            <i class="ti ti-message-circle" aria-hidden="true"></i>
+                            <span>Feedback</span>
+                        </a>
+                    </li>
+                    {% if current_user.is_admin %}
+                    <li class="sidebar-section-title">Admin Moderation</li>
+                    <li class="sidebar-nav-item {% if request.endpoint == 'admin_panel' %}active{% endif %}">
+                        <a href="{{ url_for('admin_panel') }}">
+                            <i class="ti ti-shield-lock text-danger" aria-hidden="true"></i>
+                            <span>Admin Panel</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.endpoint == 'admin_baseline' %}active{% endif %}">
+                        <a href="{{ url_for('admin_baseline') }}">
+                            <i class="ti ti-adjustments" aria-hidden="true"></i>
+                            <span>Baseline Data</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="mt-auto sidebar-footer p-3 border-top">
+                    <div class="small fw-medium mb-1">{{ current_user.university_name }}</div>
+                    <a href="{{ url_for('terms_page') }}" class="small text-body-secondary text-decoration-none">
+                        Terms & Copyright
+                    </a>
+                </div>
             </div>
+        </div>
+
+        <!-- Main Content Column -->
+        <div class="app-main">
+            <!-- Slim Topbar -->
+            <header class="app-topbar justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-outline-secondary btn-sm d-lg-none py-1 px-2" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar" aria-label="Open navigation menu">
+                        <i class="ti ti-menu-2 fs-5" aria-hidden="true"></i>
+                    </button>
+                    <span class="fw-semibold text-body d-none d-sm-inline">
+                        {% block topbar_title %}StudyExchange{% endblock %}
+                    </span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Credit balance chip -->
+                    <a href="{{ url_for('dashboard') }}" class="credit-chip" title="Your study credit balance">
+                        <i class="ti ti-coin" aria-hidden="true"></i>
+                        <span><span class="credit-balance-val">{{ current_user.credits }}</span> credits</span>
+                    </a>
+
+                    <!-- Theme toggle -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary btn-theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+                        <i class="ti {% if current_theme == 'dark' %}ti-sun{% else %}ti-moon{% endif %} theme-toggle-icon" aria-hidden="true"></i>
+                    </button>
+
+                    <!-- User dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1"
+                                type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ti ti-user" aria-hidden="true"></i>
+                            <span class="d-none d-md-inline">{{ current_user.username }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                            <li class="dropdown-header">
+                                <div class="fw-medium text-body">{{ current_user.username }}</div>
+                                <div class="small text-body-secondary">{{ current_user.university_name }}</div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('dashboard') }}">
+                                    <i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard
+                                </a>
+                            </li>
+                            {% if current_user.is_admin %}
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('admin_panel') }}">
+                                    <i class="ti ti-shield-lock" aria-hidden="true"></i>Admin Panel
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ url_for('logout') }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2">
+                                        <i class="ti ti-logout" aria-hidden="true"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Test Mode Banner (rendered inside normal layout flow below navigation, never overlapping) -->
+            <div id="task-active-banner" class="task-active-banner" style="display: none;" role="status" aria-live="polite">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="ti ti-clock-play text-warning" aria-hidden="true"></i>
+                        <span class="fw-semibold">Test Mode Active:</span>
+                        <span id="task-banner-name" class="text-body-secondary">Task</span>
+                        <span class="badge text-bg-light border ms-1">Clicks: <span id="task-banner-clicks">0</span></span>
+                        <span class="badge text-bg-warning ms-1">Errors: <span id="task-banner-errors">0</span></span>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('task_page') }}" class="btn btn-sm btn-outline-secondary py-0 px-2">
+                            Return to Task
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flash Notifications Block -->
+            <div class="px-4 pt-3" aria-live="polite">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            {% set alert_type = 'info' %}
+                            {% if category in ['success', 'danger', 'warning', 'info'] %}
+                                {% set alert_type = category %}
+                            {% elif category == 'error' %}
+                                {% set alert_type = 'danger' %}
+                            {% endif %}
+                            <div class="alert alert-{{ alert_type }} alert-dismissible fade show mb-3" role="alert">
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if alert_type == 'success' %}
+                                        <i class="ti ti-circle-check fs-5 flex-shrink-0" aria-hidden="true"></i>
+                                    {% elif alert_type == 'danger' %}
+                                        <i class="ti ti-alert-circle fs-5 flex-shrink-0" aria-hidden="true"></i>
+                                    {% elif alert_type == 'warning' %}
+                                        <i class="ti ti-alert-triangle fs-5 flex-shrink-0" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="ti ti-info-circle fs-5 flex-shrink-0" aria-hidden="true"></i>
+                                    {% endif %}
+                                    <div>{{ message }}</div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Page Main Content Container -->
+            <main id="main-content" class="app-content">
+                {% block content %}{% endblock %}
+            </main>
         </div>
     </div>
 
-    <!-- Flash Notifications Block -->
-    <div class="container mt-3" aria-live="polite">
+    {% else %}
+    <!-- ========================================================
+         PUBLIC / LOGGED-OUT NAVIGATION (Landing, Login, Register)
+         ======================================================== -->
+    <header class="border-bottom bg-body">
+        <div class="container py-3 d-flex justify-content-between align-items-center">
+            <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 text-body text-decoration-none" href="{{ url_for('index') }}">
+                <i class="ti ti-school text-primary fs-3" aria-hidden="true"></i>
+                <span>StudyExchange</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary btn-theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+                    <i class="ti {% if current_theme == 'dark' %}ti-sun{% else %}ti-moon{% endif %} theme-toggle-icon" aria-hidden="true"></i>
+                </button>
+                <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-secondary">Sign In</a>
+                <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary">Register (+{{ config.SIGNUP_BONUS }})</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Notifications Block for Guests -->
+    <div class="container pt-3" aria-live="polite">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -167,16 +325,16 @@
                     {% elif category == 'error' %}
                         {% set alert_type = 'danger' %}
                     {% endif %}
-                    <div class="alert alert-{{ alert_type }} alert-dismissible fade show shadow-sm" role="alert">
-                        <div class="d-flex align-items-center">
+                    <div class="alert alert-{{ alert_type }} alert-dismissible fade show mb-3" role="alert">
+                        <div class="d-flex align-items-center gap-2">
                             {% if alert_type == 'success' %}
-                                <i class="ti ti-circle-check fs-4 me-2 flex-shrink-0" aria-hidden="true"></i>
+                                <i class="ti ti-circle-check fs-5 flex-shrink-0" aria-hidden="true"></i>
                             {% elif alert_type == 'danger' %}
-                                <i class="ti ti-alert-circle fs-4 me-2 flex-shrink-0" aria-hidden="true"></i>
+                                <i class="ti ti-alert-circle fs-5 flex-shrink-0" aria-hidden="true"></i>
                             {% elif alert_type == 'warning' %}
-                                <i class="ti ti-alert-triangle fs-4 me-2 flex-shrink-0" aria-hidden="true"></i>
+                                <i class="ti ti-alert-triangle fs-5 flex-shrink-0" aria-hidden="true"></i>
                             {% else %}
-                                <i class="ti ti-info-circle fs-4 me-2 flex-shrink-0" aria-hidden="true"></i>
+                                <i class="ti ti-info-circle fs-5 flex-shrink-0" aria-hidden="true"></i>
                             {% endif %}
                             <div>{{ message }}</div>
                         </div>
@@ -187,38 +345,25 @@
         {% endwith %}
     </div>
 
-    <!-- Main Content Area -->
-    <main id="main-content" class="flex-shrink-0 flex-grow-1 py-4">
+    <!-- Main Content for Guests -->
+    <main id="main-content" class="flex-grow-1 py-4">
         <div class="container">
-            {% block content %}{% endblock %}
+            {{ self.content() }}
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-white border-top">
-        <div class="container text-center text-md-start">
-            <div class="row align-items-center">
-                <div class="col-md-6 mb-2 mb-md-0">
-                    <p class="mb-0 text-muted small">
-                        <strong>StudyExchange</strong> &copy; 2026. Academic Peer-to-Peer Study Material Platform.
-                        <br>
-                        <span class="text-success"><i class="ti ti-shield-lock me-1"></i>University-isolated exchange</span>: Student material is strictly segregated by verified institutional email domains.
-                    </p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <ul class="list-inline mb-0 small">
-                        <li class="list-inline-item"><a href="{{ url_for('terms_page') }}" class="text-decoration-none text-muted">Terms & Copyright</a></li>
-                        <li class="list-inline-item">&middot;</li>
-                        <li class="list-inline-item"><a href="{{ url_for('task_page') }}" class="text-decoration-none text-muted">Test Mode</a></li>
-                        <li class="list-inline-item">&middot;</li>
-                        <li class="list-inline-item"><a href="{{ url_for('sus_survey') }}" class="text-decoration-none text-muted">SUS Survey</a></li>
-                        <li class="list-inline-item">&middot;</li>
-                        <li class="list-inline-item"><a href="{{ url_for('feedback_page') }}" class="text-decoration-none text-muted">Feedback</a></li>
-                    </ul>
-                </div>
+    <!-- Public Footer -->
+    <footer class="py-4 border-top bg-body mt-auto">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center small text-body-secondary gap-2">
+            <span>&copy; 2026 StudyExchange. Peer-to-Peer Academic Resource Exchange.</span>
+            <div class="d-flex gap-3">
+                <a href="{{ url_for('terms_page') }}" class="text-body-secondary text-decoration-none">Terms & Copyright</a>
+                <a href="{{ url_for('login') }}" class="text-body-secondary text-decoration-none">Sign In</a>
+                <a href="{{ url_for('register') }}" class="text-body-secondary text-decoration-none">Register</a>
             </div>
         </div>
     </footer>
+    {% endif %}
 
     <!-- Bootstrap 5 Bundle JS strictly via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

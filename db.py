@@ -51,6 +51,14 @@ def init_db(app=None):
 
     # Populate allowed universities
     cursor = conn.cursor()
+
+    # Safe migration: ensure theme column exists in users table
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN theme TEXT NOT NULL DEFAULT 'light'")
+        conn.commit()
+    except Exception:
+        pass
+
     for domain, name in allowed_domains.items():
         cursor.execute(
             "INSERT OR IGNORE INTO universities (name, domain) VALUES (?, ?)",

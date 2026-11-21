@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
     university_id INTEGER NOT NULL REFERENCES universities(id),
     credits INTEGER NOT NULL DEFAULT 0,
     is_admin INTEGER NOT NULL DEFAULT 0,
+    theme TEXT NOT NULL DEFAULT 'light',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
