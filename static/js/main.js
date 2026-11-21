@@ -6,7 +6,7 @@
  * - Automated usage logging (clicks, form errors) via POST /api/event
  * - Test mode (task timer, click and error tracking across navigation)
  * - Live credit UI sync (/api/credits)
- * - Dark mode theme toggle (/api/theme)
+ * - Client-side dark mode theme toggle (localStorage)
  */
 
 (function () {
@@ -58,15 +58,11 @@
             .catch(function () {});
     };
 
-    // Theme Toggle Handler
-    window.toggleTheme = function () {
-        const html = document.documentElement;
-        const currentTheme = html.getAttribute('data-bs-theme') || 'light';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        html.setAttribute('data-bs-theme', newTheme);
-
+    // Sync theme toggle icons with current data-bs-theme
+    function syncThemeIcons() {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
         document.querySelectorAll('.theme-toggle-icon').forEach(function (icon) {
-            if (newTheme === 'dark') {
+            if (currentTheme === 'dark') {
                 icon.classList.remove('ti-moon');
                 icon.classList.add('ti-sun');
             } else {
@@ -74,15 +70,18 @@
                 icon.classList.add('ti-moon');
             }
         });
+    }
 
-        fetch('/api/theme', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            body: JSON.stringify({ theme: newTheme })
-        }).catch(function () {});
+    // Theme Toggle Handler via localStorage (Zero server round-trip)
+    window.toggleTheme = function () {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-bs-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-bs-theme', newTheme);
+        try {
+            localStorage.setItem('theme', newTheme);
+        } catch (e) {}
+        syncThemeIcons();
     };
 
     // --- Task Test Mode Tracker ---
@@ -164,6 +163,9 @@
 
     // Document Ready setup
     document.addEventListener('DOMContentLoaded', function () {
+        // Sync theme icons immediately on DOM ready
+        syncThemeIcons();
+
         // 1. Bootstrap standard client validation
         const forms = document.querySelectorAll('.needs-validation');
         Array.prototype.slice.call(forms).forEach(function (form) {

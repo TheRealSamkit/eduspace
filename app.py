@@ -29,7 +29,7 @@ def create_app(test_config=None):
     # ---------------------------------------------------------
     @app.context_processor
     def inject_global_template_data():
-        """Expose current user (with fresh DB credits on every render), csrf token, current theme, and config."""
+        """Expose current user (with fresh DB credits on every render), csrf token, and config."""
         user_id = session.get('user_id')
         fresh_user = None
         if user_id:
@@ -37,7 +37,7 @@ def create_app(test_config=None):
                 db = get_db()
                 fresh_user = db.execute(
                     """
-                    SELECT u.id, u.email, u.username, u.credits, u.is_admin, u.theme,
+                    SELECT u.id, u.email, u.username, u.credits, u.is_admin,
                            u.university_id, un.name as university_name, un.domain as university_domain
                     FROM users u
                     JOIN universities un ON u.university_id = un.id
@@ -49,16 +49,8 @@ def create_app(test_config=None):
             except Exception:
                 fresh_user = getattr(g, 'user', None)
 
-        theme = 'light'
-        if fresh_user and 'theme' in fresh_user and fresh_user['theme']:
-            theme = fresh_user['theme']
-        else:
-            theme = session.get('theme', 'light')
-        g.theme = theme
-
         return {
             'current_user': fresh_user,
-            'current_theme': theme,
             'csrf_token': get_csrf_token,
             'config': app.config
         }
@@ -96,7 +88,7 @@ def create_app(test_config=None):
             db = get_db()
             user = db.execute(
                 """
-                SELECT u.id, u.email, u.username, u.credits, u.is_admin, u.theme,
+                SELECT u.id, u.email, u.username, u.credits, u.is_admin,
                        u.university_id, un.name as university_name, un.domain as university_domain
                 FROM users u
                 JOIN universities un ON u.university_id = un.id
@@ -109,12 +101,6 @@ def create_app(test_config=None):
             else:
                 session.clear()
 
-        # Resolve active theme
-        if g.user and 'theme' in g.user and g.user['theme']:
-            g.theme = g.user['theme']
-        else:
-            g.theme = session.get('theme', 'light')
-
         # 3. Check research consent for authenticated users
         if g.user:
             db = get_db()
@@ -125,7 +111,7 @@ def create_app(test_config=None):
             g.has_consented = bool(consent)
 
             # Redirect unconsented users to /consent
-            allowed_endpoints = {'consent', 'logout', 'static', 'api_event', 'api_credits', 'api_theme'}
+            allowed_endpoints = {'consent', 'logout', 'static', 'api_event', 'api_credits', 'api_me', 'api_domain_check'}
             if not g.has_consented and request.endpoint and request.endpoint not in allowed_endpoints:
                 return redirect(url_for('consent'))
         else:
@@ -140,11 +126,11 @@ def create_app(test_config=None):
             if not app.config.get('TESTING'):
                 if not client_token or not expected_token or client_token != expected_token:
                     # Allow json api logging with session if available, else abort
-                    if request.endpoint not in {'api_event', 'api_theme'}:
+                    if request.endpoint not in {'api_event'}:
                         abort(400, description="Invalid or missing CSRF token.")
 
         # 5. Server-side page view event logging (ignore static and api)
-        if request.method == 'GET' and request.endpoint and request.endpoint not in {'static', 'api_event'}:
+        if request.method == 'GET' and request.endpoint and request.endpoint not in {'static', 'api_event', 'api_me', 'api_domain_check'}:
             try:
                 db = get_db()
                 db.execute(
@@ -161,7 +147,7 @@ def create_app(test_config=None):
 
     @app.after_request
     def set_session_cookie(response):
-        """Persist session_id cookie if newly generated."""
+        """Persist session_id cookie if newly generated and apply no-store headers to all non-static responses."""
         if hasattr(g, 'new_session_id'):
             response.set_cookie(
                 'study_session_id',
@@ -170,6 +156,10 @@ def create_app(test_config=None):
                 httponly=True,
                 samesite='Lax'
             )
+        if not request.path.startswith('/static/'):
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
         return response
 
     # ---------------------------------------------------------
@@ -362,12 +352,15 @@ def create_app(test_config=None):
 
         return render_template('login.html')
 
-    @app.route('/logout', methods=['POST'])
+    @app.route('/logout', methods=['GET', 'POST'])
     def logout():
-        """Log out the current user."""
+        """Log out the current user, expire cookies, and redirect to login."""
         session.clear()
         flash("You have been logged out.", "info")
-        return redirect(url_for('index'))
+        resp = redirect(url_for('login'))
+        resp.delete_cookie(app.config.get('SESSION_COOKIE_NAME', 'session'))
+        resp.delete_cookie('study_session_id')
+        return resp
 
     # ---------------------------------------------------------
     # Core Resource Routes: Browse, Upload, Details, Download
@@ -1052,19 +1045,47 @@ def create_app(test_config=None):
     # ---------------------------------------------------------
     # Usage Measurement & Evaluation Routes (Task, SUS, Feedback, API)
     # ---------------------------------------------------------
-    @app.route('/api/theme', methods=['POST'])
-    def api_theme():
-        """Persist theme selection (light/dark) for the session and logged-in user."""
-        data = request.get_json(silent=True) or {}
-        theme = data.get('theme', 'light')
-        if theme not in ['light', 'dark']:
-            theme = 'light'
-        session['theme'] = theme
-        if g.user:
-            db = get_db()
-            db.execute("UPDATE users SET theme = ? WHERE id = ?", (theme, g.user['id']))
-            db.commit()
-        return jsonify({'status': 'ok', 'theme': theme}), 200
+    @app.route('/api/me', methods=['GET'])
+    def api_me():
+        """Lightweight auth status check for clients and bfcache validation."""
+        if not g.user:
+            return jsonify({'authenticated': False}), 401
+        return jsonify({
+            'authenticated': True,
+            'user': {
+                'id': g.user['id'],
+                'username': g.user['username'],
+                'email': g.user['email'],
+                'university_id': g.user['university_id'],
+                'university_name': g.user['university_name'],
+                'credits': g.user['credits'],
+                'is_admin': bool(g.user['is_admin'])
+            }
+        }), 200
+
+    @app.route('/api/domain-check', methods=['GET'])
+    def api_domain_check():
+        """
+        Validate university institutional domain for registration.
+        Returns university name if recognized, else 404 (never lists all domains).
+        """
+        email = request.args.get('email', '').strip().lower()
+        if not email or '@' not in email:
+            return jsonify({'valid': False, 'message': 'Invalid email format'}), 400
+
+        domain = email.split('@')[-1]
+        allowed_domains = app.config.get('ALLOWED_DOMAINS', {})
+        if domain in allowed_domains:
+            return jsonify({
+                'valid': True,
+                'domain': domain,
+                'university_name': allowed_domains[domain]
+            }), 200
+        else:
+            return jsonify({
+                'valid': False,
+                'message': 'This email domain is not supported yet'
+            }), 404
 
     @app.route('/api/credits', methods=['GET'])
     def api_credits():
@@ -1183,8 +1204,8 @@ def create_app(test_config=None):
             for i in range(1, 11):
                 val = request.form.get(f'q{i}', type=int)
                 if val is None or not (1 <= val <= 5):
-                    flash(f"Please rate item {i}.", "warning")
-                    return render_template('sus.html', items=sus_items)
+                    flash(f"Please rate item {i} (value between 1 and 5).", "warning")
+                    return render_template('sus.html', items=sus_items), 400
                 answers.append(val)
 
             # Compute SUS score correctly:

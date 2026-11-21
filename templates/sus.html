@@ -49,8 +49,7 @@
                     <!-- 10 Question Cards -->
                     {% for item in items %}
                     {% set q_num = loop.index %}
-                    <div class="sus-question-card" data-step="{{ q_num }}" {% if not loop.first %}style="display: none;"
-                        {% endif %}>
+                    <div class="sus-question-card" data-step="{{ q_num }}" {% if not loop.first %}style="display: none;"{% endif %}>
                         <div class="mb-4">
                             <span class="badge border text-body-secondary mb-2">Item {{ q_num }}</span>
                             <h2 class="h5 fw-semibold text-body lh-base mb-0">{{ item }}</h2>
@@ -68,14 +67,14 @@
                                 ] %}
                                 {% for val, label_text in labels %}
                                 <div class="col">
-                                    <label
-                                        class="sus-option-btn w-100 p-3 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100 cursor-pointer"
-                                        for="q{{ q_num }}_{{ val }}" tabindex="0" role="button">
+                                    <button type="button"
+                                        class="sus-option-btn w-100 p-3 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100 bg-body"
+                                        data-step="{{ q_num }}" data-val="{{ val }}" id="opt_{{ q_num }}_{{ val }}">
                                         <input class="form-check-input visually-hidden" type="radio" name="q{{ q_num }}"
                                             id="q{{ q_num }}_{{ val }}" value="{{ val }}" required>
                                         <span class="fw-semibold text-body mb-1">{{ val }}</span>
                                         <span class="small text-body-secondary">{{ label_text }}</span>
-                                    </label>
+                                    </button>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -89,11 +88,11 @@
                             <i class="ti ti-arrow-left me-1" aria-hidden="true"></i>Back
                         </button>
                         <div class="d-flex gap-2">
-                            <button type="button" id="sus-next-btn" class="btn btn-primary btn-sm">
+                            <button type="button" id="sus-next-btn" class="btn btn-primary btn-sm" disabled>
                                 Next<i class="ti ti-arrow-right ms-1" aria-hidden="true"></i>
                             </button>
                             <button type="submit" id="sus-submit-btn" class="btn btn-primary btn-sm"
-                                style="display: none;">
+                                style="display: none;" disabled>
                                 Submit Survey
                             </button>
                         </div>
@@ -110,7 +109,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const totalSteps = 10;
-        let currentStep = 1;
+        let currentIndex = 1;
+        const answers = new Array(11).fill(null);
+        let advanceLock = false;
 
         const progressBar = document.getElementById('sus-progress-bar');
         const stepIndicator = document.getElementById('sus-step-indicator');
@@ -118,97 +119,145 @@
         const nextBtn = document.getElementById('sus-next-btn');
         const submitBtn = document.getElementById('sus-submit-btn');
 
-        function updateStepView() {
+        function render() {
+            // Show only the current question card
             document.querySelectorAll('.sus-question-card').forEach(function (card) {
                 const step = parseInt(card.getAttribute('data-step'), 10);
-                if (step === currentStep) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                card.style.display = (step === currentIndex) ? 'block' : 'none';
             });
 
-            const pct = Math.round((currentStep / totalSteps) * 100);
+            // Update progress bar and step indicator
+            const pct = Math.round((currentIndex / totalSteps) * 100);
             if (progressBar) {
                 progressBar.style.width = pct + '%';
                 progressBar.setAttribute('aria-valuenow', pct);
             }
             if (stepIndicator) {
-                stepIndicator.textContent = 'Question ' + currentStep + ' of ' + totalSteps;
+                stepIndicator.textContent = 'Question ' + currentIndex + ' of ' + totalSteps;
             }
 
+            // Sync visual button state with stored answers
+            for (let s = 1; s <= totalSteps; s++) {
+                const ans = answers[s];
+                document.querySelectorAll('.sus-question-card[data-step="' + s + '"] .sus-option-btn').forEach(function (btn) {
+                    const val = parseInt(btn.getAttribute('data-val'), 10);
+                    const radio = document.getElementById('q' + s + '_' + val);
+                    if (val === ans) {
+                        btn.classList.add('selected');
+                        if (radio) radio.checked = true;
+                    } else {
+                        btn.classList.remove('selected');
+                        if (radio && ans === null) radio.checked = false;
+                    }
+                });
+            }
+
+            // Back button disabled on question 1
             if (prevBtn) {
-                prevBtn.disabled = (currentStep === 1);
+                prevBtn.disabled = (currentIndex === 1);
             }
 
-            if (currentStep === totalSteps) {
+            // Next button vs Submit button state
+            const hasCurrentAns = (answers[currentIndex] !== null);
+            const allAnswered = answers.slice(1, 11).every(function (a) { return a !== null; });
+
+            if (currentIndex === totalSteps) {
                 if (nextBtn) nextBtn.style.display = 'none';
-                if (submitBtn) submitBtn.style.display = 'inline-block';
+                if (submitBtn) {
+                    submitBtn.style.display = 'inline-block';
+                    submitBtn.disabled = !allAnswered;
+                }
             } else {
-                if (nextBtn) nextBtn.style.display = 'inline-block';
                 if (submitBtn) submitBtn.style.display = 'none';
+                if (nextBtn) {
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.disabled = !hasCurrentAns;
+                }
             }
         }
 
-        // Handle radio changes & option card highlighting
+        function selectAnswer(step, val) {
+            if (advanceLock) return; // Prevent double trigger during transition
+            answers[step] = val;
+            render();
+
+            // Auto-advance once if not on the final question
+            if (step < totalSteps) {
+                advanceLock = true;
+                setTimeout(function () {
+                    if (currentIndex === step) {
+                        currentIndex = step + 1;
+                        render();
+                    }
+                    advanceLock = false;
+                }, 220);
+            }
+        }
+
+        // Attach click handlers to option buttons
         document.querySelectorAll('.sus-option-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                const input = btn.querySelector('input[type="radio"]');
-                if (input) {
-                    input.checked = true;
-                    // Update parent row styles
-                    const row = btn.closest('.row');
-                    if (row) {
-                        row.querySelectorAll('.sus-option-btn').forEach(function (other) {
-                            other.classList.remove('border-primary', 'bg-body-tertiary', 'shadow-sm');
-                        });
-                    }
-                    btn.classList.add('border-primary', 'bg-body-tertiary', 'shadow-sm');
-
-                    // Auto-advance after 200ms if not on last step
-                    if (currentStep < totalSteps) {
-                        setTimeout(function () {
-                            currentStep++;
-                            updateStepView();
-                        }, 220);
-                    }
-                }
-            });
-
-            // Keyboard navigation (Enter or Space)
-            btn.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    btn.click();
-                }
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const step = parseInt(btn.getAttribute('data-step'), 10);
+                const val = parseInt(btn.getAttribute('data-val'), 10);
+                selectAnswer(step, val);
             });
         });
 
-        if (nextBtn) {
-            nextBtn.addEventListener('click', function () {
-                // Check if current question answered
-                const checked = document.querySelector('input[name="q' + currentStep + '"]:checked');
-                if (!checked) {
-                    alert('Please select an option to continue.');
-                    return;
-                }
-                if (currentStep < totalSteps) {
-                    currentStep++;
-                    updateStepView();
-                }
-            });
-        }
+        // Keyboard navigation: 1-5 keys answer current question
+        document.addEventListener('keydown', function (e) {
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && document.activeElement.type !== 'radio') {
+                return;
+            }
+            const keyNum = parseInt(e.key, 10);
+            if (keyNum >= 1 && keyNum <= 5) {
+                e.preventDefault();
+                selectAnswer(currentIndex, keyNum);
+            }
+        });
 
+        // Back button navigation
         if (prevBtn) {
-            prevBtn.addEventListener('click', function () {
-                if (currentStep > 1) {
-                    currentStep--;
-                    updateStepView();
+            prevBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (advanceLock) return;
+                if (currentIndex > 1) {
+                    currentIndex--;
+                    render();
                 }
             });
         }
 
-        updateStepView();
+        // Next button navigation (cannot skip unanswered questions)
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (advanceLock) return;
+                if (answers[currentIndex] === null) return;
+                if (currentIndex < totalSteps) {
+                    currentIndex++;
+                    render();
+                }
+            });
+        }
+
+        // Form submit guard
+        const form = document.getElementById('sus-form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                for (let i = 1; i <= totalSteps; i++) {
+                    if (answers[i] === null) {
+                        e.preventDefault();
+                        currentIndex = i;
+                        render();
+                        return;
+                    }
+                }
+            });
+        }
+
+        // Initial render
+        render();
     });
 </script>
 {% endblock %}
