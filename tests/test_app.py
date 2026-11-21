@@ -350,7 +350,7 @@ def test_sus_scoring(client, app_instance):
         'q1': 5, 'q2': 1, 'q3': 5, 'q4': 1, 'q5': 5,
         'q6': 1, 'q7': 5, 'q8': 1, 'q9': 5, 'q10': 1
     }, follow_redirects=True)
-    assert b"100.0/100" in res.data
+    assert b"Thank you" in res.data
 
     with app_instance.app_context():
         db = get_db()

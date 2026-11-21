@@ -1204,10 +1204,11 @@ def create_app(test_config=None):
             )
             db.commit()
 
-            flash(f"Thank you! Your System Usability Scale response was submitted. Usability score: {sus_score:.1f}/100.", "success")
-            return redirect(url_for('browse'))
+            flash("Thank you! Your System Usability Scale evaluation has been recorded.", "success")
+            return redirect(url_for('sus_survey', submitted=1))
 
-        return render_template('sus.html', items=sus_items)
+        submitted = bool(request.args.get('submitted'))
+        return render_template('sus.html', items=sus_items, submitted=submitted)
 
     @app.route('/feedback', methods=['GET', 'POST'])
     @login_required

@@ -1,72 +1,210 @@
 {% extends "base.html" %}
 
-{% block title %}System Usability Scale (SUS) Survey - StudyExchange{% endblock %}
+{% block title %}System Usability Scale (SUS) - StudyExchange{% endblock %}
+{% block topbar_title %}System Usability Scale{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-3">
-    <div class="col-lg-10">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-dark text-white p-3">
-                <h4 class="card-title mb-0 d-flex align-items-center gap-2">
-                    <i class="ti ti-star text-warning fs-3"></i>
-                    <span>System Usability Scale (SUS) Survey</span>
-                </h4>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        {% if submitted %}
+        <!-- Friendly Thank-You View (Score is intentionally hidden from user) -->
+        <div class="card p-4 p-md-5 text-center">
+            <div class="mb-3">
+                <i class="ti ti-circle-check fs-1 text-success" aria-hidden="true"></i>
             </div>
+            <h1 class="h4 fw-semibold text-body mb-2">Thank you for your feedback!</h1>
+            <p class="text-body-secondary mb-4 mx-auto" style="max-width: 520px;">
+                Your responses have been recorded anonymously for our academic evaluation.
+                Your insights directly guide the design and usability improvements of StudyExchange.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('browse') }}" class="btn btn-primary">
+                    Browse Materials
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                    View Dashboard
+                </a>
+            </div>
+        </div>
 
+        {% else %}
+        <!-- Step-by-Step Question Flow -->
+        <div class="card">
             <div class="card-body p-4 p-md-5">
-                <p class="lead mb-2">
-                    Please indicate your level of agreement with each statement regarding your experience with the <strong>StudyExchange</strong> prototype.
-                </p>
-                <p class="text-muted small mb-4">
-                    Ratings use a 1 to 5 scale where <strong>1 = Strongly Disagree</strong> and <strong>5 = Strongly Agree</strong>. Your response is recorded anonymously for research evaluation.
-                </p>
+                <!-- Header / Progress bar -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small fw-medium text-body" id="sus-step-indicator">Question 1 of 10</span>
+                        <span class="small text-body-secondary">System Usability Scale</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div id="sus-progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
 
-                <form action="{{ url_for('sus_survey') }}" method="POST" class="needs-validation" novalidate>
+                <form id="sus-form" action="{{ url_for('sus_survey') }}" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <div class="table-responsive mb-4">
-                        <table class="table table-bordered table-hover align-middle">
-                            <thead class="table-light text-center">
-                                <tr>
-                                    <th scope="col" class="text-start" style="width: 55%;">Statement</th>
-                                    <th scope="col" style="width: 9%;" class="small">1<br><span class="text-muted fw-normal">Strongly Disagree</span></th>
-                                    <th scope="col" style="width: 9%;" class="small">2<br><span class="text-muted fw-normal">Disagree</span></th>
-                                    <th scope="col" style="width: 9%;" class="small">3<br><span class="text-muted fw-normal">Neutral</span></th>
-                                    <th scope="col" style="width: 9%;" class="small">4<br><span class="text-muted fw-normal">Agree</span></th>
-                                    <th scope="col" style="width: 9%;" class="small">5<br><span class="text-muted fw-normal">Strongly Agree</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in items %}
-                                {% set q_num = loop.index %}
-                                <tr>
-                                    <td class="fw-semibold">
-                                        <span class="badge bg-secondary-subtle text-secondary me-2">{{ q_num }}</span>
-                                        {{ item }}
-                                    </td>
-                                    {% for val in range(1, 6) %}
-                                    <td class="text-center">
-                                        <input class="form-check-input" type="radio" name="q{{ q_num }}" id="q{{ q_num }}_{{ val }}" value="{{ val }}" required>
-                                        <label class="visually-hidden" for="q{{ q_num }}_{{ val }}">Question {{ q_num }}, rating {{ val }}</label>
-                                    </td>
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- 10 Question Cards -->
+                    {% for item in items %}
+                    {% set q_num = loop.index %}
+                    <div class="sus-question-card" data-step="{{ q_num }}" {% if not loop.first %}style="display: none;"{% endif %}>
+                        <div class="mb-4">
+                            <span class="badge text-bg-light border text-body-secondary mb-2">Item {{ q_num }}</span>
+                            <h2 class="h5 fw-semibold text-body lh-base mb-0">{{ item }}</h2>
+                        </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ url_for('browse') }}" class="btn btn-outline-secondary">
-                            <i class="ti ti-arrow-left me-1"></i>Back
-                        </a>
-                        <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm">
-                            <i class="ti ti-send me-1"></i>Submit Usability Evaluation
+                        <!-- 5 Tappable Rating Buttons -->
+                        <div class="mb-4">
+                            <div class="row row-cols-1 row-cols-sm-5 g-2">
+                                {% set labels = [
+                                    (1, "Strongly disagree"),
+                                    (2, "Disagree"),
+                                    (3, "Neutral"),
+                                    (4, "Agree"),
+                                    (5, "Strongly agree")
+                                ] %}
+                                {% for val, label_text in labels %}
+                                <div class="col">
+                                    <label class="sus-option-btn w-100 p-3 text-center border rounded-3 d-flex flex-column align-items-center justify-content-center h-100 cursor-pointer"
+                                           for="q{{ q_num }}_{{ val }}" tabindex="0" role="button">
+                                        <input class="form-check-input visually-hidden" type="radio"
+                                               name="q{{ q_num }}" id="q{{ q_num }}_{{ val }}" value="{{ val }}" required>
+                                        <span class="fw-semibold text-body mb-1">{{ val }}</span>
+                                        <span class="small text-body-secondary">{{ label_text }}</span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Navigation Footer -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <button type="button" id="sus-prev-btn" class="btn btn-outline-secondary btn-sm" disabled>
+                            <i class="ti ti-arrow-left me-1" aria-hidden="true"></i>Back
                         </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" id="sus-next-btn" class="btn btn-primary btn-sm">
+                                Next<i class="ti ti-arrow-right ms-1" aria-hidden="true"></i>
+                            </button>
+                            <button type="submit" id="sus-submit-btn" class="btn btn-primary btn-sm" style="display: none;">
+                                Submit Survey
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const totalSteps = 10;
+    let currentStep = 1;
+
+    const progressBar = document.getElementById('sus-progress-bar');
+    const stepIndicator = document.getElementById('sus-step-indicator');
+    const prevBtn = document.getElementById('sus-prev-btn');
+    const nextBtn = document.getElementById('sus-next-btn');
+    const submitBtn = document.getElementById('sus-submit-btn');
+
+    function updateStepView() {
+        document.querySelectorAll('.sus-question-card').forEach(function (card) {
+            const step = parseInt(card.getAttribute('data-step'), 10);
+            if (step === currentStep) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const pct = Math.round((currentStep / totalSteps) * 100);
+        if (progressBar) {
+            progressBar.style.width = pct + '%';
+            progressBar.setAttribute('aria-valuenow', pct);
+        }
+        if (stepIndicator) {
+            stepIndicator.textContent = 'Question ' + currentStep + ' of ' + totalSteps;
+        }
+
+        if (prevBtn) {
+            prevBtn.disabled = (currentStep === 1);
+        }
+
+        if (currentStep === totalSteps) {
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (submitBtn) submitBtn.style.display = 'inline-block';
+        } else {
+            if (nextBtn) nextBtn.style.display = 'inline-block';
+            if (submitBtn) submitBtn.style.display = 'none';
+        }
+    }
+
+    // Handle radio changes & option card highlighting
+    document.querySelectorAll('.sus-option-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const input = btn.querySelector('input[type="radio"]');
+            if (input) {
+                input.checked = true;
+                // Update parent row styles
+                const row = btn.closest('.row');
+                if (row) {
+                    row.querySelectorAll('.sus-option-btn').forEach(function (other) {
+                        other.classList.remove('border-primary', 'bg-body-tertiary', 'shadow-sm');
+                    });
+                }
+                btn.classList.add('border-primary', 'bg-body-tertiary', 'shadow-sm');
+
+                // Auto-advance after 200ms if not on last step
+                if (currentStep < totalSteps) {
+                    setTimeout(function () {
+                        currentStep++;
+                        updateStepView();
+                    }, 220);
+                }
+            }
+        });
+
+        // Keyboard navigation (Enter or Space)
+        btn.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                btn.click();
+            }
+        });
+    });
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+            // Check if current question answered
+            const checked = document.querySelector('input[name="q' + currentStep + '"]:checked');
+            if (!checked) {
+                alert('Please select an option to continue.');
+                return;
+            }
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStepView();
+            }
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepView();
+            }
+        });
+    }
+
+    updateStepView();
+});
+</script>
 {% endblock %}
