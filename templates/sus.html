@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}System Usability Scale (SUS) Survey - StudyExchange{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-lg-10">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-dark text-white p-3">
+                <h4 class="card-title mb-0 d-flex align-items-center gap-2">
+                    <i class="ti ti-star text-warning fs-3"></i>
+                    <span>System Usability Scale (SUS) Survey</span>
+                </h4>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <p class="lead mb-2">
+                    Please indicate your level of agreement with each statement regarding your experience with the <strong>StudyExchange</strong> prototype.
+                </p>
+                <p class="text-muted small mb-4">
+                    Ratings use a 1 to 5 scale where <strong>1 = Strongly Disagree</strong> and <strong>5 = Strongly Agree</strong>. Your response is recorded anonymously for research evaluation.
+                </p>
+
+                <form action="{{ url_for('sus_survey') }}" method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th scope="col" class="text-start" style="width: 55%;">Statement</th>
+                                    <th scope="col" style="width: 9%;" class="small">1<br><span class="text-muted fw-normal">Strongly Disagree</span></th>
+                                    <th scope="col" style="width: 9%;" class="small">2<br><span class="text-muted fw-normal">Disagree</span></th>
+                                    <th scope="col" style="width: 9%;" class="small">3<br><span class="text-muted fw-normal">Neutral</span></th>
+                                    <th scope="col" style="width: 9%;" class="small">4<br><span class="text-muted fw-normal">Agree</span></th>
+                                    <th scope="col" style="width: 9%;" class="small">5<br><span class="text-muted fw-normal">Strongly Agree</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                {% set q_num = loop.index %}
+                                <tr>
+                                    <td class="fw-semibold">
+                                        <span class="badge bg-secondary-subtle text-secondary me-2">{{ q_num }}</span>
+                                        {{ item }}
+                                    </td>
+                                    {% for val in range(1, 6) %}
+                                    <td class="text-center">
+                                        <input class="form-check-input" type="radio" name="q{{ q_num }}" id="q{{ q_num }}_{{ val }}" value="{{ val }}" required>
+                                        <label class="visually-hidden" for="q{{ q_num }}_{{ val }}">Question {{ q_num }}, rating {{ val }}</label>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('browse') }}" class="btn btn-outline-secondary">
+                            <i class="ti ti-arrow-left me-1"></i>Back
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm">
+                            <i class="ti ti-send me-1"></i>Submit Usability Evaluation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Server Error - StudyExchange{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 text-center">
+        <div class="card shadow-sm border-0 rounded-4 p-5 bg-white">
+            <div class="mb-3">
+                <i class="ti ti-server-off fs-1 text-danger"></i>
+            </div>
+            <h1 class="display-6 fw-bold mb-3">Internal Server Error</h1>
+            <p class="lead text-muted mb-4">
+                An unexpected technical glitch occurred. Our administrators have logged the error telemetry for investigation.
+            </p>
+            <div>
+                <a href="{{ url_for('browse') if current_user else url_for('index') }}" class="btn btn-primary px-4 fw-bold">
+                    <i class="ti ti-home me-1"></i>Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
