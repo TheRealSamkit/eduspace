@@ -421,3 +421,97 @@ def test_task_logging_and_csv_anonymization(client, app_instance):
     assert 'password' not in csv_text.lower()
     assert 'university_name' in csv_text
     assert 'credits' in csv_text
+
+
+# -------------------------------------------------------------
+# 7. Phase 1 Verification Tests
+# -------------------------------------------------------------
+def test_registration_atomic_success(client, app_instance):
+    """
+    Assert registration through the real HTTP route:
+    - HTTP 302/200, no 500 error
+    - User exists exactly once in users table
+    - Ledger has exactly one signup row
+    - User is logged in and redirected to consent with success flash
+    """
+    client.post('/logout', follow_redirects=True)
+    res = client.post('/register', data={
+        'username': 'atomic_user',
+        'email': 'atomic_user@xyz.edu',
+        'password': 'password123',
+        'agree_terms': '1'
+    }, follow_redirects=False)
+
+    # Must redirect to /consent
+    assert res.status_code == 302
+    assert res.headers.get('Location') == '/consent'
+
+    # Follow to consent page
+    consent_page = client.get('/consent')
+    assert consent_page.status_code == 200
+    assert b"Welcome to StudyExchange, atomic_user" in consent_page.data
+
+    with app_instance.app_context():
+        db = get_db()
+        users = db.execute("SELECT * FROM users WHERE email = 'atomic_user@xyz.edu'").fetchall()
+        assert len(users) == 1
+        u = users[0]
+        assert u['username'] == 'atomic_user'
+        assert u['credits'] == 20
+
+        ledger_rows = db.execute(
+            "SELECT * FROM ledger WHERE user_id = ? AND reason = 'signup'",
+            (u['id'],)
+        ).fetchall()
+        assert len(ledger_rows) == 1
+        assert ledger_rows[0]['amount'] == 20
+
+
+def test_credit_ui_fresh_rendered_html(client, app_instance):
+    """
+    Assert the credit balance shown in the rendered HTML updates immediately
+    after each credit-changing action (signup, upload, download).
+    """
+    # 1. Register user (starts with 20 credits)
+    register_user(client, 'credit_user1', 'credit1@xyz.edu')
+    dash1 = client.get('/dashboard')
+    assert dash1.status_code == 200
+    assert b'class="credit-balance-val">20<' in dash1.data
+
+    # 2. Upload file -> +10 credits (total 30 credits)
+    upload_res = client.post('/upload', data={
+        'title': 'Credit Sync Note',
+        'subject': 'Physics',
+        'semester': 1,
+        'type': 'Lecture Notes',
+        'description': 'Notes to test credit UI freshness',
+        'confirm_copyright': '1',
+        'file': (io.BytesIO(b'%PDF-1.4 sample content'), 'sync_test.pdf')
+    }, follow_redirects=True)
+    assert upload_res.status_code == 200
+    # The rendered file_detail page immediately reflects 30 credits in the navbar
+    assert b'class="credit-balance-val">30<' in upload_res.data
+
+    # Also verify dashboard renders 30 credits fresh from DB
+    dash2 = client.get('/dashboard')
+    assert b'class="credit-balance-val">30<' in dash2.data
+
+    # Get file id
+    with app_instance.app_context():
+        db = get_db()
+        f = db.execute("SELECT id FROM files WHERE title = 'Credit Sync Note'").fetchone()
+        f_id = f['id']
+
+    # 3. Second user downloads file -> 20 - 5 = 15 credits
+    register_user(client, 'credit_user2', 'credit2@xyz.edu')
+    file_page = client.get(f'/file/{f_id}')
+    assert b'class="credit-balance-val">20<' in file_page.data
+
+    # Download file
+    dl_res = client.get(f'/download/{f_id}')
+    assert dl_res.status_code == 200
+
+    # Next render of browse or dashboard immediately renders 15 credits
+    dash3 = client.get('/dashboard')
+    assert b'class="credit-balance-val">15<' in dash3.data
+    assert b'class="credit-balance-val">20<' not in dash3.data

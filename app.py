@@ -29,9 +29,28 @@ def create_app(test_config=None):
     # ---------------------------------------------------------
     @app.context_processor
     def inject_global_template_data():
-        """Expose current user, csrf token, and config to all templates."""
+        """Expose current user (with fresh DB credits on every render), csrf token, and config."""
+        user_id = session.get('user_id')
+        fresh_user = None
+        if user_id:
+            try:
+                db = get_db()
+                fresh_user = db.execute(
+                    """
+                    SELECT u.id, u.email, u.username, u.credits, u.is_admin,
+                           u.university_id, un.name as university_name, un.domain as university_domain
+                    FROM users u
+                    JOIN universities un ON u.university_id = un.id
+                    WHERE u.id = ?
+                    """,
+                    (user_id,)
+                ).fetchone()
+                g.user = fresh_user
+            except Exception:
+                fresh_user = getattr(g, 'user', None)
+
         return {
-            'current_user': getattr(g, 'user', None),
+            'current_user': fresh_user,
             'csrf_token': get_csrf_token,
             'config': app.config
         }
@@ -92,7 +111,7 @@ def create_app(test_config=None):
             g.has_consented = bool(consent)
 
             # Redirect unconsented users to /consent
-            allowed_endpoints = {'consent', 'logout', 'static', 'api_event'}
+            allowed_endpoints = {'consent', 'logout', 'static', 'api_event', 'api_credits'}
             if not g.has_consented and request.endpoint and request.endpoint not in allowed_endpoints:
                 return redirect(url_for('consent'))
         else:
@@ -246,8 +265,9 @@ def create_app(test_config=None):
             signup_bonus = app.config.get('SIGNUP_BONUS', Config.SIGNUP_BONUS)
 
             try:
-                # DB transaction: create user and initial ledger entry
+                # Atomic DB transaction: create user and initial ledger entry
                 cursor = db.cursor()
+                cursor.execute("BEGIN IMMEDIATE")
                 cursor.execute(
                     """
                     INSERT INTO users (email, username, password_hash, university_id, credits, is_admin)
@@ -264,14 +284,20 @@ def create_app(test_config=None):
                     (user_id, signup_bonus)
                 )
                 db.commit()
-
-                session['user_id'] = user_id
-                flash(f"Welcome to StudyExchange, {username}! You have received {signup_bonus} bonus credits.", "success")
-                return redirect(url_for('consent'))
+            except sqlite3.IntegrityError:
+                db.rollback()
+                flash("An account with that email or username already exists. Please log in.", "warning")
+                return render_template('register.html', username=username, email=email)
             except Exception as e:
                 db.rollback()
+                app.logger.error("Registration transaction error: %s", e, exc_info=True)
                 flash("Registration failed due to a server error. Please try again.", "danger")
                 return render_template('register.html', username=username, email=email)
+
+            # Success flow strictly outside the DB transaction try/except block
+            session['user_id'] = user_id
+            flash(f"Welcome to StudyExchange, {username}! You have received {signup_bonus} bonus credits.", "success")
+            return redirect(url_for('consent'))
 
         return render_template('register.html')
 
@@ -1012,6 +1038,17 @@ def create_app(test_config=None):
     # ---------------------------------------------------------
     # Usage Measurement & Evaluation Routes (Task, SUS, Feedback, API)
     # ---------------------------------------------------------
+    @app.route('/api/credits', methods=['GET'])
+    def api_credits():
+        """Return fresh credit balance for the authenticated user as JSON."""
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'credits': 0, 'logged_in': False}), 200
+        db = get_db()
+        row = db.execute("SELECT credits FROM users WHERE id = ?", (user_id,)).fetchone()
+        credits = row['credits'] if row else 0
+        return jsonify({'credits': credits, 'logged_in': True}), 200
+
     @app.route('/api/event', methods=['POST'])
     def api_event():
         """Receive telemetry events from client-side JS (clicks, validation errors)."""

@@ -38,6 +38,24 @@
         }
     };
 
+    // Credit UI real-time sync
+    window.updateCreditUI = function (credits) {
+        document.querySelectorAll('.credit-balance-val').forEach(function (el) {
+            el.textContent = credits;
+        });
+    };
+
+    window.refreshCredits = function () {
+        fetch('/api/credits')
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data && typeof data.credits === 'number') {
+                    window.updateCreditUI(data.credits);
+                }
+            })
+            .catch(function () {});
+    };
+
     // --- Task Test Mode Tracker ---
     const TASK_STORAGE_KEY = 'studyexchange_active_task';
 
@@ -131,16 +149,19 @@
                         .map(function (el) { return el.name || el.id; });
                     window.logEvent('validation_error', window.location.pathname, { fields: invalidFields });
                 } else {
+                    // Prevent accidental double submissions
+                    if (form.dataset.submitting === 'true') {
+                        event.preventDefault();
+                        return;
+                    }
+                    form.dataset.submitting = 'true';
+
                     // Show spinner on submit button
                     const submitBtn = form.querySelector('button[type="submit"]');
                     if (submitBtn && !submitBtn.dataset.noSpinner) {
-                        const originalText = submitBtn.innerHTML;
-                        submitBtn.disabled = true;
+                        submitBtn.classList.add('disabled');
+                        submitBtn.setAttribute('aria-busy', 'true');
                         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
-                        // Allow actual form submit by re-enabling or let browser post
-                        setTimeout(function () {
-                            form.submit();
-                        }, 50);
                     }
                 }
                 form.classList.add('was-validated');
@@ -164,6 +185,13 @@
                         }
                         clickTimer = null;
                     }, 2000);
+                }
+
+                // If downloading a file, schedule instant credit chip sync
+                const href = target.getAttribute('href') || '';
+                if (href.indexOf('/download/') !== -1) {
+                    setTimeout(window.refreshCredits, 600);
+                    setTimeout(window.refreshCredits, 2000);
                 }
             }
         });

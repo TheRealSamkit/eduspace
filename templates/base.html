@@ -18,24 +18,6 @@
     <!-- Accessibility Skip Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Active Task Mode Banner (shown when a test session is ongoing) -->
-    <div id="task-active-banner" class="task-active-banner" style="display: none;" role="status" aria-live="polite">
-        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <div>
-                <i class="ti ti-clock-play me-1" aria-hidden="true"></i>
-                <strong>Test Mode Active:</strong>
-                <span id="task-banner-name" class="ms-1">Task</span>
-                <span class="badge bg-white text-dark ms-2"><i class="ti ti-pointer me-1" aria-hidden="true"></i>Clicks: <span id="task-banner-clicks">0</span></span>
-                <span class="badge bg-warning text-dark ms-1"><i class="ti ti-alert-triangle me-1" aria-hidden="true"></i>Errors: <span id="task-banner-errors">0</span></span>
-            </div>
-            <div>
-                <a href="{{ url_for('task_page') }}" class="btn btn-sm btn-light fw-bold py-0 px-2">
-                    <i class="ti ti-arrow-forward-up me-1" aria-hidden="true"></i>Return to Task
-                </a>
-            </div>
-        </div>
-    </div>
-
     <!-- Navigation Header -->
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
@@ -93,7 +75,7 @@
                         <li class="nav-item">
                             <a href="{{ url_for('dashboard') }}" class="credit-badge text-decoration-none" title="Your study credit balance">
                                 <i class="ti ti-coin" aria-hidden="true"></i>
-                                <span>{{ current_user.credits }} Credits</span>
+                                <span><span class="credit-balance-val">{{ current_user.credits }}</span> Credits</span>
                             </a>
                         </li>
 
@@ -155,6 +137,24 @@
             </div>
         </nav>
     </header>
+
+    <!-- Active Task Mode Banner (rendered inside normal layout flow below navigation, never overlapping) -->
+    <div id="task-active-banner" class="task-active-banner" style="display: none;" role="status" aria-live="polite">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <i class="ti ti-clock-play me-1" aria-hidden="true"></i>
+                <strong>Test Mode Active:</strong>
+                <span id="task-banner-name" class="ms-1">Task</span>
+                <span class="badge bg-white text-dark ms-2"><i class="ti ti-pointer me-1" aria-hidden="true"></i>Clicks: <span id="task-banner-clicks">0</span></span>
+                <span class="badge bg-warning text-dark ms-1"><i class="ti ti-alert-triangle me-1" aria-hidden="true"></i>Errors: <span id="task-banner-errors">0</span></span>
+            </div>
+            <div>
+                <a href="{{ url_for('task_page') }}" class="btn btn-sm btn-light fw-bold py-0 px-2">
+                    <i class="ti ti-arrow-forward-up me-1" aria-hidden="true"></i>Return to Task
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Flash Notifications Block -->
     <div class="container mt-3" aria-live="polite">

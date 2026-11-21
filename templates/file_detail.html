@@ -105,7 +105,7 @@
                                 </a>
                             {% else %}
                                 <div class="small text-muted mb-2">
-                                    Your balance: <strong>{{ current_user.credits }} Credits</strong>
+                                    Your balance: <strong><span class="credit-balance-val">{{ current_user.credits }}</span> Credits</strong>
                                 </div>
                                 <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-primary btn-lg fw-bold shadow-sm">
                                     <i class="ti ti-download me-2"></i>Download Material

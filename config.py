@@ -3,6 +3,8 @@ import os
 class Config:
     # Allowed university email domains mapped to University Name
     ALLOWED_DOMAINS = {
+        "xyz.edu": "XYZ University",
+        "abc.edu": "ABC College",
         "jg.edu.in": "JG University",
         "lj.edu.in": "LJ University",
         "gtu.ac.in": "GTU",
