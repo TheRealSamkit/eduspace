@@ -348,7 +348,9 @@
     <!-- Main Content for Guests -->
     <main id="main-content" class="flex-grow-1 py-4">
         <div class="container">
-            {{ self.content() }}
+            {% block content_guest %}
+                {{ self.content() }}
+            {% endblock %}
         </div>
     </main>
 

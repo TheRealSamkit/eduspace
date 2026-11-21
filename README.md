@@ -68,7 +68,8 @@ studyVerse/
 │   └── js/
 │       └── main.js          # Telemetry logging, test mode tracker, validation
 ├── templates/
-│   ├── base.html            # Master layout containing navbar, CDN links, and footer
+│   ├── base.html            # Master layout with left sidebar, slim topbar, and CDN links
+│   ├── _components.html     # Reusable UI macros (page_header, stat_card, empty_state, file_card)
 │   ├── index.html           # Landing page for prospective students
 │   ├── register.html        # Institutional registration form
 │   ├── login.html           # Sign in form
@@ -80,17 +81,20 @@ studyVerse/
 │   ├── admin.html           # Moderation panel, stats cards, and CSV export buttons
 │   ├── admin_baseline.html  # Facilitator entry form for baseline control data
 │   ├── task.html            # HCI Test Mode evaluation interface (timed tasks)
-│   ├── sus.html             # Standard 10-item System Usability Scale (SUS) survey
+│   ├── sus.html             # Stepped 10-item System Usability Scale (SUS) survey
 │   ├── feedback.html        # Qualitative user feedback and usability issue reporting
 │   ├── terms.html           # Terms of service, copyright policy, and takedown policy
 │   ├── 404.html             # Friendly 404 / 403 error page
 │   └── 500.html             # Friendly 500 server error page
 ├── uploads/                 # Local storage for uploaded files (randomized filenames)
+├── screenshots/             # Visual validation captures at 1440px and 390px (light/dark)
 ├── analysis/
 │   ├── export_data.py       # Standalone CSV export script
 │   └── exports/             # Output folder for exported CSV research datasets
 └── tests/
-    └── test_app.py          # Pytest suite verifying isolation, auth, and credits
+    ├── test_app.py          # Core tests (isolation, auth, credits, moderation)
+    ├── test_routes.py       # Route smoke tests iterating app.url_map under 4 contexts
+    └── test_flows.py        # End-to-end integration flows and input validation
 ```
 
 ---
@@ -237,19 +241,32 @@ By default, this writes all 8 datasets to `analysis/exports/`.
 
 ---
 
-## Running the Automated Test Suite
+## Automated Test Suite
 
-Run pytest to execute the complete automated test suite:
+The test suite covers unit tests, security route smoke tests, and full end-to-end integration flows across three test modules:
+
 ```bash
 pytest
 ```
-Tests cover:
-1. `test_domain_restriction`: Permitted vs disallowed email domains.
-2. `test_university_isolation_browse_and_download`: Cross-university browse filtering, search isolation, and 404 on direct download attempts.
-3. `test_credit_economy_rules`: Signup bonus, daily upload reward caps, download deductions, no negative balances, and free re-downloads.
-4. `test_admin_removal_and_reversal`: Content takedown and ledger reward reversal.
-5. `test_sus_scoring`: 10-item SUS calculation accuracy across standard profiles.
-6. `test_task_logging_and_csv_anonymization`: Prototype and baseline task logging and CSV anonymization verification.
+
+1. **`tests/test_app.py`**:
+   - `test_domain_restriction`: Permitted vs disallowed email domains.
+   - `test_university_isolation_browse_and_download`: Cross-university browse filtering, search isolation, and 404 on direct download attempts.
+   - `test_credit_economy_rules`: Signup bonus, daily upload reward caps, download deductions, no negative balances, and free re-downloads.
+   - `test_admin_removal_and_reversal`: Content takedown and ledger reward reversal.
+   - `test_sus_scoring`: 10-item SUS calculation accuracy across standard profiles.
+   - `test_task_logging_and_csv_anonymization`: Prototype and baseline task logging and CSV anonymization verification.
+   - `test_registration_atomic_success`: Atomic user + ledger signup bonus transaction with redirect to consent.
+   - `test_credit_ui_fresh_rendered_html`: Verification of fresh credit balances rendered on credit actions.
+
+2. **`tests/test_routes.py`**:
+   - Iterates `app.url_map` across four security contexts (Anonymous, Student, Cross-University Student, Admin).
+   - Guarantees zero 500 server errors across all routes.
+   - Confirms proper authentication redirects (302), role-based forbidden blocks (403), and custom 404 error page responses.
+
+3. **`tests/test_flows.py`**:
+   - End-to-end user lifecycle: Registration -> Consent -> Upload (+10) -> Browse/Search/Filter/Sort -> Second user download (-5) -> Free re-download -> Rate -> Report -> Admin moderation takedown & reversal (-10) -> Test Mode task tracking -> SUS survey scoring (Odd=5/Even=1 -> 100, All 3s -> 50) -> Qualitative feedback -> Facilitator baseline metric entry -> Anonymized CSV dataset downloads.
+   - Input validation & security: Oversized file rejection (>10MB), disallowed extensions (.exe, .sh), missing fields, duplicate email/username, password length requirements, SQL injection resilience in search/filters, XSS HTML escaping, and CSRF token enforcement.
 
 ---
 
