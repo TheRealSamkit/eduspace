@@ -13,7 +13,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
 ) }}
 
 <!-- Stat Cards Row (Neutral-first) -->
-<div class="row g-4 mb-4">
+<div class="row g-3 g-md-4 mb-4">
     <div class="col-md-4">
         {{ ui.stat_card(
         label="Platform Balance",
@@ -164,7 +164,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                                 <td><span class="badge border text-body-secondary small">{{ u.type
                                         }}</span></td>
                                 <td>
-                                    <span class="text-warning small"><i class="ti ti-star-filled"
+                                    <span class="text-brass small"><i class="ti ti-star-filled"
                                             aria-hidden="true"></i></span>
                                     <span class="small fw-medium">{{ "%.1f"|format(u.avg_rating) }}</span>
                                 </td>

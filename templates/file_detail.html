@@ -72,7 +72,7 @@
                                     {{ "%.1f"|format(file.avg_rating) }}
                                 </div>
                                 <div>
-                                    <div class="star-rating text-warning fs-5">
+                                    <div class="star-rating text-brass fs-5">
                                         {% set stars_round = file.avg_rating|round|int %}
                                         {% for s in range(1, 6) %}
                                         {% if s <= stars_round %} <i class="ti ti-star-filled" aria-hidden="true"></i>

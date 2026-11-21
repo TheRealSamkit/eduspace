@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_components.html" as ui %}
 
 {% block title %}Research Ethics Consent - StudyExchange{% endblock %}
 {% block topbar_title %}Participant Consent{% endblock %}
@@ -6,14 +7,19 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
+        {{ ui.page_header(
+            title="Academic Research Evaluation & Consent",
+            subtitle="Please review our anonymized evaluation policy before accessing study materials"
+        ) }}
+
         <div class="card">
-            <div class="card-header py-3">
-                <span class="fw-semibold text-body">Academic Research Evaluation & Consent</span>
+            <div class="card-header py-3 px-4">
+                <span class="fw-semibold text-body">Participant Agreement</span>
             </div>
             <div class="card-body p-4 p-md-5">
-                <h1 class="h5 fw-semibold text-body mb-3">
+                <h2 class="h5 fw-semibold text-body mb-3">
                     Welcome to StudyExchange, {{ current_user.username }}
-                </h1>
+                </h2>
                 <p class="text-body-secondary mb-4">
                     Before accessing study materials from <strong>{{ current_user.university_name }}</strong>, please review our anonymized academic evaluation policy.
                 </p>

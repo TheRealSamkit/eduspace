@@ -3,34 +3,26 @@
 {% block title %}Register - StudyExchange{% endblock %}
 
 {% block content_guest %}
-<div class="row justify-content-center py-4">
-    <div class="col-md-7 col-lg-5">
+<div class="row g-4 justify-content-center">
+    <!-- Left Column: Registration Form in a Card -->
+    <div class="col-lg-7">
         <div class="card">
-            <div class="card-header text-center py-3">
+            <div class="card-header py-3 px-4">
                 <span class="fw-semibold text-body">Create Account</span>
             </div>
             <div class="card-body p-4 p-md-5">
-                <p class="text-body-secondary small mb-3">
-                    Register with your university institutional email to receive <strong>{{ config.SIGNUP_BONUS }} bonus credits</strong>.
+                <p class="text-body-secondary small mb-4">
+                    Register with your institutional university email to receive <strong>{{ config.SIGNUP_BONUS }} bonus credits</strong>.
                 </p>
 
-                <div class="border rounded-3 p-3 bg-body-tertiary small text-body-secondary mb-4">
-                    <div class="fw-medium text-body mb-1">Permitted University Domains:</div>
-                    <ul class="mb-0 ps-3">
-                        {% for domain, name in config.ALLOWED_DOMAINS.items() %}
-                            <li><code>@{{ domain }}</code> &mdash; {{ name }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <form action="{{ url_for('register') }}" method="POST" class="needs-validation" novalidate>
+                <form action="{{ url_for('register') }}" method="POST" class="needs-validation" novalidate id="register-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="mb-3">
                         <label for="username" class="form-label fw-medium text-body">Public Username</label>
                         <input type="text" class="form-control" id="username" name="username" value="{{ username or '' }}"
-                               placeholder="e.g. alex_smith" minlength="3" maxlength="30" required>
-                        <div class="form-text small text-body-secondary">Displayed publicly. Your email is kept private.</div>
+                               placeholder="e.g. alex_smith" minlength="3" maxlength="30" required autofocus>
+                        <div class="form-text small text-body-secondary">Displayed publicly to peers. Your email is kept private.</div>
                         <div class="invalid-feedback">Please choose a username of at least 3 characters.</div>
                     </div>
 
@@ -38,6 +30,7 @@
                         <label for="email" class="form-label fw-medium text-body">Institutional Email</label>
                         <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}"
                                placeholder="e.g. student@xyz.edu" required>
+                        <div id="domain-feedback" class="form-text small" style="display: none;"></div>
                         <div class="invalid-feedback">Please enter your verified institutional email.</div>
                     </div>
 
@@ -69,5 +62,106 @@
             </div>
         </div>
     </div>
+
+    <!-- Right Column: Info Panel with Collapsed Accordion -->
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header py-3 px-4">
+                <span class="fw-semibold text-body">Why Join StudyExchange?</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex flex-column gap-3 mb-4">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="ti ti-cloud-upload fs-4 text-primary flex-shrink-0" aria-hidden="true"></i>
+                        <div>
+                            <div class="fw-medium text-body">Share & Earn Credits</div>
+                            <div class="small text-body-secondary">Upload your original study notes and earn +{{ config.UPLOAD_REWARD }} credits for each approved document.</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="ti ti-coin text-brass fs-4 flex-shrink-0" aria-hidden="true"></i>
+                        <div>
+                            <div class="fw-medium text-body">{{ config.SIGNUP_BONUS }} Welcome Credits</div>
+                            <div class="small text-body-secondary">Get started right away with bonus credits deposited into your ledger immediately upon registration.</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="ti ti-building fs-4 text-primary flex-shrink-0" aria-hidden="true"></i>
+                        <div>
+                            <div class="fw-medium text-body">University-Only Access</div>
+                            <div class="small text-body-secondary">Course materials are strictly isolated to students of your university, ensuring direct curriculum alignment.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bootstrap Accordion for Supported Universities (collapsed by default) -->
+                <div class="accordion" id="emailAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingDomains">
+                            <button class="accordion-button collapsed py-2 px-3 small" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseDomains" aria-expanded="false" aria-controls="collapseDomains">
+                                <i class="ti ti-help-circle me-2 flex-shrink-0" aria-hidden="true"></i>Which email can I use?
+                            </button>
+                        </h2>
+                        <div id="collapseDomains" class="accordion-collapse collapse" aria-labelledby="headingDomains" data-bs-parent="#emailAccordion">
+                            <div class="accordion-body small text-body-secondary py-3 px-3">
+                                <p class="mb-2">Registration requires an institutional email from a supported university:</p>
+                                <ul class="mb-0 ps-3">
+                                    {% for domain, name in config.ALLOWED_DOMAINS.items() %}
+                                    <li class="mb-1"><strong>{{ name }}</strong> (<code>@{{ domain }}</code>)</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const emailInput = document.getElementById('email');
+        const feedbackEl = document.getElementById('domain-feedback');
+        let debounceTimer = null;
+
+        if (emailInput && feedbackEl) {
+            emailInput.addEventListener('input', function () {
+                clearTimeout(debounceTimer);
+                const email = emailInput.value.trim();
+
+                if (!email || email.indexOf('@') === -1) {
+                    feedbackEl.style.display = 'none';
+                    feedbackEl.textContent = '';
+                    return;
+                }
+
+                debounceTimer = setTimeout(function () {
+                    fetch('/api/domain-check?email=' + encodeURIComponent(email))
+                        .then(function (res) {
+                            return res.json().then(function (data) {
+                                return { status: res.status, data: data };
+                            });
+                        })
+                        .then(function (result) {
+                            feedbackEl.style.display = 'block';
+                            if (result.status === 200 && result.data.valid) {
+                                feedbackEl.className = 'form-text text-success small mt-1';
+                                feedbackEl.textContent = 'Recognised: ' + result.data.university_name;
+                            } else {
+                                feedbackEl.className = 'form-text text-danger small mt-1';
+                                feedbackEl.textContent = 'This email domain is not supported yet';
+                            }
+                        })
+                        .catch(function () {
+                            feedbackEl.style.display = 'none';
+                        });
+                }, 250);
+            });
+        }
+    });
+</script>
 {% endblock %}

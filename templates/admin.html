@@ -2,13 +2,13 @@
 {% import "_components.html" as ui %}
 
 {% block title %}Administrator Panel - StudyExchange{% endblock %}
+{% block topbar_title %}Admin Panel{% endblock %}
 
 {% block content %}
 {{ ui.page_header(
 "Administrator Control Panel",
 "Supervise content moderation, view usage metrics, and export evaluation data.",
-action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-secondary btn-sm"><i
-        class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
+action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-primary btn-sm"><i class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
 ) }}
 
 <!-- Stats Grid -->
@@ -35,9 +35,9 @@ action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-
 
 <!-- Data Export Center -->
 <div class="card mb-4">
-    <div class="card-header bg-transparent py-3 px-4 border-bottom">
+    <div class="card-header py-3 px-4 border-bottom">
         <h2 class="h6 fw-semibold mb-0 text-body d-flex align-items-center gap-2">
-            <i class="ti ti-file-spreadsheet fs-5 text-body-secondary" aria-hidden="true"></i>
+            <i class="ti ti-file-spreadsheet fs-5 text-body-secondary flex-shrink-0" aria-hidden="true"></i>
             <span>Research Data Export Center (CSV)</span>
         </h2>
     </div>
@@ -80,13 +80,13 @@ action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-
 
 <!-- Open Content Reports & Moderation -->
 <div class="card mb-4">
-    <div class="card-header bg-transparent py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+    <div class="card-header py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
         <h2 class="h6 fw-semibold mb-0 text-body d-flex align-items-center gap-2">
-            <i class="ti ti-flag fs-5 text-body-secondary" aria-hidden="true"></i>
+            <i class="ti ti-flag fs-5 text-body-secondary flex-shrink-0" aria-hidden="true"></i>
             <span>Open Reports & Content Moderation</span>
         </h2>
         {% if reports %}
-        <span class="badge text-bg-secondary">{{ reports|length }} Open</span>
+        <span class="badge border text-body-secondary">{{ reports|length }} Open</span>
         {% endif %}
     </div>
     <div class="card-body p-0">
@@ -94,7 +94,7 @@ action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead>
-                    <tr>
+                    <tr class="text-body-secondary small">
                         <th scope="col" class="ps-4">Date</th>
                         <th scope="col">Institution</th>
                         <th scope="col">Reported Material</th>
@@ -142,8 +142,7 @@ action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-outline-
             </table>
         </div>
         {% else %}
-        {{ ui.empty_state("ti-circle-check", "No Open Reports", "All uploaded materials are clear and compliant with
-        university policies.") }}
+        {{ ui.empty_state("ti-circle-check", "No Open Reports", "All uploaded materials are clear and compliant with university policies.") }}
         {% endif %}
     </div>
 </div>

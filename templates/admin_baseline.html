@@ -2,6 +2,7 @@
 {% import "_components.html" as ui %}
 
 {% block title %}Facilitator Baseline Entry - StudyExchange{% endblock %}
+{% block topbar_title %}Baseline Data{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -18,9 +19,9 @@
         ) }}
 
         <div class="card mb-4">
-            <div class="card-header bg-transparent py-3 px-4 border-bottom">
+            <div class="card-header py-3 px-4 border-bottom">
                 <h2 class="h6 fw-semibold mb-0 text-body d-flex align-items-center gap-2">
-                    <i class="ti ti-adjustments fs-5 text-body-secondary" aria-hidden="true"></i>
+                    <i class="ti ti-adjustments fs-5 text-body-secondary flex-shrink-0" aria-hidden="true"></i>
                     <span>Record Control Condition Trial</span>
                 </h2>
             </div>
@@ -34,7 +35,7 @@
                             Task Description <span class="text-danger" aria-hidden="true">*</span>
                         </label>
                         <input type="text" class="form-control" id="task_name" name="task_name"
-                               placeholder="e.g. Locate Calculus notes via Google Drive" required>
+                               placeholder="e.g. Locate Calculus notes via Google Drive" required autofocus>
                         <div class="invalid-feedback">Task name is required.</div>
                     </div>
 
@@ -83,7 +84,7 @@
 
         <!-- Recent Baseline Records -->
         <div class="card mb-4">
-            <div class="card-header bg-transparent py-3 px-4 border-bottom">
+            <div class="card-header py-3 px-4 border-bottom">
                 <h3 class="h6 fw-semibold mb-0 text-body">Recorded Baseline Metrics (method='baseline')</h3>
             </div>
             <div class="card-body p-0">
@@ -91,7 +92,7 @@
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
-                            <tr>
+                            <tr class="text-body-secondary small">
                                 <th class="ps-4">Task</th>
                                 <th>Duration</th>
                                 <th>Clicks</th>
@@ -108,9 +109,9 @@
                                 <td class="text-body-secondary">{{ b.errors }}</td>
                                 <td class="text-end pe-4">
                                     {% if b.success == 1 %}
-                                        <span class="badge text-bg-success">Success</span>
+                                        <span class="badge border text-success">Success</span>
                                     {% else %}
-                                        <span class="badge text-bg-danger">Failed</span>
+                                        <span class="badge border text-danger">Failed</span>
                                     {% endif %}
                                 </td>
                             </tr>
