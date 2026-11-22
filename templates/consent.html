@@ -34,7 +34,7 @@
                     </ul>
                 </div>
 
-                <form id="consent-form" action="{{ url_for('consent') }}" method="POST" class="needs-validation" novalidate>
+                <form id="consent-form" action="{{ url_for('auth.consent') }}" method="POST" class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-check p-3 border rounded-3 bg-body mb-4">

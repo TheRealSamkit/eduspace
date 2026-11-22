@@ -8,7 +8,7 @@
 {{ ui.page_header(
 "Administrator Control Panel",
 "Supervise content moderation, view usage metrics, and export evaluation data.",
-action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-primary btn-sm"><i class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
+action_html='<a href="' ~ url_for('admin.admin_baseline') ~ '" class="btn btn-primary btn-sm"><i class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
 ) }}
 
 <!-- Stats Grid -->
@@ -47,31 +47,31 @@ action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-primary 
             dataset is strictly anonymized (user emails and password hashes are never exported).
         </p>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ url_for('admin_export_csv', table_name='events') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='events') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Events Telemetry CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='tasks') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='tasks') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Tasks Performance CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='sus_responses') }}"
+            <a href="{{ url_for('admin.admin_export_csv', table_name='sus_responses') }}"
                 class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>SUS Responses CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='feedback') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='feedback') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Feedback CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='users_anonymized') }}"
+            <a href="{{ url_for('admin.admin_export_csv', table_name='users_anonymized') }}"
                 class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Anonymized Users CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='files') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='files') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Files Metadata CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='downloads') }}"
+            <a href="{{ url_for('admin.admin_export_csv', table_name='downloads') }}"
                 class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Downloads CSV
             </a>
-            <a href="{{ url_for('admin_export_csv', table_name='ledger') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='ledger') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Credit Ledger CSV
             </a>
         </div>
@@ -110,7 +110,7 @@ action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-primary 
                         <td class="ps-4 text-body-secondary small">{{ r.created_at[:16] if r.created_at else '' }}</td>
                         <td><span class="badge border text-body-secondary">{{ r.university_name }}</span></td>
                         <td>
-                            <a href="{{ url_for('file_detail', file_id=r.file_id) }}"
+                            <a href="{{ url_for('library.file_detail', file_id=r.file_id) }}"
                                 class="fw-semibold text-decoration-none">
                                 {{ r.file_title }}
                             </a>
@@ -120,14 +120,14 @@ action_html='<a href="' ~ url_for('admin_baseline') ~ '" class="btn btn-primary 
                         <td class="small text-danger fw-semibold">{{ r.reason }}</td>
                         <td class="text-end pe-4">
                             <div class="d-inline-flex gap-2">
-                                <form action="{{ url_for('resolve_report', report_id=r.id) }}" method="POST">
+                                <form action="{{ url_for('admin.resolve_report', report_id=r.id) }}" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-outline-secondary"
                                         title="Dismiss / Resolve report without changes">
                                         <i class="ti ti-check me-1" aria-hidden="true"></i>Dismiss
                                     </button>
                                 </form>
-                                <form action="{{ url_for('remove_file_admin', file_id=r.file_id) }}" method="POST"
+                                <form action="{{ url_for('admin.remove_file_admin', file_id=r.file_id) }}" method="POST"
                                     onsubmit="return confirm('Are you sure you want to remove this file and reverse the uploader\'s reward credits?');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">

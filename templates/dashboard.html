@@ -8,7 +8,7 @@
 {{ ui.page_header(
 title="Dashboard & Credit Ledger",
 subtitle="Track your platform credit balance, uploads, and download history",
-action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn-sm"><i class="ti ti-cloud-upload me-1"
+action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-primary btn-sm"><i class="ti ti-cloud-upload me-1"
         aria-hidden="true"></i>Upload Material</a>'
 ) }}
 
@@ -106,7 +106,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                                 </td>
                                 <td>
                                     {% if item.file_id and item.file_title %}
-                                    <a href="{{ url_for('file_detail', file_id=item.file_id) }}"
+                                    <a href="{{ url_for('library.file_detail', file_id=item.file_id) }}"
                                         class="text-decoration-none">
                                         {{ item.file_title }}
                                     </a>
@@ -155,7 +155,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                             {% for u in uploads %}
                             <tr>
                                 <td class="fw-medium">
-                                    <a href="{{ url_for('file_detail', file_id=u.id) }}"
+                                    <a href="{{ url_for('library.file_detail', file_id=u.id) }}"
                                         class="text-decoration-none text-body">
                                         {{ u.title }}
                                     </a>
@@ -178,7 +178,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                                 </td>
                                 <td class="text-end">
                                     {% if u.status == 'active' %}
-                                    <a href="{{ url_for('download_file', file_id=u.id) }}"
+                                    <a href="{{ url_for('library.download_file', file_id=u.id) }}"
                                         class="btn btn-sm btn-outline-secondary" title="Download">
                                         <i class="ti ti-download" aria-hidden="true"></i>
                                     </a>
@@ -194,7 +194,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                 icon="ti-cloud-upload",
                 title="No uploads yet",
                 message="You haven't uploaded any study materials yet. Upload your first file to earn credits.",
-                action_url=url_for('upload_file'),
+                action_url=url_for('upload.upload_file'),
                 action_text="Upload Material"
                 ) }}
                 {% endif %}
@@ -218,7 +218,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                             {% for d in downloads %}
                             <tr>
                                 <td class="fw-medium">
-                                    <a href="{{ url_for('file_detail', file_id=d.file_id) }}"
+                                    <a href="{{ url_for('library.file_detail', file_id=d.file_id) }}"
                                         class="text-decoration-none text-body">
                                         {{ d.title }}
                                     </a>
@@ -228,7 +228,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                                 <td class="text-body-secondary small">{{ d.downloaded_at }}</td>
                                 <td class="text-end">
                                     {% if d.status == 'active' %}
-                                    <a href="{{ url_for('download_file', file_id=d.file_id) }}"
+                                    <a href="{{ url_for('library.download_file', file_id=d.file_id) }}"
                                         class="btn btn-sm btn-outline-secondary">
                                         <i class="ti ti-download me-1" aria-hidden="true"></i>Re-download
                                     </a>
@@ -246,7 +246,7 @@ action_html='<a href="' + url_for('upload_file') + '" class="btn btn-primary btn
                 icon="ti-download",
                 title="No downloads yet",
                 message="You have not unlocked any materials yet. Browse available documents to get started.",
-                action_url=url_for('browse'),
+                action_url=url_for('library.browse'),
                 action_text="Browse Materials"
                 ) }}
                 {% endif %}

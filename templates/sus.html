@@ -18,10 +18,10 @@
                 Your insights directly guide the design and usability improvements of StudyExchange.
             </p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="{{ url_for('browse') }}" class="btn btn-primary">
+                <a href="{{ url_for('library.browse') }}" class="btn btn-primary">
                     Browse Materials
                 </a>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-secondary">
                     View Dashboard
                 </a>
             </div>
@@ -43,7 +43,7 @@
                     </div>
                 </div>
 
-                <form id="sus-form" action="{{ url_for('sus_survey') }}" method="POST">
+                <form id="sus-form" action="{{ url_for('research.sus_survey') }}" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <!-- 10 Question Cards -->

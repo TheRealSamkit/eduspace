@@ -14,7 +14,7 @@
                 An unexpected technical glitch occurred. Our administrators have logged the error telemetry for investigation.
             </p>
             <div>
-                <a href="{{ url_for('browse') if current_user else url_for('index') }}" class="btn btn-primary px-4 fw-medium">
+                <a href="{{ url_for('library.browse') if current_user else url_for('pages.index') }}" class="btn btn-primary px-4 fw-medium">
                     <i class="ti ti-home me-1" aria-hidden="true"></i>Return to Homepage
                 </a>
             </div>

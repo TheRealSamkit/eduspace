@@ -15,7 +15,7 @@
                     Register with your institutional university email to receive <strong>{{ config.SIGNUP_BONUS }} bonus credits</strong>.
                 </p>
 
-                <form action="{{ url_for('register') }}" method="POST" class="needs-validation" novalidate id="register-form">
+                <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate id="register-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="mb-3">
@@ -44,7 +44,7 @@
                     <div class="mb-4 form-check">
                         <input type="checkbox" class="form-check-input" id="agree_terms" name="agree_terms" required>
                         <label class="form-check-label small text-body-secondary" for="agree_terms">
-                            I accept the <a href="{{ url_for('terms_page') }}" target="_blank">Terms of Service & Copyright Policy</a> and confirm I will only upload study material I own or have the right to share.
+                            I accept the <a href="{{ url_for('pages.terms_page') }}" target="_blank">Terms of Service & Copyright Policy</a> and confirm I will only upload study material I own or have the right to share.
                         </label>
                         <div class="invalid-feedback">You must accept the terms and copyright policy to proceed.</div>
                     </div>
@@ -56,7 +56,7 @@
 
                 <div class="text-center mt-4 pt-3 border-top">
                     <p class="text-body-secondary small mb-0">
-                        Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none">Sign in here</a>
+                        Already have an account? <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Sign in here</a>
                     </p>
                 </div>
             </div>

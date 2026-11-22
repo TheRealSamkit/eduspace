@@ -61,7 +61,7 @@
                 </div>
 
                 <div class="pt-3 border-top">
-                    <a href="{{ url_for('browse') if current_user else url_for('index') }}"
+                    <a href="{{ url_for('library.browse') if current_user else url_for('pages.index') }}"
                         class="btn btn-outline-secondary btn-sm">
                         <i class="ti ti-arrow-left me-1" aria-hidden="true"></i>Return to Repository
                     </a>
