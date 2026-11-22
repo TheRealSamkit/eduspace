@@ -1,7 +1,7 @@
 """
 Administrator moderation, baseline evaluation entry, and data export routes.
 
-Depends on Flask, db.get_db, config.Config, and studyexchange.security.admin_required.
+Depends on Flask, db.get_db, config.Config, studyexchange.security, and studyexchange.services.
 """
 
 import io
@@ -13,6 +13,8 @@ from flask import (
 from config import Config
 from db import get_db
 from studyexchange.security import admin_required
+from studyexchange.services.files import takedown_file_admin
+from studyexchange.services.exports import get_export_dataset
 
 bp = Blueprint('admin', __name__)
 
@@ -94,43 +96,13 @@ def remove_file_admin(file_id):
         Response: Redirect to admin panel.
     """
     db = get_db()
-    cursor = db.cursor()
-    try:
-        cursor.execute("BEGIN IMMEDIATE")
-        file = cursor.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
-        if not file:
-            abort(404, description="File not found.")
+    default_reward = current_app.config.get('UPLOAD_REWARD', Config.UPLOAD_REWARD)
+    success, title, reversed_credits = takedown_file_admin(db, file_id, default_reward)
 
-        cursor.execute("UPDATE files SET status = 'removed' WHERE id = ?", (file_id,))
+    if not success:
+        abort(404, description="File not found.")
 
-        upload_ledger = cursor.execute(
-            "SELECT amount FROM ledger WHERE file_id = ? AND user_id = ? AND reason = 'upload' AND amount > 0",
-            (file_id, file['uploader_id'])
-        ).fetchone()
-
-        reversal_amount = upload_ledger['amount'] if upload_ledger else current_app.config.get('UPLOAD_REWARD', Config.UPLOAD_REWARD)
-
-        cursor.execute(
-            "UPDATE users SET credits = MAX(0, credits - ?) WHERE id = ?",
-            (reversal_amount, file['uploader_id'])
-        )
-
-        cursor.execute(
-            """
-            INSERT INTO ledger (user_id, amount, reason, file_id)
-            VALUES (?, ?, 'reversal', ?)
-            """,
-            (file['uploader_id'], -reversal_amount, file_id)
-        )
-
-        cursor.execute("UPDATE reports SET status = 'resolved' WHERE file_id = ?", (file_id,))
-
-        db.commit()
-        flash(f"Material '{file['title']}' removed and {reversal_amount} credits reversed from uploader.", "success")
-    except Exception:
-        db.rollback()
-        flash("Failed to remove material due to a database error.", "danger")
-
+    flash(f"Material '{title}' removed and {reversed_credits} credits reversed from uploader.", "success")
     return redirect(url_for('admin.admin_panel'))
 
 
@@ -185,54 +157,12 @@ def admin_export_csv(table_name):
     Returns:
         Response: CSV download attachment.
     """
-    allowed_tables = {
-        'events': (
-            'SELECT id, session_id, user_id, event_type, page, detail, ts FROM events',
-            ['id', 'session_id', 'user_id', 'event_type', 'page', 'detail', 'ts']
-        ),
-        'tasks': (
-            'SELECT id, user_id, task_name, method, started_at, ended_at, duration_sec, clicks, errors, success FROM tasks',
-            ['id', 'user_id', 'task_name', 'method', 'started_at', 'ended_at', 'duration_sec', 'clicks', 'errors', 'success']
-        ),
-        'sus_responses': (
-            'SELECT id, user_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, score, created_at FROM sus_responses',
-            ['id', 'user_id', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'score', 'created_at']
-        ),
-        'feedback': (
-            'SELECT id, user_id, text, usability_issue, created_at FROM feedback',
-            ['id', 'user_id', 'text', 'usability_issue', 'created_at']
-        ),
-        'users_anonymized': (
-            """
-            SELECT u.id, u.university_id, un.name as university_name, u.credits, u.is_admin, u.created_at
-            FROM users u
-            JOIN universities un ON u.university_id = un.id
-            """,
-            ['id', 'university_id', 'university_name', 'credits', 'is_admin', 'created_at']
-        ),
-        'files': (
-            """
-            SELECT f.id, f.university_id, f.subject, f.semester, f.type, f.size, f.status, f.created_at
-            FROM files f
-            """,
-            ['id', 'university_id', 'subject', 'semester', 'type', 'size', 'status', 'created_at']
-        ),
-        'downloads': (
-            'SELECT id, user_id, file_id, created_at FROM downloads',
-            ['id', 'user_id', 'file_id', 'created_at']
-        ),
-        'ledger': (
-            'SELECT id, user_id, amount, reason, file_id, created_at FROM ledger',
-            ['id', 'user_id', 'amount', 'reason', 'file_id', 'created_at']
-        )
-    }
-
-    if table_name not in allowed_tables:
+    db = get_db()
+    export_result = get_export_dataset(db, table_name)
+    if not export_result:
         abort(404, description="Dataset not available for export.")
 
-    query, headers = allowed_tables[table_name]
-    db = get_db()
-    rows = db.execute(query).fetchall()
+    headers, rows, filename = export_result
 
     si = io.StringIO()
     cw = csv.writer(si)
@@ -241,6 +171,6 @@ def admin_export_csv(table_name):
         cw.writerow([row[col] for col in headers])
 
     output = make_response(si.getvalue())
-    output.headers["Content-Disposition"] = f"attachment; filename=studyexchange_{table_name}.csv"
+    output.headers["Content-Disposition"] = f"attachment; filename={filename}"
     output.headers["Content-type"] = "text/csv"
     return output

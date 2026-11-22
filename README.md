@@ -18,7 +18,7 @@ The technology stack was chosen strictly to prioritize rapid prototyping, zero-b
   - *Why SQLite without ORM?* Built directly into Python with zero external server dependencies. Direct parameterized SQL gives complete transparency over query isolation, index optimization, and atomic transactions (`BEGIN IMMEDIATE`) ensuring platform credit balances never go negative.
 - **Templates**: **Jinja2**
   - *Why Jinja2?* Native integration with Flask for secure server-side HTML rendering, template inheritance (`base.html`), automatic escaping against XSS, and seamless context processor injection (e.g., CSRF tokens, current user).
-- **Frontend CSS**: **Bootstrap 5.3.3 (via jsDelivr CDN)**
+- **Frontend CSS**: **Bootstrap 5.3.3 (via custom build and jsDelivr CDN)**
   - *Why Bootstrap?* Industry-standard responsive grid, accessible form components, was-validated validation styling, modals, badges, and dismissible alerts without requiring build tools or bundlers.
 - **Icons**: **Tabler Icons (v3.19.0 webfont via jsDelivr CDN)**
   - *Why Tabler Icons?* Clean, modern SVG-based icon font rendered with semantic `<i class="ti ti-*"></i>` tags, providing icons for coins, files, ratings, dashboards, and shields.
@@ -32,17 +32,17 @@ The technology stack was chosen strictly to prioritize rapid prototyping, zero-b
 To maintain strict architectural boundaries across the team, the codebase is partitioned into distinct ownership domains:
 
 - **Frontend Team**:
-  - `templates/*.html` (All pages extending `templates/base.html`)
-  - `static/css/custom.css` (Brand variables, elevation styles, star ratings)
-  - `static/js/main.js` (Telemetry event logger, task timer tracker, validation)
+  - `templates/` (All Jinja templates extending `templates/base.html`)
+  - `static/` (CSS styling at `static/css/`, vanilla JS at `static/js/`)
 - **Backend Team**:
-  - `app.py` (Flask factory, application routes, authentication, transactions)
+  - `app.py` (Thin server runner script)
+  - `studyexchange/` (Modular application package, blueprints, services, hooks, security)
   - `db.py` (SQLite connection lifecycle, automatic initialization)
   - `schema.sql` (Relational schema, foreign keys, table indexes)
   - `config.py` (Configuration constants, domain mappings, credit rewards)
 - **Analysis & Quality Assurance Team**:
-  - `analysis/export_data.py` (CSV dataset export tool for research analytics)
-  - `tests/test_app.py` (Automated pytest test suite)
+  - `analysis/` (CSV dataset export scripts and export folder)
+  - `tests/` (Automated pytest test suite, route snapshot, route integrity tests)
 
 ### Ownership Rules
 1. **Schema Guard**: Nobody modifies `schema.sql` without consulting and getting sign-off from the Backend owner.
@@ -55,47 +55,136 @@ To maintain strict architectural boundaries across the team, the codebase is par
 
 ```text
 studyVerse/
-├── app.py                   # Flask application factory, routes, and error handlers
-├── db.py                    # Database connection manager and initialization
-├── schema.sql               # SQLite schema definition and indexes
-├── seed.py                  # Seed script populating demo unis, users, and dummy files
-├── config.py                # Platform parameters (rewards, limits, domains)
-├── requirements.txt         # Python dependencies (flask, werkzeug, pytest)
-├── README.md                # Project documentation and evaluation guide
+├── app.py                             # Thin runner entry point (create_app, runs local server)
+├── db.py                              # Database connection manager and initialization
+├── schema.sql                         # SQLite schema definition and indexes
+├── seed.py                            # Seed script populating demo unis, users, and dummy files
+├── config.py                          # Platform parameters (rewards, limits, domains)
+├── requirements.txt                   # Python dependencies (flask, werkzeug, pytest)
+├── README.md                          # Project documentation and architecture guide
+├── studyexchange/                     # Core application package
+│   ├── __init__.py                    # create_app factory: config, init_app, hooks, blueprints
+│   ├── hooks.py                       # Context processors, before_request, after_request headers
+│   ├── security.py                    # CSRF helpers, login_required, admin_required decorators
+│   ├── blueprints/                    # Modular route handlers
+│   │   ├── pages.py                   # /, /terms, /favicon.ico
+│   │   ├── auth.py                    # /register, /login, /logout, /consent
+│   │   ├── library.py                 # /browse, /file/<id>, rate, report, /download/<id>
+│   │   ├── upload.py                  # /upload
+│   │   ├── dashboard.py               # /dashboard
+│   │   ├── admin.py                   # /admin, report resolve, takedown, baseline, CSV export
+│   │   ├── research.py                # /task, /task/complete, /sus, /feedback
+│   │   ├── api.py                     # /api/me, /api/domain-check, /api/credits, /api/event
+│   │   └── errors.py                  # HTTP 400, 403, 404, 500 error handlers
+│   └── services/                      # Decoupled business logic (no Flask request/response)
+│       ├── credits.py                 # Ledger writes, upload rewards, atomic download charges, reversals
+│       ├── files.py                   # Upload validation, saving, browse querying with isolation, takedowns
+│       ├── telemetry.py               # Event logging, task evaluation metrics, user feedback
+│       ├── sus.py                     # 10-item System Usability Scale calculations and validation
+│       └── exports.py                 # CSV dataset schemas and anonymized data querying
 ├── static/
 │   ├── css/
-│   │   └── custom.css       # Brand styling and hover elevations
+│   │   ├── bootstrap.css              # Custom compiled Bootstrap 5.3 build
+│   │   └── custom.css                 # Brand styling, toast layout, elevations
 │   └── js/
-│       └── main.js          # Telemetry logging, test mode tracker, validation
+│       ├── main.js                    # Telemetry logging, test mode tracker, form validation
+│       ├── toast.js                   # Client-side toast notification manager
+│       └── shortcuts.js               # Keyboard shortcuts handler and help modal
 ├── templates/
-│   ├── base.html            # Master layout with left sidebar, slim topbar, and CDN links
-│   ├── _components.html     # Reusable UI macros (page_header, stat_card, empty_state, file_card)
-│   ├── index.html           # Landing page for prospective students
-│   ├── register.html        # Institutional registration form
-│   ├── login.html           # Sign in form
-│   ├── consent.html         # Academic research ethics consent page
-│   ├── browse.html          # Resource repository with search, filters, and pagination
-│   ├── upload.html          # File upload form with copyright ownership checkbox
-│   ├── file_detail.html     # Resource detail, star rating widget, and report modal
-│   ├── dashboard.html       # Credit balance, ledger history, my uploads & downloads
-│   ├── admin.html           # Moderation panel, stats cards, and CSV export buttons
-│   ├── admin_baseline.html  # Facilitator entry form for baseline control data
-│   ├── task.html            # HCI Test Mode evaluation interface (timed tasks)
-│   ├── sus.html             # Stepped 10-item System Usability Scale (SUS) survey
-│   ├── feedback.html        # Qualitative user feedback and usability issue reporting
-│   ├── terms.html           # Terms of service, copyright policy, and takedown policy
-│   ├── 404.html             # Friendly 404 / 403 error page
-│   └── 500.html             # Friendly 500 server error page
-├── uploads/                 # Local storage for uploaded files (randomized filenames)
-├── screenshots/             # Visual validation captures at 1440px and 390px (light/dark)
+│   ├── base.html                      # Master layout with left sidebar, slim topbar, toasts container
+│   ├── _components.html               # Reusable UI macros (page_header, stat_card, empty_state, file_card)
+│   ├── index.html                     # Landing page for prospective students
+│   ├── register.html                  # Institutional registration form
+│   ├── login.html                     # Sign in form
+│   ├── consent.html                   # Academic research ethics consent page
+│   ├── browse.html                    # Resource repository with search, filters, and pagination
+│   ├── upload.html                    # Single-card two-column file upload form
+│   ├── file_detail.html               # Resource detail, star rating widget, and report modal
+│   ├── dashboard.html                 # Credit balance, ledger history, my uploads & downloads
+│   ├── admin.html                     # Moderation panel, stats cards, and CSV export buttons
+│   ├── admin_baseline.html            # Facilitator entry form for baseline control data
+│   ├── task.html                      # HCI Test Mode evaluation interface (timed tasks)
+│   ├── sus.html                       # Stepped 10-item System Usability Scale (SUS) survey
+│   ├── feedback.html                  # Qualitative user feedback and usability issue reporting
+│   ├── terms.html                     # Terms of service, copyright policy, and takedown policy
+│   ├── 404.html                       # Friendly 404 / 403 error page
+│   └── 500.html                       # Friendly 500 server error page
+├── uploads/                           # Local storage for uploaded files (randomized filenames)
+├── screenshots/                       # Visual validation captures at 1440px and 390px (light/dark)
 ├── analysis/
-│   ├── export_data.py       # Standalone CSV export script
-│   └── exports/             # Output folder for exported CSV research datasets
+│   ├── export_data.py                 # Standalone CSV export script
+│   └── exports/                       # Output folder for exported CSV research datasets
 └── tests/
-    ├── test_app.py          # Core tests (isolation, auth, credits, moderation)
-    ├── test_routes.py       # Route smoke tests iterating app.url_map under 4 contexts
-    └── test_flows.py        # End-to-end integration flows and input validation
+    ├── test_app.py                    # Core tests (isolation, auth, credits, moderation)
+    ├── test_routes.py                 # Route smoke tests iterating app.url_map under 4 contexts
+    ├── test_flows.py                  # End-to-end integration flows and input validation
+    ├── test_phase1_improvements.py    # Phase 1 UI and architecture test suite
+    ├── test_route_integrity.py        # Route snapshot comparison and url_for endpoint scanner
+    └── route_snapshot.json            # Baseline route table snapshot
 ```
+
+---
+
+## What Each Module Does
+
+### Blueprints (`studyexchange/blueprints/`)
+- **`pages.py`**: Public landing page (`/`), legal and copyright terms (`/terms`), and silent favicon handler (`/favicon.ico`).
+- **`auth.py`**: User authentication lifecycles including institutional domain-checked registration (`/register`), login (`/login`), logout (`/logout`), and research ethics consent (`/consent`).
+- **`library.py`**: Core student study material workflows: browsing with search/filters (`/browse`), material details (`/file/<id>`), 1–5 star ratings (`/file/<id>/rate`), content infringement reporting (`/file/<id>/report`), and credit-deducted file downloads (`/download/<id>`).
+- **`upload.py`**: Material submission (`/upload`), input validation, and daily upload credit rewarding.
+- **`dashboard.py`**: Personal account overview (`/dashboard`) showing real-time credits, transaction history, active uploads, and previous downloads.
+- **`admin.py`**: Administrator moderation console (`/admin`), open report dismissal (`/admin/report/<id>/resolve`), material removal with credit reversal (`/admin/file/<id>/remove`), facilitator baseline data recording (`/admin/baseline`), and CSV exports (`/admin/export/<table>`).
+- **`research.py`**: Usability evaluation tools: interactive test mode runner (`/task`), task completion telemetry (`/task/complete`), 10-item System Usability Scale survey (`/sus`), and qualitative feedback submission (`/feedback`).
+- **`api.py`**: JSON endpoints supporting dynamic client UI: auth status check (`/api/me`), real-time domain verification (`/api/domain-check`), live credit sync (`/api/credits`), and telemetry event logging (`/api/event`).
+- **`errors.py`**: Custom HTTP error handling rendering styled 400, 403, 404, and 500 error templates.
+
+### Services (`studyexchange/services/`)
+- **`credits.py`**: Manages all credit transactions and ledger writes. Enforces the daily upload reward cap (`MAX_REWARDED_UPLOADS_PER_DAY`), performs atomic credit checks and deductions in a `BEGIN IMMEDIATE` transaction during downloads, and handles reward reversals upon moderation removal.
+- **`files.py`**: Handles upload metadata validation, disk persistence with randomized filenames, browse queries with strict `university_id` isolation, rating/report persistence, and content takedown.
+- **`telemetry.py`**: Persistence helpers for client-side events, prototype task metrics, and qualitative usability feedback.
+- **`sus.py`**: System Usability Scale utilities: item definition, 1–5 range validation, Brooke (1996) formula score calculation, and database persistence.
+- **`exports.py`**: CSV export table definitions and data retrieval with strict anonymization rules (excluding student emails and password hashes).
+
+---
+
+## How to Add a New Route
+
+To add a new route while preserving modular separation and testing invariants:
+
+1. **Implement Business Logic (Service)**:
+   Add any non-trivial database operations or domain logic to the relevant service module in `studyexchange/services/` (e.g. `files.py`, `credits.py`, or `telemetry.py`). Keep service functions decoupled from Flask request and response objects.
+
+2. **Add View Function to Blueprint**:
+   Locate or create the appropriate blueprint in `studyexchange/blueprints/`:
+   ```python
+   from flask import Blueprint, render_template, request, redirect, url_for, flash
+   from studyexchange.security import login_required
+
+   @bp.route('/my-route', methods=['GET', 'POST'])
+   @login_required
+   def my_view():
+       # Handle request, call service function, return response
+       return render_template('my_template.html')
+   ```
+
+3. **Register Blueprint (if new)**:
+   If you created a new blueprint, register it inside `studyexchange/__init__.py`:
+   ```python
+   from studyexchange.blueprints.my_module import bp as my_bp
+   app.register_blueprint(my_bp)
+   ```
+
+4. **Reference via Namespaced `url_for`**:
+   In templates, redirects, and tests, always reference the route with its blueprint prefix:
+   ```jinja2
+   <a href="{{ url_for('my_bp.my_view') }}">Go to My View</a>
+   ```
+
+5. **Verify with Tests**:
+   Run `pytest` to automatically verify that the route appears in the url map and that all `url_for` references in templates match registered endpoints:
+   ```bash
+   pytest tests/test_route_integrity.py
+   ```
 
 ---
 
@@ -243,7 +332,7 @@ By default, this writes all 8 datasets to `analysis/exports/`.
 
 ## Automated Test Suite
 
-The test suite covers unit tests, security route smoke tests, and full end-to-end integration flows across three test modules:
+The test suite covers unit tests, security route smoke tests, and full end-to-end integration flows across five test modules:
 
 ```bash
 pytest
@@ -265,8 +354,12 @@ pytest
    - Confirms proper authentication redirects (302), role-based forbidden blocks (403), and custom 404 error page responses.
 
 3. **`tests/test_flows.py`**:
-   - End-to-end user lifecycle: Registration -> Consent -> Upload (+10) -> Browse/Search/Filter/Sort -> Second user download (-5) -> Free re-download -> Rate -> Report -> Admin moderation takedown & reversal (-10) -> Test Mode task tracking -> SUS survey scoring (Odd=5/Even=1 -> 100, All 3s -> 50) -> Qualitative feedback -> Facilitator baseline metric entry -> Anonymized CSV dataset downloads.
+   - End-to-end user lifecycle: Registration -> Consent -> Upload (+10) -> Browse/Search/Filter/Sort -> Second user download (-5) -> Free re-download -> Rate -> Report -> Admin moderation takedown & reversal (-10) -> Test Mode task tracking -> SUS survey scoring -> Qualitative feedback -> Facilitator baseline metric entry -> Anonymized CSV dataset downloads.
    - Input validation & security: Oversized file rejection (>10MB), disallowed extensions (.exe, .sh), missing fields, duplicate email/username, password length requirements, SQL injection resilience in search/filters, XSS HTML escaping, and CSRF token enforcement.
+
+4. **`tests/test_route_integrity.py`**:
+   - Compares registered rules and methods against `tests/route_snapshot.json` to guarantee identical route URLs.
+   - Scans all template HTML and static JavaScript files to ensure every `url_for` call references a valid registered endpoint.
 
 ---
 

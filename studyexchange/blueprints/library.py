@@ -3,7 +3,7 @@ Core library routes for StudyExchange.
 
 Includes repository browsing, search/filter, material detail views, ratings,
 reporting, and credit-deducted file downloads with institutional isolation.
-Depends on Flask, db.get_db, and studyexchange.security.login_required.
+Depends on Flask, db.get_db, and studyexchange.services.
 """
 
 from flask import (
@@ -13,6 +13,8 @@ from flask import (
 from config import Config
 from db import get_db
 from studyexchange.security import login_required
+from studyexchange.services.files import query_browse_materials, get_file_detail_isolated
+from studyexchange.services.credits import process_download_transaction
 
 bp = Blueprint('library', __name__)
 
@@ -32,81 +34,32 @@ def browse():
     type_filter = request.args.get('type', '').strip()
     sort_by = request.args.get('sort', 'newest')
     page = max(1, request.args.get('page', 1, type=int))
-    per_page = 9
 
     db = get_db()
-
-    # Base query with university isolation and active status
-    sql_base = """
-        FROM files f
-        JOIN users u ON f.uploader_id = u.id
-        LEFT JOIN ratings r ON f.id = r.file_id
-        LEFT JOIN downloads d ON f.id = d.file_id
-        WHERE f.university_id = ? AND f.status = 'active'
-    """
-    params = [g.user['university_id']]
-
-    if search_query:
-        sql_base += " AND (f.title LIKE ? OR f.subject LIKE ? OR f.description LIKE ?)"
-        term = f"%{search_query}%"
-        params.extend([term, term, term])
-
-    if subject_filter:
-        sql_base += " AND f.subject = ?"
-        params.append(subject_filter)
-
-    if semester_filter:
-        sql_base += " AND f.semester = ?"
-        params.append(semester_filter)
-
-    if type_filter:
-        sql_base += " AND f.type = ?"
-        params.append(type_filter)
-
-    count_sql = f"SELECT COUNT(DISTINCT f.id) {sql_base}"
-    total_items = db.execute(count_sql, params).fetchone()[0]
-    total_pages = max(1, (total_items + per_page - 1) // per_page)
-    offset = (page - 1) * per_page
-
-    order_clause = "ORDER BY f.created_at DESC"
-    if sort_by == 'top_rated':
-        order_clause = "ORDER BY avg_rating DESC, rating_count DESC, f.created_at DESC"
-    elif sort_by == 'most_downloaded':
-        order_clause = "ORDER BY download_count DESC, f.created_at DESC"
-    elif sort_by == 'oldest':
-        order_clause = "ORDER BY f.created_at ASC"
-
-    select_sql = f"""
-        SELECT f.id, f.title, f.subject, f.semester, f.type, f.description,
-               f.size, f.created_at, u.username as uploader_username,
-               COALESCE(AVG(r.stars), 0.0) as avg_rating,
-               COUNT(DISTINCT r.id) as rating_count,
-               COUNT(DISTINCT d.id) as download_count
-        {sql_base}
-        GROUP BY f.id
-        {order_clause}
-        LIMIT ? OFFSET ?
-    """
-    query_params = list(params) + [per_page, offset]
-    files = db.execute(select_sql, query_params).fetchall()
-
-    subjects = db.execute(
-        "SELECT DISTINCT subject FROM files WHERE university_id = ? AND status = 'active' ORDER BY subject",
-        (g.user['university_id'],)
-    ).fetchall()
-
-    return render_template(
-        'browse.html',
-        files=files,
-        total_items=total_items,
-        page=page,
-        total_pages=total_pages,
+    result = query_browse_materials(
+        db=db,
+        university_id=g.user['university_id'],
         search_query=search_query,
         subject_filter=subject_filter,
         semester_filter=semester_filter,
         type_filter=type_filter,
         sort_by=sort_by,
-        subjects=[s['subject'] for s in subjects]
+        page=page,
+        per_page=9
+    )
+
+    return render_template(
+        'browse.html',
+        files=result['files'],
+        total_items=result['total_items'],
+        page=page,
+        total_pages=result['total_pages'],
+        search_query=search_query,
+        subject_filter=subject_filter,
+        semester_filter=semester_filter,
+        type_filter=type_filter,
+        sort_by=sort_by,
+        subjects=result['subjects']
     )
 
 
@@ -123,22 +76,7 @@ def file_detail(file_id):
         Response: Rendered file_detail.html or 404 if not found / different university.
     """
     db = get_db()
-    file = db.execute(
-        """
-        SELECT f.*, u.username as uploader_username,
-               COALESCE(AVG(r.stars), 0.0) as avg_rating,
-               COUNT(DISTINCT r.id) as rating_count,
-               COUNT(DISTINCT d.id) as download_count
-        FROM files f
-        JOIN users u ON f.uploader_id = u.id
-        LEFT JOIN ratings r ON f.id = r.file_id
-        LEFT JOIN downloads d ON f.id = d.file_id
-        WHERE f.id = ? AND f.university_id = ? AND f.status = 'active'
-        GROUP BY f.id
-        """,
-        (file_id, g.user['university_id'])
-    ).fetchone()
-
+    file = get_file_detail_isolated(db, file_id, g.user['university_id'])
     if not file:
         abort(404, description="Material not found or access restricted to its institution.")
 
@@ -252,6 +190,7 @@ def download_file(file_id):
         Response: File attachment or redirect on error.
     """
     db = get_db()
+    # Strict university isolation check
     file = db.execute(
         "SELECT * FROM files WHERE id = ? AND university_id = ? AND status = 'active'",
         (file_id, g.user['university_id'])
@@ -267,49 +206,17 @@ def download_file(file_id):
     ).fetchone() is not None
 
     cost = current_app.config.get('DOWNLOAD_COST', Config.DOWNLOAD_COST)
+    success, err_msg = process_download_transaction(
+        db=db,
+        user_id=g.user['id'],
+        file_id=file_id,
+        cost=cost,
+        is_uploader=is_uploader,
+        already_downloaded=already_downloaded
+    )
 
-    # Atomic credit balance verification and deduction
-    cursor = db.cursor()
-    try:
-        cursor.execute("BEGIN IMMEDIATE")
-
-        if not is_uploader and not already_downloaded:
-            user_record = cursor.execute(
-                "SELECT credits FROM users WHERE id = ?",
-                (g.user['id'],)
-            ).fetchone()
-
-            if not user_record or user_record['credits'] < cost:
-                db.rollback()
-                flash(
-                    f"Insufficient credits! Downloading this document requires {cost} credits. "
-                    f"Your current balance is {g.user['credits']}. Upload study materials to earn more.",
-                    "danger"
-                )
-                return redirect(url_for('library.file_detail', file_id=file_id))
-
-            cursor.execute(
-                "UPDATE users SET credits = credits - ? WHERE id = ?",
-                (cost, g.user['id'])
-            )
-            cursor.execute(
-                """
-                INSERT INTO ledger (user_id, amount, reason, file_id)
-                VALUES (?, ?, 'download', ?)
-                """,
-                (g.user['id'], -cost, file_id)
-            )
-
-        if not already_downloaded:
-            cursor.execute(
-                "INSERT INTO downloads (user_id, file_id) VALUES (?, ?)",
-                (g.user['id'], file_id)
-            )
-
-        db.commit()
-    except Exception:
-        db.rollback()
-        flash("An error occurred during download processing. Please try again.", "danger")
+    if not success:
+        flash(err_msg, "danger")
         return redirect(url_for('library.file_detail', file_id=file_id))
 
     upload_folder = current_app.config.get('UPLOAD_FOLDER', Config.UPLOAD_FOLDER)

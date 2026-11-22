@@ -1,11 +1,12 @@
 """
 JSON API endpoints for client-side state, domain validation, telemetry, and live credit sync.
 
-Depends on Flask, db.get_db.
+Depends on Flask, db.get_db, and studyexchange.services.telemetry.
 """
 
 from flask import Blueprint, request, jsonify, session, g, current_app
 from db import get_db
+from studyexchange.services.telemetry import log_event_entry
 
 bp = Blueprint('api', __name__)
 
@@ -93,14 +94,14 @@ def api_event():
 
     try:
         db = get_db()
-        db.execute(
-            """
-            INSERT INTO events (session_id, user_id, event_type, page, detail)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (g.session_id, g.user['id'] if g.user else None, event_type, page, str(detail)[:500])
+        log_event_entry(
+            db=db,
+            session_id=g.session_id,
+            user_id=g.user['id'] if g.user else None,
+            event_type=event_type,
+            page=page,
+            detail=detail
         )
-        db.commit()
         return jsonify({'status': 'ok'}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500

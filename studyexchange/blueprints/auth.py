@@ -1,7 +1,7 @@
 """
 Authentication, registration, session termination, and research consent routes.
 
-Depends on Flask, werkzeug.security, db.get_db, sqlite3, and config.Config.
+Depends on Flask, werkzeug.security, db.get_db, and studyexchange.services.credits.
 """
 
 import sqlite3
@@ -12,8 +12,73 @@ from flask import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from db import get_db
+from studyexchange.services.credits import record_ledger_entry
 
 bp = Blueprint('auth', __name__)
+
+
+def validate_registration_form(username, email, password, agree_terms, allowed_domains):
+    """
+    Validate student registration form inputs and institutional domain.
+
+    Args:
+        username (str): Proposed username.
+        email (str): Institutional email address.
+        password (str): Password.
+        agree_terms (str or None): Agreement checkbox value.
+        allowed_domains (dict): Whitelisted domain mappings.
+
+    Returns:
+        tuple: (errors: list of str, domain: str)
+    """
+    errors = []
+    if not username or len(username) < 3:
+        errors.append("Username must be at least 3 characters.")
+    if not email or '@' not in email:
+        errors.append("A valid email address is required.")
+    if not password or len(password) < 8:
+        errors.append("Password must be at least 8 characters long.")
+    if not agree_terms:
+        errors.append("You must agree to the Terms of Service and Copyright policy.")
+
+    domain = email.split('@')[-1] if '@' in email else ''
+    if domain not in allowed_domains:
+        errors.append(
+            f"Email domain '@{domain}' is not recognized. "
+            f"Only allowed universities can register: {', '.join(['@' + d for d in allowed_domains.keys()])}."
+        )
+    return errors, domain
+
+
+def create_user_account(db, email, username, pwd_hash, uni_id, is_admin, signup_bonus):
+    """
+    Atomically insert user record and initial signup bonus ledger entry.
+
+    Args:
+        db: SQLite database connection.
+        email (str): User email.
+        username (str): Public username.
+        pwd_hash (str): Password hash.
+        uni_id (int): University primary key.
+        is_admin (int): 1 if admin, 0 otherwise.
+        signup_bonus (int): Initial credits awarded on registration.
+
+    Returns:
+        int: Created user primary key.
+    """
+    cursor = db.cursor()
+    cursor.execute("BEGIN IMMEDIATE")
+    cursor.execute(
+        """
+        INSERT INTO users (email, username, password_hash, university_id, credits, is_admin)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (email, username, pwd_hash, uni_id, signup_bonus, is_admin)
+    )
+    user_id = cursor.lastrowid
+    record_ledger_entry(cursor, user_id, signup_bonus, 'signup', None)
+    db.commit()
+    return user_id
 
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -36,25 +101,8 @@ def register():
         password = request.form.get('password', '')
         agree_terms = request.form.get('agree_terms')
 
-        errors = []
-        if not username or len(username) < 3:
-            errors.append("Username must be at least 3 characters.")
-        if not email or '@' not in email:
-            errors.append("A valid email address is required.")
-        if not password or len(password) < 8:
-            errors.append("Password must be at least 8 characters long.")
-        if not agree_terms:
-            errors.append("You must agree to the Terms of Service and Copyright policy.")
-
-        # Institutional domain validation
-        domain = email.split('@')[-1] if '@' in email else ''
         allowed_domains = current_app.config.get('ALLOWED_DOMAINS', Config.ALLOWED_DOMAINS)
-        if domain not in allowed_domains:
-            errors.append(
-                f"Email domain '@{domain}' is not recognized. "
-                f"Only allowed universities can register: {', '.join(['@' + d for d in allowed_domains.keys()])}."
-            )
-
+        errors, domain = validate_registration_form(username, email, password, agree_terms, allowed_domains)
         if errors:
             for err in errors:
                 flash(err, "danger")
@@ -74,10 +122,9 @@ def register():
             (email, username)
         ).fetchone()
         if existing:
-            if existing['email'] == email:
-                flash("An account with that email already exists. Please log in.", "warning")
-            else:
-                flash("That username is already taken. Please choose another.", "warning")
+            msg = "An account with that email already exists. Please log in." if existing['email'] == email \
+                else "That username is already taken. Please choose another."
+            flash(msg, "warning")
             return render_template('register.html', username=username, email=email)
 
         pwd_hash = generate_password_hash(password)
@@ -85,25 +132,7 @@ def register():
         signup_bonus = current_app.config.get('SIGNUP_BONUS', Config.SIGNUP_BONUS)
 
         try:
-            # Atomic creation: user account and initial signup bonus ledger row
-            cursor = db.cursor()
-            cursor.execute("BEGIN IMMEDIATE")
-            cursor.execute(
-                """
-                INSERT INTO users (email, username, password_hash, university_id, credits, is_admin)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (email, username, pwd_hash, uni_id, signup_bonus, is_admin)
-            )
-            user_id = cursor.lastrowid
-            cursor.execute(
-                """
-                INSERT INTO ledger (user_id, amount, reason, file_id)
-                VALUES (?, ?, 'signup', NULL)
-                """,
-                (user_id, signup_bonus)
-            )
-            db.commit()
+            user_id = create_user_account(db, email, username, pwd_hash, uni_id, is_admin, signup_bonus)
         except sqlite3.IntegrityError:
             db.rollback()
             flash("An account with that email or username already exists. Please log in.", "warning")
@@ -136,10 +165,7 @@ def consent():
         agreed = request.form.get('agree_consent')
         if agreed:
             db = get_db()
-            db.execute(
-                "INSERT OR IGNORE INTO consents (user_id) VALUES (?)",
-                (g.user['id'],)
-            )
+            db.execute("INSERT OR IGNORE INTO consents (user_id) VALUES (?)", (g.user['id'],))
             db.commit()
             flash("Thank you for consenting to anonymised academic evaluation.", "success")
             return redirect(url_for('library.browse'))
