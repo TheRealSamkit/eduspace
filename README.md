@@ -236,6 +236,33 @@ To add a new route while preserving modular separation and testing invariants:
 
 ---
 
+## Keyboard Shortcuts & Accessibility
+
+StudyExchange provides full keyboard navigation via a single source of truth defined in `static/js/shortcuts.js`:
+
+| Key Sequence | Action | Group | Notes |
+|:---|:---|:---|:---|
+| <kbd>G</kbd> then <kbd>B</kbd> | Navigate to Browse | Navigation | 1.5s sequence window with hint pill |
+| <kbd>G</kbd> then <kbd>U</kbd> | Navigate to Upload | Navigation | |
+| <kbd>G</kbd> then <kbd>D</kbd> | Navigate to Dashboard | Navigation | |
+| <kbd>G</kbd> then <kbd>T</kbd> | Navigate to Test Mode | Navigation | |
+| <kbd>G</kbd> then <kbd>S</kbd> | Navigate to SUS Survey | Navigation | |
+| <kbd>G</kbd> then <kbd>F</kbd> | Navigate to Usability Feedback | Navigation | |
+| <kbd>G</kbd> then <kbd>A</kbd> | Navigate to Admin Panel | Navigation | Visible & active for admins only |
+| <kbd>G</kbd> then <kbd>L</kbd> | Navigate to Baseline Data | Navigation | Visible & active for admins only |
+| <kbd>T</kbd> | Toggle light / dark theme | Interface | Instant client-side toggle |
+| <kbd>/</kbd> | Focus Search field | Interface | Available on Browse page |
+| <kbd>?</kbd> | Keyboard shortcuts modal | Interface | Accessible dialog with Esc dismissal |
+| <kbd>Esc</kbd> | Close dialog / dismiss toast | Interface | Restores focus to previous active element |
+
+### Research Safety Rules
+- **Test Mode Gating**: To preserve research validity, all navigation shortcuts and `/` are automatically disabled while an evaluation task is running. Pressing a navigation shortcut during a task displays a non-blocking warning toast (`"Keyboard shortcuts are disabled during test tasks."`) and does not inflate task click counts.
+- **Form Input Safety**: Shortcuts never fire when focus is inside text inputs, textareas, selects, or `contenteditable` elements.
+- **Modifier Isolation**: Key events with `Ctrl`, `Alt`, or `Meta` modifiers are ignored to avoid interfering with browser defaults.
+- **Accessible Tooltips**: Navigation items and icon-only buttons display Bootstrap tooltips on hover and keyboard focus. Tooltips are initialized only on hover-capable devices (`@media (hover: hover)`) to prevent sticky tooltips on mobile touchscreens.
+
+---
+
 ## Setup & Running the Application
 
 ### 1. Requirements & Dependencies
@@ -360,6 +387,14 @@ pytest
 4. **`tests/test_route_integrity.py`**:
    - Compares registered rules and methods against `tests/route_snapshot.json` to guarantee identical route URLs.
    - Scans all template HTML and static JavaScript files to ensure every `url_for` call references a valid registered endpoint.
+
+5. **`tests/test_toasts.py`**:
+   - Verifies Flask flash messages render as semantic Bootstrap toasts instead of inline alert banners.
+   - Asserts correct semantic categories (`text-bg-success`, `text-bg-danger`, etc.) and eliminates legacy `.alert` markup.
+
+6. **`tests/test_shortcuts.py`**:
+   - Verifies `SHORTCUTS_DEF` data integrity, key uniqueness, and avoidance of numerical/Enter shortcuts.
+   - Asserts role-aware presence of `data-shortcut` and `aria-keyshortcuts` attributes for students vs admins.
 
 ---
 

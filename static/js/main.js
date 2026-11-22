@@ -255,6 +255,37 @@
                 window.toggleTheme();
             });
         });
+
+        // 6. Accessible Bootstrap tooltips initialization (hover-capable devices only)
+        let tooltipInstances = [];
+        function initTooltips() {
+            if (!window.matchMedia('(hover: hover)').matches) return;
+            const triggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipInstances = triggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    trigger: 'hover focus',
+                    delay: { show: 400, hide: 0 },
+                    container: 'body'
+                });
+            });
+        }
+        initTooltips();
+
+        // Dismiss tooltip immediately when its target is clicked
+        document.addEventListener('click', function (e) {
+            const el = e.target.closest('[data-bs-toggle="tooltip"]');
+            if (el) {
+                const inst = bootstrap.Tooltip.getInstance(el);
+                if (inst) inst.hide();
+            }
+        });
+
+        window.addEventListener('pagehide', function () {
+            tooltipInstances.forEach(function (t) {
+                try { t.dispose(); } catch (e) {}
+            });
+            tooltipInstances = [];
+        });
     });
 
     // Make TaskTracker available globally

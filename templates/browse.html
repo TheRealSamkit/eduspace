@@ -23,7 +23,8 @@ action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-prim
                     <span class="input-group-text bg-body-tertiary"><i class="ti ti-search"
                             aria-hidden="true"></i></span>
                     <input type="text" class="form-control" id="searchQuery" name="q" value="{{ search_query }}"
-                        placeholder="Search title, subject, or description...">
+                        placeholder="Search title, subject, or description..."
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Press / to search">
                 </div>
             </div>
 

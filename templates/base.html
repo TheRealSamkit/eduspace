@@ -49,37 +49,43 @@
 
             <ul class="sidebar-nav">
                 <li class="sidebar-nav-item {% if request.endpoint == 'library.browse' %}active{% endif %}">
-                    <a href="{{ url_for('library.browse') }}">
+                    <a href="{{ url_for('library.browse') }}" data-shortcut="g b" aria-keyshortcuts="g b"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Browse (G then B)">
                         <i class="ti ti-compass fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Browse</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'upload.upload_file' %}active{% endif %}">
-                    <a href="{{ url_for('upload.upload_file') }}">
+                    <a href="{{ url_for('upload.upload_file') }}" data-shortcut="g u" aria-keyshortcuts="g u"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Upload (G then U)">
                         <i class="ti ti-cloud-upload fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Upload</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
-                    <a href="{{ url_for('dashboard.dashboard') }}">
+                    <a href="{{ url_for('dashboard.dashboard') }}" data-shortcut="g d" aria-keyshortcuts="g d"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard (G then D)">
                         <i class="ti ti-layout-dashboard fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'research.task_page' %}active{% endif %}">
-                    <a href="{{ url_for('research.task_page') }}">
+                    <a href="{{ url_for('research.task_page') }}" data-shortcut="g t" aria-keyshortcuts="g t"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Test Mode (G then T)">
                         <i class="ti ti-clipboard-check fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Test Mode</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'research.sus_survey' %}active{% endif %}">
-                    <a href="{{ url_for('research.sus_survey') }}">
+                    <a href="{{ url_for('research.sus_survey') }}" data-shortcut="g s" aria-keyshortcuts="g s"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="SUS Survey (G then S)">
                         <i class="ti ti-chart-bar fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>SUS Survey</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'research.feedback_page' %}active{% endif %}">
-                    <a href="{{ url_for('research.feedback_page') }}">
+                    <a href="{{ url_for('research.feedback_page') }}" data-shortcut="g f" aria-keyshortcuts="g f"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Feedback (G then F)">
                         <i class="ti ti-message-circle fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Feedback</span>
                     </a>
@@ -88,13 +94,15 @@
                 {% if current_user.is_admin %}
                 <li class="sidebar-section-title">Admin Moderation</li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'admin.admin_panel' %}active{% endif %}">
-                    <a href="{{ url_for('admin.admin_panel') }}">
+                    <a href="{{ url_for('admin.admin_panel') }}" data-shortcut="g a" aria-keyshortcuts="g a"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Admin Panel (G then A)">
                         <i class="ti ti-shield-lock text-danger fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Admin Panel</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'admin.admin_baseline' %}active{% endif %}">
-                    <a href="{{ url_for('admin.admin_baseline') }}">
+                    <a href="{{ url_for('admin.admin_baseline') }}" data-shortcut="g l" aria-keyshortcuts="g l"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Baseline Data (G then L)">
                         <i class="ti ti-adjustments fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Baseline Data</span>
                     </a>
@@ -130,37 +138,37 @@
             <div class="offcanvas-body d-flex flex-column p-0">
                 <ul class="sidebar-nav p-3">
                     <li class="sidebar-nav-item {% if request.endpoint == 'library.browse' %}active{% endif %}">
-                        <a href="{{ url_for('library.browse') }}">
+                        <a href="{{ url_for('library.browse') }}" data-shortcut="g b" aria-keyshortcuts="g b">
                             <i class="ti ti-compass fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Browse</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'upload.upload_file' %}active{% endif %}">
-                        <a href="{{ url_for('upload.upload_file') }}">
+                        <a href="{{ url_for('upload.upload_file') }}" data-shortcut="g u" aria-keyshortcuts="g u">
                             <i class="ti ti-cloud-upload fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Upload</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
-                        <a href="{{ url_for('dashboard.dashboard') }}">
+                        <a href="{{ url_for('dashboard.dashboard') }}" data-shortcut="g d" aria-keyshortcuts="g d">
                             <i class="ti ti-layout-dashboard fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'research.task_page' %}active{% endif %}">
-                        <a href="{{ url_for('research.task_page') }}">
+                        <a href="{{ url_for('research.task_page') }}" data-shortcut="g t" aria-keyshortcuts="g t">
                             <i class="ti ti-clipboard-check fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Test Mode</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'research.sus_survey' %}active{% endif %}">
-                        <a href="{{ url_for('research.sus_survey') }}">
+                        <a href="{{ url_for('research.sus_survey') }}" data-shortcut="g s" aria-keyshortcuts="g s">
                             <i class="ti ti-chart-bar fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>SUS Survey</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'research.feedback_page' %}active{% endif %}">
-                        <a href="{{ url_for('research.feedback_page') }}">
+                        <a href="{{ url_for('research.feedback_page') }}" data-shortcut="g f" aria-keyshortcuts="g f">
                             <i class="ti ti-message-circle fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Feedback</span>
                         </a>
@@ -168,13 +176,13 @@
                     {% if current_user.is_admin %}
                     <li class="sidebar-section-title">Admin Moderation</li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'admin.admin_panel' %}active{% endif %}">
-                        <a href="{{ url_for('admin.admin_panel') }}">
+                        <a href="{{ url_for('admin.admin_panel') }}" data-shortcut="g a" aria-keyshortcuts="g a">
                             <i class="ti ti-shield-lock text-danger fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Admin Panel</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'admin.admin_baseline' %}active{% endif %}">
-                        <a href="{{ url_for('admin.admin_baseline') }}">
+                        <a href="{{ url_for('admin.admin_baseline') }}" data-shortcut="g l" aria-keyshortcuts="g l">
                             <i class="ti ti-adjustments fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Baseline Data</span>
                         </a>
@@ -192,13 +200,13 @@
 
         <!-- Main Content Column -->
         <div class="app-main">
-            <!-- Slim Topbar (Identical padding px-3 px-lg-4 py-2 across all pages) -->
             <header
                 class="app-topbar d-flex align-items-center justify-content-between px-2 px-lg-4 py-2 border-bottom bg-body">
                 <div class="d-flex align-items-center gap-3">
                     <button class="btn btn-outline-secondary btn-sm d-lg-none py-1 px-2" type="button"
                         data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar"
-                        aria-label="Open navigation menu">
+                        aria-label="Open navigation menu" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                        title="Open navigation menu">
                         <i class="ti ti-menu-2 fs-5 flex-shrink-0" aria-hidden="true"></i>
                     </button>
                     <span class="fw-semibold text-body d-none d-sm-inline">
@@ -209,8 +217,8 @@
                 <div class="d-flex align-items-center gap-2">
                     <!-- Credit balance chip (Brass icon, neutral chip) -->
                     <a href="{{ url_for('dashboard.dashboard') }}"
-                        class="credit-chip bg-warning-subtle text-warning btn btn-warning"
-                        title="Your study credit balance">
+                        class="credit-chip bg-warning-subtle text-warning btn btn-warning" data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" title="Your credit balance - open dashboard">
                         <i class="ti ti-coin fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span class="credit-balance-val">{{ current_user.credits }}</span>
                     </a>
@@ -218,7 +226,8 @@
                     <!-- Theme toggle button -->
                     <button type="button"
                         class="btn rounded-circle btn-primary bg-body border-0 text-body btn-theme-toggle"
-                        aria-label="Toggle light/dark theme" title="Toggle theme">
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="Toggle light/dark theme"
+                        title="Toggle theme (T)">
                         <i class="ti ti-moon theme-toggle-icon fs-5 flex-shrink-0" aria-hidden="true"></i>
                     </button>
 
@@ -226,7 +235,8 @@
                     <div class="dropdown">
                         <button
                             class="btn dropdown-toggle d-flex align-items-center gap-2 btn-primary border-0 text-body bg-body"
-                            type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                            title="User account options">
                             <i class="ti ti-user fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span class="d-none d-md-inline">{{ current_user.username }}</span>
                         </button>
@@ -244,6 +254,13 @@
                                     <i class="ti ti-layout-dashboard fs-5 flex-shrink-0"
                                         aria-hidden="true"></i>Dashboard
                                 </a>
+                            </li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center gap-2" type="button"
+                                    id="btn-shortcuts-modal">
+                                    <i class="ti ti-keyboard fs-5 flex-shrink-0" aria-hidden="true"></i>Keyboard
+                                    shortcuts
+                                </button>
                             </li>
                             {% if current_user.is_admin %}
                             <li>
@@ -282,7 +299,8 @@
                         <span class="badge text-bg-warning ms-1">Errors: <span id="task-banner-errors">0</span></span>
                     </div>
                     <div>
-                        <a href="{{ url_for('research.task_page') }}" class="btn btn-sm btn-outline-secondary py-0 px-2">
+                        <a href="{{ url_for('research.task_page') }}"
+                            class="btn btn-sm btn-outline-secondary py-0 px-2">
                             Return to Task
                         </a>
                     </div>
@@ -360,21 +378,19 @@
     {% endif %}
 
     <!-- Toast Notification Container (Positioned Below Topbar) -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" aria-live="polite" aria-atomic="true">
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" aria-live="polite"
+        aria-atomic="true">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        {% set cat = 'danger' if category in ['danger', 'error'] else (category if category in ['success', 'warning', 'info'] else 'info') %}
+        {% set cat = 'danger' if category in ['danger', 'error'] else (category if category in ['success', 'warning',
+        'info'] else 'info') %}
         {% set role = 'alert' if cat in ['danger', 'warning'] else 'status' %}
         {% set live = 'assertive' if cat in ['danger', 'warning'] else 'polite' %}
         {% set delay = 8000 if cat == 'danger' else (6000 if cat == 'warning' else 4000) %}
-        <div class="toast align-items-center border-0 text-bg-{{ cat }} mb-2 toast-server shadow-sm"
-             role="{{ role }}"
-             aria-live="{{ live }}"
-             aria-atomic="true"
-             data-bs-delay="{{ delay }}"
-             data-bs-autohide="true"
-             data-category="{{ cat }}">
+        <div class="toast align-items-center border-0 text-bg-{{ cat }} mb-2 toast-server shadow-sm" role="{{ role }}"
+            aria-live="{{ live }}" aria-atomic="true" data-bs-delay="{{ delay }}" data-bs-autohide="true"
+            data-category="{{ cat }}">
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-2">
                     {% if cat == 'success' %}
@@ -388,7 +404,9 @@
                     {% endif %}
                     <div class="toast-message-text">{{ message }}</div>
                 </div>
-                <button type="button" class="btn-close {{ 'btn-close-white' if cat in ['danger', 'success'] else '' }} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button"
+                    class="btn-close {{ 'btn-close-white' if cat in ['danger', 'success'] else '' }} me-2 m-auto"
+                    data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
         {% endfor %}
@@ -400,6 +418,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Toast notifications -->
     <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    <!-- Keyboard shortcuts -->
+    <script src="{{ url_for('static', filename='js/shortcuts.js') }}"></script>
     <!-- Custom vanilla JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_scripts %}{% endblock %}

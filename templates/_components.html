@@ -90,10 +90,10 @@
         <div class="pt-3 border-top small text-body-secondary mt-auto">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="d-flex align-items-center gap-1"><i class="ti ti-user fs-6 flex-shrink-0" aria-hidden="true"></i>{{ f.uploader_username }}</span>
-                <span class="d-flex align-items-center gap-1"><i class="ti ti-download fs-6 flex-shrink-0" aria-hidden="true"></i>{{ f.download_count }}</span>
+                <span class="d-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Download count"><i class="ti ti-download fs-6 flex-shrink-0" aria-hidden="true"></i>{{ f.download_count }}</span>
             </div>
             <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-1">
+                <div class="d-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-placement="top" title="User rating">
                     <span class="text-brass"><i class="ti ti-star-filled" aria-hidden="true"></i></span>
                     <span class="fw-medium text-body">{{ "%.1f"|format(f.avg_rating) }}</span>
                     <span class="text-body-secondary">({{ f.rating_count }})</span>
