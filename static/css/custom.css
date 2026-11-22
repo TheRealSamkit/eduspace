@@ -21,6 +21,13 @@
     pointer-events: auto;
 }
 
+/* Responsive borders for multi-column cards */
+@media (min-width: 992px) {
+    .border-lg-start {
+        border-left: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+    }
+}
+
 /* Sidebar and Desktop App Layout */
 .app-layout {
     display: flex;

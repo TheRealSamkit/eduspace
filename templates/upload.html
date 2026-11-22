@@ -1,29 +1,25 @@
 {% extends "base.html" %}
-{% import "_components.html" as ui %}
 
 {% block title %}Upload Study Material - StudyExchange{% endblock %}
 {% block topbar_title %}Upload Material{% endblock %}
 
 {% block content %}
 <div class="container-fluid p-0">
-    {{ ui.page_header(
-    title="Upload Study Material",
-    subtitle="Earn +" + config.UPLOAD_REWARD|string + " credits. Uploads are strictly available to students of " + current_user.university_name
-    ) }}
-
     <form action="{{ url_for('upload.upload_file') }}" method="POST" enctype="multipart/form-data"
         class="needs-validation" novalidate>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <div class="row g-3 g-lg-4 align-items-stretch">
-            <!-- Left Card: Metadata (col-lg-8) -->
-            <div class="col-lg-8">
-                <div class="card h-100">
-                    <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
-                        <span class="fw-semibold text-body">Document Information</span>
-                        <span class="badge border text-body-secondary fw-normal">Exclusively for {{ current_user.university_name }}</span>
-                    </div>
-                    <div class="card-body p-3 p-md-4">
+        <!-- Single Card: Two-Column Upload Layout -->
+        <div class="card shadow-sm">
+            <div class="card-header py-3 px-3 px-md-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h1 class="h6 fw-semibold text-body mb-0">Upload study material</h1>
+                <span class="text-body-secondary small">Exclusively for {{ current_user.university_name }}</span>
+            </div>
+
+            <div class="card-body p-3 p-md-4">
+                <div class="row g-3 g-lg-4">
+                    <!-- Left Column: Metadata (col-lg-8) -->
+                    <div class="col-lg-8">
                         <!-- Title (Full Row) -->
                         <div class="mb-3">
                             <label for="title" class="form-label fw-medium text-body mb-1">
@@ -34,7 +30,7 @@
                             <div class="invalid-feedback">Please enter a clear document title.</div>
                         </div>
 
-                        <!-- Subject, Semester, Material Type on One Row (3 cols) -->
+                        <!-- Subject, Semester, Material Type on One Row -->
                         <div class="row g-2 g-md-3 mb-3">
                             <div class="col-md-5">
                                 <label for="subject" class="form-label fw-medium text-body mb-1">
@@ -82,17 +78,9 @@
                                 placeholder="Summary of topics, exam relevance, included worked problems..."></textarea>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Right Card: File Upload & Actions (col-lg-4) -->
-            <div class="col-lg-4">
-                <div class="card h-100">
-                    <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
-                        <span class="fw-semibold text-body">File & Copyright</span>
-                        <span class="badge border text-body-secondary fw-normal">+{{ config.UPLOAD_REWARD }} Credits</span>
-                    </div>
-                    <div class="card-body p-3 p-md-4 d-flex flex-column">
+                    <!-- Right Column: File & Copyright with Divider (col-lg-4) -->
+                    <div class="col-lg-4 border-lg-start ps-lg-4 d-flex flex-column justify-content-between pt-3 pt-lg-0 border-top border-lg-top-0">
                         <!-- File Input -->
                         <div class="mb-3">
                             <label for="file" class="form-label fw-medium text-body mb-1">
@@ -101,13 +89,13 @@
                             <input class="form-control" type="file" id="file" name="file"
                                 accept=".pdf,.docx,.pptx,.png,.jpg" required>
                             <div class="form-text small text-body-secondary mt-1">
-                                PDF, DOCX, PPTX, PNG, JPG (Max {{ config.MAX_FILE_MB }}MB).
+                                Formats: PDF, DOCX, PPTX, PNG, JPG (Max {{ config.MAX_FILE_MB }}MB).
                             </div>
                             <div class="invalid-feedback">Please select an academic document.</div>
                         </div>
 
                         <!-- Copyright Checkbox -->
-                        <div class="mb-4 form-check">
+                        <div class="mb-3 form-check">
                             <input class="form-check-input" type="checkbox" id="confirm_copyright"
                                 name="confirm_copyright" required>
                             <label class="form-check-label small text-body-secondary" for="confirm_copyright">
@@ -115,17 +103,22 @@
                             </label>
                             <div class="invalid-feedback">You must confirm ownership before uploading.</div>
                         </div>
-
-                        <!-- Actions: Single Primary Button, Cancel as Outline Secondary -->
-                        <div class="mt-auto d-flex flex-column gap-2 pt-2">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Publish & Earn +{{ config.UPLOAD_REWARD }} Credits
-                            </button>
-                            <a href="{{ url_for('library.browse') }}" class="btn btn-outline-secondary w-100">
-                                Cancel
-                            </a>
-                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Card Footer: Actions and subtle credit note -->
+            <div class="card-footer py-3 px-3 px-md-4 bg-body border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span class="text-body-secondary small">
+                    Earns {{ config.UPLOAD_REWARD }} credits upon publication
+                </span>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('library.browse') }}" class="btn btn-outline-secondary btn-sm">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Publish material
+                    </button>
                 </div>
             </div>
         </div>
