@@ -18,7 +18,7 @@ action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-prim
         {{ ui.stat_card(
         label="Platform Balance",
         value=current_user.credits|string + ' credits',
-        subtext="Earn +" + config.UPLOAD_REWARD|string + " for each verified upload",
+        subtext=config.UPLOAD_REWARD|string + " credits for each verified upload",
         icon="ti-coin"
         ) }}
     </div>
@@ -250,6 +250,33 @@ action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-prim
                 action_text="Browse Materials"
                 ) }}
                 {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How Credits Work (Factual Reference) -->
+<div class="card mb-4">
+    <div class="card-header py-3 px-4 border-bottom">
+        <h2 class="h6 fw-semibold mb-0 text-body">How credits work</h2>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-3">
+            <div class="col-sm-6 col-lg-3">
+                <div class="small fw-semibold text-body">Starting balance</div>
+                <div class="small text-body-secondary">{{ config.SIGNUP_BONUS }} credits upon account creation</div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="small fw-semibold text-body">Upload reward</div>
+                <div class="small text-body-secondary">{{ config.UPLOAD_REWARD }} credits per material (daily cap: {{ config.MAX_REWARDED_UPLOADS_PER_DAY }})</div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="small fw-semibold text-body">Download cost</div>
+                <div class="small text-body-secondary">{{ config.DOWNLOAD_COST }} credits per peer document</div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="small fw-semibold text-body">Fair use</div>
+                <div class="small text-body-secondary">Your own uploads and re-downloads are free</div>
             </div>
         </div>
     </div>

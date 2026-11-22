@@ -1,119 +1,103 @@
 {% extends "base.html" %}
 
-{% block title %}Register - StudyExchange{% endblock %}
+{% block title %}Create Account - StudyExchange{% endblock %}
 
 {% block content_guest %}
-<div class="row g-4 justify-content-center">
-    <!-- Left Column: Registration Form in a Card -->
-    <div class="col-lg-7">
-        <div class="card">
-            <div class="card-header py-3 px-4">
-                <span class="fw-semibold text-body">Create Account</span>
-            </div>
-            <div class="card-body p-4 p-md-5">
-                <p class="text-body-secondary small mb-4">
-                    Register with your institutional university email to receive <strong>{{ config.SIGNUP_BONUS }} bonus credits</strong>.
-                </p>
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-5 col-xl-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-4">
+                <div class="text-center mb-4">
+                    <h1 class="h4 fw-bold text-body mb-1">Create your account</h1>
+                    <p class="text-body-secondary small mb-0">Use your university email. Other students only see your username.</p>
+                </div>
 
                 <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate id="register-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+                    <!-- 1. University Email -->
                     <div class="mb-3">
-                        <label for="username" class="form-label fw-medium text-body">Public Username</label>
-                        <input type="text" class="form-control" id="username" name="username" value="{{ username or '' }}"
-                               placeholder="e.g. alex_smith" minlength="3" maxlength="30" required autofocus>
-                        <div class="form-text small text-body-secondary">Displayed publicly to peers. Your email is kept private.</div>
-                        <div class="invalid-feedback">Please choose a username of at least 3 characters.</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label fw-medium text-body">Institutional Email</label>
+                        <label for="email" class="form-label fw-medium text-body mb-1">University email</label>
                         <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}"
-                               placeholder="e.g. student@xyz.edu" required>
-                        <div id="domain-feedback" class="form-text small" style="display: none;"></div>
-                        <div class="invalid-feedback">Please enter your verified institutional email.</div>
-                    </div>
+                               placeholder="e.g. student@xyz.edu" required autofocus>
+                        <div id="domain-feedback" class="form-text small text-body-secondary mt-1">Enter your university email address.</div>
+                        <div class="invalid-feedback">Please enter your verified university email.</div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label fw-medium text-body">Password</label>
-                        <input type="password" class="form-control" id="password" name="password"
-                               minlength="8" placeholder="Minimum 8 characters" required>
-                        <div class="invalid-feedback">Password must be at least 8 characters long.</div>
-                    </div>
-
-                    <div class="mb-4 form-check">
-                        <input type="checkbox" class="form-check-input" id="agree_terms" name="agree_terms" required>
-                        <label class="form-check-label small text-body-secondary" for="agree_terms">
-                            I accept the <a href="{{ url_for('pages.terms_page') }}" target="_blank">Terms of Service & Copyright Policy</a> and confirm I will only upload study material I own or have the right to share.
-                        </label>
-                        <div class="invalid-feedback">You must accept the terms and copyright policy to proceed.</div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-2">
-                        Create Account & Claim {{ config.SIGNUP_BONUS }} Credits
-                    </button>
-                </form>
-
-                <div class="text-center mt-4 pt-3 border-top">
-                    <p class="text-body-secondary small mb-0">
-                        Already have an account? <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Sign in here</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Column: Info Panel with Collapsed Accordion -->
-    <div class="col-lg-5">
-        <div class="card h-100">
-            <div class="card-header py-3 px-4">
-                <span class="fw-semibold text-body">Why Join StudyExchange?</span>
-            </div>
-            <div class="card-body p-4">
-                <div class="d-flex flex-column gap-3 mb-4">
-                    <div class="d-flex align-items-start gap-3">
-                        <i class="ti ti-cloud-upload fs-4 text-primary flex-shrink-0" aria-hidden="true"></i>
-                        <div>
-                            <div class="fw-medium text-body">Share & Earn Credits</div>
-                            <div class="small text-body-secondary">Upload your original study notes and earn +{{ config.UPLOAD_REWARD }} credits for each approved document.</div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start gap-3">
-                        <i class="ti ti-coin text-brass fs-4 flex-shrink-0" aria-hidden="true"></i>
-                        <div>
-                            <div class="fw-medium text-body">{{ config.SIGNUP_BONUS }} Welcome Credits</div>
-                            <div class="small text-body-secondary">Get started right away with bonus credits deposited into your ledger immediately upon registration.</div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start gap-3">
-                        <i class="ti ti-building fs-4 text-primary flex-shrink-0" aria-hidden="true"></i>
-                        <div>
-                            <div class="fw-medium text-body">University-Only Access</div>
-                            <div class="small text-body-secondary">Course materials are strictly isolated to students of your university, ensuring direct curriculum alignment.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bootstrap Accordion for Supported Universities (collapsed by default) -->
-                <div class="accordion" id="emailAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingDomains">
-                            <button class="accordion-button collapsed py-2 px-3 small" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseDomains" aria-expanded="false" aria-controls="collapseDomains">
-                                <i class="ti ti-help-circle me-2 flex-shrink-0" aria-hidden="true"></i>Which email can I use?
-                            </button>
-                        </h2>
-                        <div id="collapseDomains" class="accordion-collapse collapse" aria-labelledby="headingDomains" data-bs-parent="#emailAccordion">
-                            <div class="accordion-body small text-body-secondary py-3 px-3">
-                                <p class="mb-2">Registration requires an institutional email from a supported university:</p>
-                                <ul class="mb-0 ps-3">
-                                    {% for domain, name in config.ALLOWED_DOMAINS.items() %}
-                                    <li class="mb-1"><strong>{{ name }}</strong> (<code>@{{ domain }}</code>)</li>
-                                    {% endfor %}
-                                </ul>
+                        <!-- Supported Universities Collapse -->
+                        <div class="mt-1">
+                            <a class="small text-decoration-none" data-bs-toggle="collapse" href="#collapseSupportedUnis" role="button" aria-expanded="false" aria-controls="collapseSupportedUnis">
+                                Which emails are supported?
+                            </a>
+                            <div class="collapse mt-2" id="collapseSupportedUnis">
+                                <div class="card card-body p-2 small text-body-secondary bg-body-tertiary">
+                                    <p class="mb-1 fw-medium">Supported institutions:</p>
+                                    <ul class="list-unstyled mb-0 d-flex flex-column gap-1">
+                                        {% for domain, name in config.ALLOWED_DOMAINS.items() %}
+                                        <li><strong>{{ name }}</strong> (<code>@{{ domain }}</code>)</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- 2. Public Username -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-medium text-body mb-1">Public username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ username or '' }}"
+                               placeholder="e.g. alex_smith" minlength="3" maxlength="30" required>
+                        <div class="invalid-feedback">Please choose a username of at least 3 characters.</div>
+                    </div>
+
+                    <!-- 3. Password with Show/Hide Toggle -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-medium text-body mb-1">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password"
+                                   minlength="8" placeholder="At least 8 characters" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggle-password-btn" aria-label="Toggle password visibility">
+                                <i class="ti ti-eye" id="toggle-password-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                        </div>
+                        <div class="form-text small text-body-secondary mt-1">At least 8 characters.</div>
+                    </div>
+
+                    <!-- 4. Quiet Welcome Credits Mention -->
+                    <div class="small text-body-secondary mb-3">
+                        You'll start with {{ config.SIGNUP_BONUS }} credits.
+                    </div>
+
+                    <!-- 5. Terms Checkbox -->
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="agree_terms" name="agree_terms" required>
+                        <label class="form-check-label small text-body-secondary" for="agree_terms">
+                            I accept the <a href="{{ url_for('pages.terms_page') }}" target="_blank">Terms of Service</a> and confirm I will only share material I have the right to distribute.
+                        </label>
+                        <div class="invalid-feedback">You must accept the terms to proceed.</div>
+                    </div>
+
+                    <!-- 6. Single Primary Button -->
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        Create account
+                    </button>
+                </form>
+
+                <!-- 7. Trust Line Under Form -->
+                <div class="mt-4 pt-3 border-top text-center">
+                    <div class="d-flex align-items-center justify-content-center gap-1 text-body-secondary small mb-1">
+                        <i class="ti ti-lock fs-5 flex-shrink-0" aria-hidden="true"></i>
+                        <span>Your email is never shown to other students.</span>
+                    </div>
+                    <div class="text-body-secondary small">
+                        <a href="{{ url_for('pages.terms_page') }}" class="text-body-secondary text-decoration-none">Terms</a> &bull; Anonymised academic research use.
+                    </div>
+                </div>
+
+                <!-- 8. Link to Sign In -->
+                <div class="text-center mt-3">
+                    <span class="text-body-secondary small">Already have an account? </span>
+                    <a href="{{ url_for('auth.login') }}" class="small text-decoration-none">Sign in</a>
                 </div>
             </div>
         </div>
@@ -124,6 +108,7 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Live domain check feedback
         const emailInput = document.getElementById('email');
         const feedbackEl = document.getElementById('domain-feedback');
         let debounceTimer = null;
@@ -134,8 +119,8 @@
                 const email = emailInput.value.trim();
 
                 if (!email || email.indexOf('@') === -1) {
-                    feedbackEl.style.display = 'none';
-                    feedbackEl.textContent = '';
+                    feedbackEl.className = 'form-text small text-body-secondary mt-1';
+                    feedbackEl.textContent = 'Enter your university email address.';
                     return;
                 }
 
@@ -147,7 +132,6 @@
                             });
                         })
                         .then(function (result) {
-                            feedbackEl.style.display = 'block';
                             if (result.status === 200 && result.data.valid) {
                                 feedbackEl.className = 'form-text text-success small mt-1';
                                 feedbackEl.textContent = 'Recognised: ' + result.data.university_name;
@@ -157,9 +141,24 @@
                             }
                         })
                         .catch(function () {
-                            feedbackEl.style.display = 'none';
+                            feedbackEl.className = 'form-text small text-body-secondary mt-1';
+                            feedbackEl.textContent = 'Enter your university email address.';
                         });
                 }, 250);
+            });
+        }
+
+        // Show/Hide Password Toggle
+        const toggleBtn = document.getElementById('toggle-password-btn');
+        const pwdInput = document.getElementById('password');
+        const pwdIcon = document.getElementById('toggle-password-icon');
+        if (toggleBtn && pwdInput && pwdIcon) {
+            toggleBtn.addEventListener('click', function () {
+                const isPassword = (pwdInput.type === 'password');
+                pwdInput.type = isPassword ? 'text' : 'password';
+                pwdIcon.classList.toggle('ti-eye', !isPassword);
+                pwdIcon.classList.toggle('ti-eye-off', isPassword);
+                toggleBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
             });
         }
     });
