@@ -175,6 +175,9 @@
                     event.stopPropagation();
                     // Increment task errors if task is running
                     TaskTracker.incrementErrors();
+                    if (window.showToast) {
+                        window.showToast('Please correct the highlighted form fields before submitting.', 'warning');
+                    }
                     // Log error event
                     const invalidFields = Array.from(form.querySelectorAll(':invalid'))
                         .map(function (el) { return el.name || el.id; });
@@ -203,6 +206,10 @@
         let clickBatch = 0;
         let clickTimer = null;
         document.addEventListener('click', function (e) {
+            // Clicks on toasts (including close button) must NOT be counted by Test Mode tracker
+            if (e.target.closest('.toast') || e.target.closest('.toast-container')) {
+                return;
+            }
             // Check if clicking inside interactive elements
             const target = e.target.closest('a, button, input[type="submit"], .clickable');
             if (target) {

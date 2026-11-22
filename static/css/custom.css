@@ -5,6 +5,20 @@
 
 :root {
     --app-sidebar-width: 260px;
+    --app-topbar-height: 52px;
+}
+
+/* Toast Notification Container */
+.toast-container {
+    top: calc(var(--app-topbar-height) + 0.75rem) !important;
+    right: 1rem !important;
+    z-index: 1090;
+    max-width: 360px;
+    pointer-events: none;
+}
+
+.toast-container .toast {
+    pointer-events: auto;
 }
 
 /* Sidebar and Desktop App Layout */

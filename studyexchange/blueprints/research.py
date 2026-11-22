@@ -8,7 +8,7 @@ Depends on Flask, db.get_db, studyexchange.security, and studyexchange.services.
 
 from flask import (
     Blueprint, render_template, request, redirect,
-    url_for, flash, g
+    url_for, flash, session, g
 )
 from db import get_db
 from studyexchange.security import login_required
@@ -28,7 +28,7 @@ def task_page():
     Render HCI research evaluation task runner interface.
 
     Returns:
-        Response: Rendered task.html with task selection and historical runs.
+        Response: Rendered task.html with task selection, historical runs, and inline last result.
     """
     db = get_db()
     my_tasks = db.execute(
@@ -43,7 +43,14 @@ def task_page():
         {"id": 4, "name": "Search for exam past papers and filter by semester"}
     ]
 
-    return render_template('task.html', my_tasks=my_tasks, predefined_tasks=predefined_tasks)
+    latest_result = session.pop('latest_task_result', None)
+
+    return render_template(
+        'task.html',
+        my_tasks=my_tasks,
+        predefined_tasks=predefined_tasks,
+        latest_result=latest_result
+    )
 
 
 @bp.route('/task/complete', methods=['POST'])
@@ -81,13 +88,18 @@ def task_complete():
         success=success
     )
 
+    session['latest_task_result'] = {
+        'task_name': task_name,
+        'duration_sec': round(duration_sec, 1),
+        'clicks': clicks,
+        'errors': errors,
+        'success': bool(success)
+    }
+
     if success:
-        flash(
-            f"Task '{task_name}' recorded as SUCCESS! Duration: {duration_sec}s, Clicks: {clicks}, Errors: {errors}.",
-            "success"
-        )
+        flash(f"Task completed in {round(duration_sec, 1)}s.", "success")
     else:
-        flash(f"Task '{task_name}' recorded as Abandoned. Telemetry saved for evaluation.", "warning")
+        flash("Task abandoned.", "warning")
 
     return redirect(url_for('research.task_page'))
 
