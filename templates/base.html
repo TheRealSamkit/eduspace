@@ -194,7 +194,7 @@
         <div class="app-main">
             <!-- Slim Topbar (Identical padding px-3 px-lg-4 py-2 across all pages) -->
             <header
-                class="app-topbar d-flex align-items-center justify-content-between px-3 px-lg-4 py-2 border-bottom bg-body">
+                class="app-topbar d-flex align-items-center justify-content-between px-2 px-lg-4 py-2 border-bottom bg-body">
                 <div class="d-flex align-items-center gap-3">
                     <button class="btn btn-outline-secondary btn-sm d-lg-none py-1 px-2" type="button"
                         data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar"
@@ -208,20 +208,24 @@
 
                 <div class="d-flex align-items-center gap-2">
                     <!-- Credit balance chip (Brass icon, neutral chip) -->
-                    <a href="{{ url_for('dashboard') }}" class="credit-chip" title="Your study credit balance">
-                        <i class="ti ti-coin text-brass fs-5 flex-shrink-0" aria-hidden="true"></i>
-                        <span><span class="credit-balance-val">{{ current_user.credits }}</span> credits</span>
+                    <a href="{{ url_for('dashboard') }}"
+                        class="credit-chip bg-warning-subtle text-warning btn btn-warning"
+                        title="Your study credit balance">
+                        <i class="ti ti-coin fs-5 flex-shrink-0" aria-hidden="true"></i>
+                        <span class="credit-balance-val">{{ current_user.credits }}</span>
                     </a>
 
                     <!-- Theme toggle button -->
-                    <button type="button" class="btn btn-sm btn-outline-secondary btn-theme-toggle"
+                    <button type="button"
+                        class="btn rounded-circle btn-primary bg-body border-0 text-body btn-theme-toggle"
                         aria-label="Toggle light/dark theme" title="Toggle theme">
                         <i class="ti ti-moon theme-toggle-icon fs-5 flex-shrink-0" aria-hidden="true"></i>
                     </button>
 
                     <!-- User dropdown -->
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2"
+                        <button
+                            class="btn dropdown-toggle d-flex align-items-center gap-2 btn-primary border-0 text-body bg-body"
                             type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="ti ti-user fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span class="d-none d-md-inline">{{ current_user.username }}</span>
@@ -358,7 +362,8 @@
                     <i class="ti ti-moon theme-toggle-icon fs-5 flex-shrink-0" aria-hidden="true"></i>
                 </button>
                 <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-secondary">Sign In</a>
-                <a href="{{ url_for('register') }}" class="btn btn-sm btn-outline-secondary">Register (+{{ config.SIGNUP_BONUS }})</a>
+                <a href="{{ url_for('register') }}" class="btn btn-sm btn-outline-secondary">Register (+{{
+                    config.SIGNUP_BONUS }})</a>
             </div>
         </div>
     </header>

@@ -153,8 +153,8 @@
 }
 
 .star-rating-input label:hover,
-.star-rating-input label:hover ~ label,
-.star-rating-input input:checked ~ label {
+.star-rating-input label:hover~label,
+.star-rating-input input:checked~label {
     color: var(--bs-brass);
 }
 
@@ -201,4 +201,21 @@
     background-color: var(--bs-secondary-bg);
     color: var(--bs-body-color);
     border-bottom: 1px solid var(--bs-border-color);
+}
+
+
+.empty-state-card {
+    border: 1px dashed var(--bs-border-color);
+    border-radius: var(--bs-border-radius-lg, 0.5rem);
+    background-color: var(--bs-tertiary-bg);
+}
+
+.task-active-banner {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ti {
+    line-height: unset;
 }

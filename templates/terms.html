@@ -6,10 +6,10 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-9">
+    <div class="col-lg-12">
         {{ ui.page_header(
-            title="Terms of Service & Copyright Policy",
-            subtitle="Platform policies, copyright ownership requirements, and administrator takedown procedures"
+        title="Terms of Service & Copyright Policy",
+        subtitle="Platform policies, copyright ownership requirements, and administrator takedown procedures"
         ) }}
 
         <div class="card mb-4">
@@ -17,24 +17,33 @@
                 <div class="mb-4">
                     <h2 class="h6 fw-semibold text-body">1. Ownership of Academic Materials</h2>
                     <p class="text-body-secondary small mb-2">
-                        StudyExchange is an academic peer-to-peer sharing ecosystem designed solely for students within verified university domains. Users are legally and ethically obligated to upload <strong>only materials they own or have the explicit right to share</strong> (such as original student notes, student study summaries, and personal worked solutions).
+                        StudyExchange is an academic peer-to-peer sharing ecosystem designed solely for students within
+                        verified university domains. Users are legally and ethically obligated to upload <strong>only
+                            materials they own or have the explicit right to share</strong> (such as original student
+                        notes, student study summaries, and personal worked solutions).
                     </p>
                     <div class="border rounded-3 p-3 bg-body-tertiary small text-body-secondary">
-                        <i class="ti ti-alert-triangle text-warning me-1" aria-hidden="true"></i><strong>Strict Prohibition:</strong> Do not upload copyrighted textbooks, unreleased exam papers, commercial test bank questions, or faculty slides without institutional copyright clearance.
+                        <i class="ti ti-alert-triangle text-warning me-1" aria-hidden="true"></i><strong>Strict
+                            Prohibition:</strong> Do not upload copyrighted textbooks, unreleased exam papers,
+                        commercial test bank questions, or faculty slides without institutional copyright clearance.
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <h2 class="h6 fw-semibold text-body">2. Institutional Isolation & Privacy</h2>
                     <p class="text-body-secondary small mb-0">
-                        Materials uploaded to StudyExchange are strictly isolated to verified students who hold an email address from the corresponding institutional domain. Students from other institutions can never browse, search, or download your materials.
+                        Materials uploaded to StudyExchange are strictly isolated to verified students who hold an email
+                        address from the corresponding institutional domain. Students from other institutions can never
+                        browse, search, or download your materials.
                     </p>
                 </div>
 
                 <div class="mb-4">
                     <h2 class="h6 fw-semibold text-body">3. Reporting Infringements & Inappropriate Content</h2>
                     <p class="text-body-secondary small mb-0">
-                        Every study material card includes a <strong>Report</strong> button (<i class="ti ti-flag" aria-hidden="true"></i>). If you believe a shared document infringes copyright or breaches academic integrity, submit a report directly from the document's detail page.
+                        Every study material card includes a <strong>Report</strong> button (<i class="ti ti-flag"
+                            aria-hidden="true"></i>). If you believe a shared document infringes copyright or breaches
+                        academic integrity, submit a report directly from the document's detail page.
                     </p>
                 </div>
 
@@ -45,13 +54,15 @@
                     </p>
                     <ul class="text-body-secondary small mb-0 d-flex flex-column gap-1">
                         <li>The offending material is immediately removed from the repository.</li>
-                        <li>Any upload reward credits earned by the uploader are <strong>fully reversed</strong> in the credit ledger.</li>
+                        <li>Any upload reward credits earned by the uploader are <strong>fully reversed</strong> in the
+                            credit ledger.</li>
                         <li>Repeated infractions may result in account termination under institutional honor codes.</li>
                     </ul>
                 </div>
 
                 <div class="pt-3 border-top">
-                    <a href="{{ url_for('browse') if current_user else url_for('index') }}" class="btn btn-outline-secondary btn-sm">
+                    <a href="{{ url_for('browse') if current_user else url_for('index') }}"
+                        class="btn btn-outline-secondary btn-sm">
                         <i class="ti ti-arrow-left me-1" aria-hidden="true"></i>Return to Repository
                     </a>
                 </div>
