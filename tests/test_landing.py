@@ -179,15 +179,15 @@ def test_landing_page_redirects_for_logged_in_user(client, app_instance):
     assert '/browse' in res.headers.get('Location', '')
 
 
-def test_login_page_theme_resolution_unaffected(client):
-    """Verify /login retains dynamic theme resolution via localStorage and theme toggle button."""
+def test_login_page_resolves_theme_automatically(client):
+    """Verify /login uses the saved or system theme without a manual toggle."""
     res = client.get('/login')
     assert res.status_code == 200
 
     html = res.data.decode('utf-8')
     assert "localStorage.getItem('theme')" in html, "/login must read stored theme"
     assert "prefers-color-scheme" in html, "/login must fall back to prefers-color-scheme"
-    assert "btn-theme-toggle" in html, "/login must render the theme toggle control"
+    assert "btn-theme-toggle" not in html, "/login must omit the manual theme toggle"
     assert 'data-no-theme-toggle="true"' not in html, "/login must not have data-no-theme-toggle"
     assert '<meta name="color-scheme" content="light">' not in html, "/login must not force light color-scheme"
 

@@ -1,0 +1,92 @@
+=== SAMPLE ===
+n = 28 responses
+Year: {'2nd': 16, '1st': 5, '3rd': 5, '4th': 2}
+Branch: {'CSE / IT / AIML / CE': 18, 'Other': 5, 'Other engineering': 5}
+Device: {'Both equally': 15, 'Mobile': 7, 'Laptop': 6}
+Shared notes before: {'Sometimes': 10, 'Often': 9, 'Rarely': 9}
+
+Sources (count of respondents, multi-select): [('WhatsApp groups', 19), ('Faculty or LMS', 12), ('Google Drive links', 11), ('Seniors / friends', 10), ('YouTube', 10), ('Telegram', 7), ('Library / textbooks', 6), ('Classroom', 2), ('chatgpt', 1), ('AI/ NotebookLM/ Websites and Coachings', 1), ('From cousins and siblings', 1)]
+
+=== DESCRIPTIVE STATISTICS ===
+Minutes to find material: mean=28.64, median=15.0, SD=47.38, IQR=9.8-30.0, range=1-250, mode=[10]
+Fail frequency (1-5): mean=2.64, median=3.0, SD=1.03, IQR=2.0-3.2, range=1-4, mode=[2.0]
+Satisfaction (1-5): mean=3.39, median=4.0, SD=1.17, IQR=2.8-4.0, range=1-5, mode=[4]
+Frustration (1-5): mean=3.54, median=4.0, SD=1.10, IQR=3.0-4.0, range=1-5, mode=[4]
+Credits motivate sharing (1-5): mean=3.57, median=3.0, SD=0.96, IQR=3.0-4.0, range=2-5, mode=[3]
+Copyright worry (1-5): mean=3.18, median=3.0, SD=1.06, IQR=3.0-4.0, range=1-5, mode=[3]
+Would use platform (1-5): mean=4.07, median=4.0, SD=0.94, IQR=4.0-5.0, range=2-5, mode=[4]
+
+=== 95% CONFIDENCE INTERVALS ===
+Satisfaction mean: 3.39 (95% CI 2.94 to 3.84)
+Frustration mean: 3.54 (95% CI 3.11 to 3.96)
+Would-use mean: 4.07 (95% CI 3.71 to 4.44)
+Minutes median: 15.0 (bootstrap 95% CI 10.0 to 22.5)
+Minutes mean:   28.6 (skewed by outlier of 250 min; prefer the median)
+Minutes mean without the single highest value: 20.4, median 15.0
+
+=== NORMALITY (Shapiro-Wilk) ===
+sat: W=0.884, p=0.0050 -> NOT normal, use non-parametric tests
+frus: W=0.906, p=0.0158 -> NOT normal, use non-parametric tests
+mins: W=0.509, p=0.0000 -> NOT normal, use non-parametric tests
+
+=== PRE-PLANNED BASELINE TEST (satisfaction vs neutral = 3) ===
+H0: median satisfaction = 3   H1: median satisfaction < 3   alpha = 0.05
+Wilcoxon signed-rank (one-sided, less): W=190.0, p=0.9521
+Two-sided check: W=86.0, p=0.0958
+Satisfaction distribution: {1: 2, 2: 5, 3: 5, 4: 12, 5: 4}
+Dissatisfied (1-2): 25%   Satisfied (4-5): 57%
+RESULT: FAIL TO REJECT H0. There is no evidence that overall satisfaction is below neutral.
+
+=== EXPLORATORY TESTS (not pre-planned: report as exploratory) ===
+Frustration above neutral? Wilcoxon (one-sided): W=165.0, p=0.0100
+Would-use above neutral? Wilcoxon (one-sided): W=325.5, p=0.0000
+Note: several tests were run, so treat borderline p-values (0.01-0.05) with caution.
+
+=== SPEARMAN CORRELATIONS ===
+Minutes vs frustration: rho=0.44, p=0.0185 (moderate, significant)
+Minutes vs satisfaction: rho=-0.13, p=0.5003 (weak, not significant)
+Fail frequency vs frustration: rho=0.17, p=0.3880 (weak, not significant)
+Mean pain-point score vs frustration: rho=0.80, p=0.0000 (strong, significant)
+Credit motivation vs would-use: rho=0.40, p=0.0331 (moderate, significant)
+Correlation is not causation, and small samples give wide uncertainty.
+
+=== PAIN-POINT RANKING (agree = 4 or 5) ===
+Material spread across too many places: 19/28 = 68% (95% CI 48-84%), mean severity 3.82
+Hard to find notes by subject and semester: 17/28 = 61% (95% CI 41-78%), mean severity 3.43
+Hard to judge whether material is reliable: 16/28 = 57% (95% CI 37-76%), mean severity 3.75
+Files buried in chats or need re-sending: 16/28 = 57% (95% CI 37-76%), mean severity 3.50
+Material outdated or incomplete: 12/28 = 43% (95% CI 24-63%), mean severity 3.43
+
+=== STATED WILLINGNESS (agree = 4 or 5) ===
+Would use such a platform: 23/28 = 82% (95% CI 63-94%); neutral = 2
+More willing to share if earning credits: 13/28 = 46% (95% CI 28-66%); neutral = 12
+Worry about uploading copyrighted material: 10/28 = 36% (95% CI 19-56%); neutral = 12
+Frustration rated 4-5: 15/28 = 54% (95% CI 34-72%)
+
+=== OPEN-ENDED: biggest frustration ===
+ - Data Matching with exam syllabus and straightforward
+ - When the provider doesn't pick up my call
+ - requesting and waiting for it
+ - time taking
+ - Is it correct for referring ?? or not
+ - googling keywords
+ - Storage
+ - Network issues
+ - Before AI finding anything was hard like pyq and practicals
+ - Wrong material
+ - finding topic
+ - Limits in AI/ need pro for websites and their services
+ - Can be where its hard to reach stored elsewhere cause i use old material of my cousins and siblings
+
+=== OPEN-ENDED: feature requests ===
+ - Past Exam Papers , Documented downloadabale format
+ - Where u can't exchange phone number to any random person, u can share notes using the app only...not any third party app to share like What's app, insta, telegram..etc.
+ - huge library of everything
+ - Trying to remember where i had stored them, should include a library
+ - Rating and verification by expert/ai
+ - easy look up and summary/gist
+ - Should be worth it
+ - easier access and huge library
+ - exchange of notes.3
+ - easy sharing upload from drive or to drive
+ - Easy access

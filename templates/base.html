@@ -214,6 +214,8 @@
                     <span class="fw-semibold text-body d-none d-sm-inline">
                         {% block topbar_title %}EduSpace{% endblock %}
                     </span>
+                    <div class="wrapper fw-bold fs-3 d-md-none"><span class="text-primary">Edu</span><span
+                            class="text-success">Space</span></div>
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
@@ -347,10 +349,6 @@
             </a>
 
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary btn-theme-toggle"
-                    aria-label="Toggle light/dark theme" title="Toggle theme">
-                    <i class="ti ti-moon theme-toggle-icon fs-5 flex-shrink-0" aria-hidden="true"></i>
-                </button>
                 <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-secondary">Sign in</a>
                 <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-primary">Create account</a>
             </div>
