@@ -201,6 +201,7 @@
         if (modalEl) return modalEl;
 
         const isAdmin = !!document.querySelector('[data-shortcut="g a"]');
+        const noThemeToggle = document.body.dataset.noThemeToggle === 'true' || document.body.hasAttribute('data-no-theme-toggle');
         const groups = ['Navigation', 'Interface'];
 
         modalEl = document.createElement('div');
@@ -214,6 +215,9 @@
         groups.forEach(function (groupName) {
             rowsHtml += `<tr><th colspan="2" class="bg-body-tertiary text-uppercase text-body-secondary small fw-semibold py-2 px-3">${groupName}</th></tr>`;
             SHORTCUTS_DEF.filter(function (s) {
+                if (noThemeToggle && (s.key === 't' || s.key === 'T')) {
+                    return false;
+                }
                 return s.group === groupName && (!s.adminOnly || isAdmin);
             }).forEach(function (s) {
                 const kbdHtml = s.keysDisplay.map(function (k) {
@@ -341,12 +345,15 @@
             return;
         }
 
-        // Theme toggle (T or t) - available to all (logged in and guests)
+        // Theme toggle (T or t) - available to all (logged in and guests, unless disabled via page flag)
         if (key === 't' || key === 'T') {
             if (pendingG) {
                 // If G was pressed, G T means Test Mode!
                 // Fall through to sequence logic below
             } else {
+                if (document.body.dataset.noThemeToggle === 'true' || document.body.hasAttribute('data-no-theme-toggle')) {
+                    return;
+                }
                 e.preventDefault();
                 if (window.toggleTheme) {
                     window.toggleTheme();

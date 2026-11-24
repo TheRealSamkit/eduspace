@@ -31,7 +31,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="d-flex flex-column h-100 bg-body text-body">
+<body class="d-flex flex-column h-100 bg-body text-body" {% block body_attrs %}{% endblock %}>
     <!-- Accessibility Skip Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -333,6 +333,7 @@
     <!-- ========================================================
          PUBLIC / LOGGED-OUT NAVIGATION (Landing, Login, Register)
          ======================================================== -->
+    {% block guest_header %}
     <header class="border-bottom bg-body py-2">
         <div class="px-3 px-lg-4 d-flex justify-content-between align-items-center">
             <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 text-body text-decoration-none"
@@ -351,7 +352,9 @@
             </div>
         </div>
     </header>
+    {% endblock %}
 
+    {% block guest_main %}
     <!-- Main Content for Guests: Consistent px-3 px-lg-4 py-4 wrapper -->
     <main id="main-content" class="flex-grow-1 px-3 px-lg-4 py-4">
         <div class="container-fluid p-0">
@@ -360,7 +363,9 @@
             {% endblock %}
         </div>
     </main>
+    {% endblock %}
 
+    {% block guest_footer %}
     <!-- Public Footer -->
     <footer class="py-3 px-3 px-lg-4 border-top bg-body mt-auto">
         <div class="d-flex flex-wrap justify-content-between align-items-center small text-body-secondary gap-2">
@@ -373,6 +378,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
     {% endif %}
 
     <!-- Toast Notification Container (Positioned Below Topbar) -->

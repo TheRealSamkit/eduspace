@@ -16,11 +16,11 @@ def index():
     Public landing page or redirect to repository if already logged in.
 
     Returns:
-        Response: Redirect to library.browse if authenticated, else rendered index.html.
+        Response: Redirect to library.browse if authenticated, else rendered landing.html.
     """
     if g.user:
         return redirect(url_for('library.browse'))
-    return render_template('index.html')
+    return render_template('landing.html')
 
 
 @bp.route('/terms')
