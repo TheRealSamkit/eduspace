@@ -191,3 +191,35 @@ def test_login_page_theme_resolution_unaffected(client):
     assert 'data-no-theme-toggle="true"' not in html, "/login must not have data-no-theme-toggle"
     assert '<meta name="color-scheme" content="light">' not in html, "/login must not force light color-scheme"
 
+
+def test_landing_page_no_stray_text_nodes(client):
+    """Assert no stray 'true', 'True', 'None', or 'False' text nodes appear and first visible layout text is brand/nav."""
+    res = client.get('/')
+    assert res.status_code == 200
+
+    html = res.data.decode('utf-8')
+
+    # 1. Check raw HTML outside scripts and styles for standalone stray boolean/null keywords
+    clean_html = re.sub(r'<script[\s\S]*?</script>', '', html)
+    clean_html = re.sub(r'<style[\s\S]*?</style>', '', clean_html)
+    text_only = re.sub(r'<[^>]+>', ' ', clean_html)
+    words = text_only.split()
+
+    for stray in ['true', 'True', 'None', 'False']:
+        assert stray not in words, f"Stray text '{stray}' found in rendered landing page text outside tags/scripts"
+
+    # 2. Check structure before <header> in body
+    body_to_header_match = re.search(r'<body[^>]*>([\s\S]*?)<header', html)
+    assert body_to_header_match is not None, "<header> element not found in <body>"
+    pre_header_content = body_to_header_match.group(1)
+    pre_header_text = re.sub(r'<[^>]+>', '', pre_header_content).strip()
+    # Only the accessible skip link should be present before the header
+    assert pre_header_text == 'Skip to main content', f"Unexpected text before header: {repr(pre_header_text)}"
+
+    # 3. First layout text inside <header> is the brand / nav text
+    header_content_match = re.search(r'<header[^>]*>([\s\S]*?)</header>', html)
+    assert header_content_match is not None, "<header>...</header> block not found"
+    header_text = ' '.join(re.sub(r'<[^>]+>', ' ', header_content_match.group(1)).split())
+    assert header_text.startswith('Edu Space') or header_text.startswith('EduSpace'), f"First layout text should be brand, got: {header_text[:30]}"
+
+

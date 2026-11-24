@@ -20,7 +20,7 @@ def index():
     """
     if g.user:
         return redirect(url_for('library.browse'))
-    return render_template('landing.html')
+    return render_template('landing.html', force_light=True)
 
 
 @bp.route('/terms')

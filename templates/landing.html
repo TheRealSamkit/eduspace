@@ -12,7 +12,6 @@
 <meta property="og:type" content="website">
 {% endblock %}
 
-{% block force_light_theme %}true{% endblock %}
 {% block body_attrs %}data-no-theme-toggle="true"{% endblock %}
 
 {% block guest_header %}
@@ -171,7 +170,7 @@
 
             <div class="row g-4">
                 <div class="col-lg-4">
-                    <div class="h-100 p-4 border rounded-3 bg-body d-flex flex-column">
+                    <div class="h-100 p-4 border rounded-3 bg-white d-flex flex-column">
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 1</span>
                             <h3 class="h5 fw-semibold text-body mb-0">Upload notes</h3>
@@ -192,7 +191,7 @@
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="h-100 p-4 border rounded-3 bg-body d-flex flex-column">
+                    <div class="h-100 p-4 border rounded-3 bg-white  d-flex flex-column">
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 2</span>
                             <h3 class="h5 fw-semibold text-body mb-0">Earn credits</h3>
@@ -210,7 +209,7 @@
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="h-100 p-4 border rounded-3 bg-body d-flex flex-column">
+                    <div class="h-100 p-4 border rounded-3 bg-white d-flex flex-column">
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 3</span>
                             <h3 class="h5 fw-semibold text-body mb-0">Download materials</h3>
@@ -330,7 +329,8 @@
         <div class="container-xl">
             <div class="row g-4">
                 <div class="col-lg-6">
-                    <div class="p-4 p-lg-5 border rounded-3 bg-body h-100 d-flex flex-column justify-content-between">
+                    <div
+                        class="p-4 p-lg-5 border rounded-3 bg-body-tertiary h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <i class="ti ti-building text-primary fs-4" aria-hidden="true"></i>
@@ -358,7 +358,8 @@
                 </div>
 
                 <div class="col-lg-6">
-                    <div class="p-4 p-lg-5 border rounded-3 bg-body h-100 d-flex flex-column justify-content-between">
+                    <div
+                        class="p-4 p-lg-5 border rounded-3  bg-body-tertiary h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <i class="ti ti-scale text-primary fs-4" aria-hidden="true"></i>
@@ -536,13 +537,13 @@
 {% endblock %}
 
 {% block guest_footer %}
-<footer class="py-4 border-top bg-body mt-auto">
+<footer class="py-4 border-top bg-dark mt-auto">
     <div class="container-xl">
         <div class="row g-3 align-items-center justify-content-between">
             <div class="col-md-6 text-body-secondary small">
                 <div>&copy; 2026 EduSpace. Peer-to-peer academic resource exchange.</div>
                 <div class="mt-1">Student academic project. Built for institutional note exchange.</div>
-                <div class="mt-1 text-secondary opacity-75">AI Tools Disclosure: Built with the help of an AI coding
+                <div class="mt-1 text-white opacity-75">AI Tools Disclosure: Built with the help of an AI coding
                     agent.</div>
             </div>
             <div class="col-md-6 text-md-end text-body-secondary small">

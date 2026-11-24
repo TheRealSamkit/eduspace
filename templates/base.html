@@ -8,10 +8,9 @@
     <title>{% block title %}EduSpace - Peer-to-Peer Academic Resource Exchange{% endblock %}</title>
 
     <!-- Instant Theme Resolution (Zero Flash) -->
-    {% block force_light_theme %}{% endblock %}
     <script>
         (function () {
-            {% if self.force_light_theme()|trim %}
+            {% if force_light %}
             document.documentElement.setAttribute('data-bs-theme', 'light');
             {% else %}
             try {
