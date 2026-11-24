@@ -157,7 +157,12 @@ def test_landing_page_logged_out(client):
     # 6. Page flag disabling T shortcut is present on body
     assert inspector.body_attrs.get('data-no-theme-toggle') == 'true', "Expected data-no-theme-toggle='true' on <body>"
 
-    # 7. Credit numbers match config.py
+    # 7. Forced light theme: meta tag present, head script sets light without reading localStorage
+    assert '<meta content="light" name="color-scheme"/>' in html or '<meta name="color-scheme" content="light">' in html
+    assert "document.documentElement.setAttribute('data-bs-theme', 'light');" in html
+    assert "localStorage.getItem('theme')" not in html, "Landing page inline script must not depend on localStorage"
+
+    # 8. Credit numbers match config.py
     assert str(Config.SIGNUP_BONUS) in html
     assert str(Config.UPLOAD_REWARD) in html
     assert str(Config.DOWNLOAD_COST) in html
@@ -172,3 +177,17 @@ def test_landing_page_redirects_for_logged_in_user(client, app_instance):
     res = client.get('/', follow_redirects=False)
     assert res.status_code == 302
     assert '/browse' in res.headers.get('Location', '')
+
+
+def test_login_page_theme_resolution_unaffected(client):
+    """Verify /login retains dynamic theme resolution via localStorage and theme toggle button."""
+    res = client.get('/login')
+    assert res.status_code == 200
+
+    html = res.data.decode('utf-8')
+    assert "localStorage.getItem('theme')" in html, "/login must read stored theme"
+    assert "prefers-color-scheme" in html, "/login must fall back to prefers-color-scheme"
+    assert "btn-theme-toggle" in html, "/login must render the theme toggle control"
+    assert 'data-no-theme-toggle="true"' not in html, "/login must not have data-no-theme-toggle"
+    assert '<meta name="color-scheme" content="light">' not in html, "/login must not force light color-scheme"
+

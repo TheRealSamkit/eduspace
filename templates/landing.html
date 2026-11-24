@@ -3,12 +3,16 @@
 {% block title %}EduSpace - Peer-to-Peer Academic Resource Exchange{% endblock %}
 
 {% block extra_head %}
-<meta name="description" content="EduSpace is a peer-to-peer academic resource platform where verified university students share course notes, past exams, and study guides within their institution.">
+<meta name="description"
+    content="EduSpace is a peer-to-peer academic resource platform where verified university students share course notes, past exams, and study guides within their institution.">
+<meta name="color-scheme" content="light">
 <meta property="og:title" content="EduSpace - Peer-to-Peer Academic Resource Exchange">
-<meta property="og:description" content="Exchange course notes, past papers, and study guides with students in your university courses.">
+<meta property="og:description"
+    content="Exchange course notes, past papers, and study guides with students in your university courses.">
 <meta property="og:type" content="website">
 {% endblock %}
 
+{% block force_light_theme %}true{% endblock %}
 {% block body_attrs %}data-no-theme-toggle="true"{% endblock %}
 
 {% block guest_header %}
@@ -17,7 +21,8 @@
         <div class="container-xl">
             <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 text-body text-decoration-none"
                 href="{{ url_for('pages.index') }}">
-                <span class="fs-4 fw-bold"><span class="text-primary">Edu</span><span class="text-success">Space</span></span>
+                <span class="fs-4 fw-bold"><span class="text-primary">Edu</span><span
+                        class="text-success">Space</span></span>
             </a>
 
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
@@ -64,12 +69,14 @@
                         Study materials from your classmates, not random strangers.
                     </h1>
                     <p class="fs-5 text-body-secondary mb-4 text-measure">
-                        Course notes, past exams, and lab guides shared by students in your courses. Earn credits when you contribute; spend credits when you download.
+                        Course notes, past exams, and lab guides shared by students in your courses. Earn credits when
+                        you contribute; spend credits when you download.
                     </p>
 
                     <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
                         <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create account</a>
-                        <a href="#how-it-works" class="text-body-secondary text-decoration-underline small">See how it works</a>
+                        <a href="#how-it-works" class="text-body-secondary text-decoration-underline small">See how it
+                            works</a>
                     </div>
 
                     <div class="d-flex align-items-center gap-2 text-body-secondary small">
@@ -84,16 +91,12 @@
                             <span class="landing-window-dot" aria-hidden="true"></span>
                             <span class="landing-window-dot" aria-hidden="true"></span>
                             <span class="landing-window-dot" aria-hidden="true"></span>
-                            <span class="small text-body-secondary ms-2 font-monospace">eduspace.internal/browse</span>
+                            <span class="small text-body-secondary ms-2 font-monospace">eduspace/browse</span>
                         </div>
                         <div class="p-0">
                             <img src="{{ url_for('static', filename='img/browse-preview-light.png') }}"
-                                class="img-fluid landing-preview-light w-100" width="1280" height="800"
+                                class="img-fluid w-100" width="1280" height="800"
                                 alt="EduSpace repository browse interface showing university study materials"
-                                loading="eager">
-                            <img src="{{ url_for('static', filename='img/browse-preview-dark.png') }}"
-                                class="img-fluid landing-preview-dark w-100" width="1280" height="800"
-                                alt="EduSpace repository browse interface in dark theme showing university study materials"
                                 loading="eager">
                         </div>
                     </div>
@@ -113,12 +116,14 @@
                                 Why campus study materials stay lost
                             </h2>
                             <p class="text-body-secondary text-measure mb-4">
-                                Every semester, students write detailed lecture summaries and compile practice problem sets. Yet most of that work disappears into private group chats or dead shared folders.
+                                Every semester, students write detailed lecture summaries and compile practice problem
+                                sets. Yet most of that work disappears into private group chats or dead shared folders.
                             </p>
                         </div>
                         <div class="pt-3 border-top small text-body-secondary">
                             <i class="ti ti-info-circle me-1 text-primary" aria-hidden="true"></i>
-                            EduSpace organizes materials by course, semester, and material type within your verified campus domain.
+                            EduSpace organizes materials by course, semester, and material type within your verified
+                            campus domain.
                         </div>
                     </div>
                 </div>
@@ -128,21 +133,24 @@
                         <div class="p-4 border rounded-3 bg-body">
                             <h3 class="h5 fw-semibold text-body mb-2">WhatsApp and Telegram groups</h3>
                             <p class="text-body-secondary small mb-0">
-                                Documents get buried under hundreds of chat messages. When exam week arrives, students scroll through weeks of chat history trying to find a PDF someone sent in September.
+                                Documents get buried under hundreds of chat messages. When exam week arrives, students
+                                scroll through weeks of chat history trying to find a PDF someone sent in September.
                             </p>
                         </div>
 
                         <div class="p-4 border rounded-3 bg-body">
                             <h3 class="h5 fw-semibold text-body mb-2">Google Drive links and permissions</h3>
                             <p class="text-body-secondary small mb-0">
-                                Folders set to private, links that expire when a student graduates, and confusing folder trees with no search filters or course tags.
+                                Folders set to private, links that expire when a student graduates, and confusing folder
+                                trees with no search filters or course tags.
                             </p>
                         </div>
 
                         <div class="p-4 border rounded-3 bg-body">
                             <h3 class="h5 fw-semibold text-body mb-2">Free-riding without contribution</h3>
                             <p class="text-body-secondary small mb-0">
-                                A few students share everything while others only download. The credit ledger rewards active contributors while keeping downloads accessible to all verified students.
+                                A few students share everything while others only download. The credit ledger rewards
+                                active contributors while keeping downloads accessible to all verified students.
                             </p>
                         </div>
                     </div>
@@ -169,9 +177,11 @@
                             <h3 class="h5 fw-semibold text-body mb-0">Upload notes</h3>
                         </div>
                         <p class="text-body-secondary small mb-4 flex-grow-1">
-                            Share your lecture notes, past exam questions, or lab reports in PDF, DOCX, or PPTX format. Tag by course code and term.
+                            Share your lecture notes, past exam questions, or lab reports in PDF, DOCX, or PPTX format.
+                            Tag by course code and term.
                         </p>
-                        <div class="pt-3 border-top d-flex justify-content-between align-items-center text-body-secondary small">
+                        <div
+                            class="pt-3 border-top d-flex justify-content-between align-items-center text-body-secondary small">
                             <div class="d-flex align-items-center gap-2">
                                 <i class="ti ti-file-text text-primary fs-5" aria-hidden="true"></i>
                                 <span class="fw-medium text-body">CS101_Summary.pdf</span>
@@ -188,11 +198,13 @@
                             <h3 class="h5 fw-semibold text-body mb-0">Earn credits</h3>
                         </div>
                         <p class="text-body-secondary small mb-4 flex-grow-1">
-                            Earn +{{ config.UPLOAD_REWARD }} credits for every valid document you share, up to {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads each day.
+                            Earn +{{ config.UPLOAD_REWARD }} credits for every valid document you share, up to {{
+                            config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads each day.
                         </p>
                         <div class="pt-3 border-top d-flex justify-content-between align-items-center">
                             <span class="small text-body-secondary">Daily upload reward:</span>
-                            <span class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{ config.UPLOAD_REWARD }} credits</span>
+                            <span class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{
+                                config.UPLOAD_REWARD }} credits</span>
                         </div>
                     </div>
                 </div>
@@ -204,11 +216,13 @@
                             <h3 class="h5 fw-semibold text-body mb-0">Download materials</h3>
                         </div>
                         <p class="text-body-secondary small mb-4 flex-grow-1">
-                            Spend {{ config.DOWNLOAD_COST }} credits to download any peer document. Once downloaded, re-downloads are permanently free.
+                            Spend {{ config.DOWNLOAD_COST }} credits to download any peer document. Once downloaded,
+                            re-downloads are permanently free.
                         </p>
                         <div class="pt-3 border-top d-flex justify-content-between align-items-center">
                             <span class="small text-body-secondary">Per-download cost:</span>
-                            <span class="badge bg-secondary-subtle text-body border">-{{ config.DOWNLOAD_COST }} credits</span>
+                            <span class="badge bg-secondary-subtle text-body border">-{{ config.DOWNLOAD_COST }}
+                                credits</span>
                         </div>
                     </div>
                 </div>
@@ -222,7 +236,8 @@
             <div class="mb-4">
                 <h2 id="credits-heading" class="h3 fw-semibold text-body mb-2">Platform credit parameters</h2>
                 <p class="text-body-secondary text-measure mb-0">
-                    Credit values are fixed in application configuration. All transactions are logged to an atomic database ledger.
+                    Credit values are fixed in application configuration. All transactions are logged to an atomic
+                    database ledger.
                 </p>
             </div>
 
@@ -246,10 +261,13 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{ config.SIGNUP_BONUS }} credits</span>
+                                    <span
+                                        class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{
+                                        config.SIGNUP_BONUS }} credits</span>
                                 </td>
                                 <td class="text-body-secondary small">One-time</td>
-                                <td class="pe-4 text-body-secondary small">Credited immediately when you verify your university email address.</td>
+                                <td class="pe-4 text-body-secondary small">Credited immediately when you verify your
+                                    university email address.</td>
                             </tr>
                             <tr>
                                 <td class="ps-4 fw-medium text-body">
@@ -259,10 +277,14 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{ config.UPLOAD_REWARD }} credits</span>
+                                    <span
+                                        class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{
+                                        config.UPLOAD_REWARD }} credits</span>
                                 </td>
-                                <td class="text-body-secondary small">{{ config.MAX_REWARDED_UPLOADS_PER_DAY }} uploads daily</td>
-                                <td class="pe-4 text-body-secondary small">Awarded for valid notes, past exams, and study guides up to the daily cap.</td>
+                                <td class="text-body-secondary small">{{ config.MAX_REWARDED_UPLOADS_PER_DAY }} uploads
+                                    daily</td>
+                                <td class="pe-4 text-body-secondary small">Awarded for valid notes, past exams, and
+                                    study guides up to the daily cap.</td>
                             </tr>
                             <tr>
                                 <td class="ps-4 fw-medium text-body">
@@ -272,10 +294,12 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-secondary-subtle text-body border">-{{ config.DOWNLOAD_COST }} credits</span>
+                                    <span class="badge bg-secondary-subtle text-body border">-{{ config.DOWNLOAD_COST }}
+                                        credits</span>
                                 </td>
                                 <td class="text-body-secondary small">Per file</td>
-                                <td class="pe-4 text-body-secondary small">Deducted on first download. Re-downloading and your own files cost 0 credits.</td>
+                                <td class="pe-4 text-body-secondary small">Deducted on first download. Re-downloading
+                                    and your own files cost 0 credits.</td>
                             </tr>
                             <tr>
                                 <td class="ps-4 fw-medium text-body">
@@ -285,10 +309,13 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">-{{ config.UPLOAD_REWARD }} credits</span>
+                                    <span
+                                        class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">-{{
+                                        config.UPLOAD_REWARD }} credits</span>
                                 </td>
                                 <td class="text-body-secondary small">Per violation</td>
-                                <td class="pe-4 text-body-secondary small">Upload rewards are reversed if a file is removed for copyright or content violations.</td>
+                                <td class="pe-4 text-body-secondary small">Upload rewards are reversed if a file is
+                                    removed for copyright or content violations.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -298,7 +325,8 @@
     </section>
 
     <!-- Institutional Isolation & Moderation Section -->
-    <section class="py-5 border-bottom bg-body landing-section" id="your-university" aria-labelledby="isolation-heading">
+    <section class="py-5 border-bottom bg-body landing-section" id="your-university"
+        aria-labelledby="isolation-heading">
         <div class="container-xl">
             <div class="row g-4">
                 <div class="col-lg-6">
@@ -306,18 +334,23 @@
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <i class="ti ti-building text-primary fs-4" aria-hidden="true"></i>
-                                <h2 id="isolation-heading" class="h4 fw-semibold text-body mb-0">Strict campus domain isolation</h2>
+                                <h2 id="isolation-heading" class="h4 fw-semibold text-body mb-0">Strict campus domain
+                                    isolation</h2>
                             </div>
                             <p class="text-body-secondary text-measure mb-4">
-                                EduSpace enforces institutional boundaries at the database query and route guard level. Students only discover, view, and download files uploaded within their own university domain.
+                                EduSpace enforces institutional boundaries at the database query and route guard level.
+                                Students only discover, view, and download files uploaded within their own university
+                                domain.
                             </p>
                         </div>
 
                         <div class="border-top pt-3">
-                            <span class="small fw-semibold text-body d-block mb-2">Configured university email domains:</span>
+                            <span class="small fw-semibold text-body d-block mb-2">Configured university email
+                                domains:</span>
                             <div class="d-flex flex-wrap gap-2">
                                 {% for domain, name in config.ALLOWED_DOMAINS.items() %}
-                                <span class="badge bg-body-tertiary text-body border font-monospace">@{{ domain }}</span>
+                                <span class="badge bg-body-tertiary text-body border font-monospace">@{{ domain
+                                    }}</span>
                                 {% endfor %}
                             </div>
                         </div>
@@ -332,15 +365,19 @@
                                 <h3 class="h4 fw-semibold text-body mb-0">Copyright and academic integrity</h3>
                             </div>
                             <p class="text-body-secondary text-measure mb-3">
-                                Students may only upload original notes, study summaries, and materials they hold permission to distribute. Commercial textbooks, publisher question banks, and confidential exams are strictly prohibited.
+                                Students may only upload original notes, study summaries, and materials they hold
+                                permission to distribute. Commercial textbooks, publisher question banks, and
+                                confidential exams are strictly prohibited.
                             </p>
                             <p class="text-body-secondary text-measure mb-0">
-                                Every file detail view features a report modal. Campus moderators review flagged items and issue immediate removals with credit reversals.
+                                Every file detail view features a report modal. Campus moderators review flagged items
+                                and issue immediate removals with credit reversals.
                             </p>
                         </div>
 
                         <div class="border-top pt-3 mt-4">
-                            <a href="{{ url_for('pages.terms_page') }}" class="small text-body-secondary text-decoration-underline">
+                            <a href="{{ url_for('pages.terms_page') }}"
+                                class="small text-body-secondary text-decoration-underline">
                                 Read our full terms of service and takedown policy
                             </a>
                         </div>
@@ -365,8 +402,9 @@
                     <div class="accordion border rounded-3 bg-body" id="faqAccordion">
                         <div class="accordion-item border-0 border-bottom">
                             <h3 class="accordion-header" id="headingOne">
-                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                <button class="accordion-button collapsed fw-medium" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false"
+                                    aria-controls="collapseOne">
                                     Which university email addresses are eligible?
                                 </button>
                             </h3>
@@ -384,60 +422,74 @@
 
                         <div class="accordion-item border-0 border-bottom">
                             <h3 class="accordion-header" id="headingTwo">
-                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <button class="accordion-button collapsed fw-medium" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false"
+                                    aria-controls="collapseTwo">
                                     Is my email address visible to other students?
                                 </button>
                             </h3>
                             <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
                                 data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-body-secondary small">
-                                    No. Your institutional email is used strictly for authentication and domain assignment. Other students on the platform only see your username on uploaded documents and ratings.
+                                    No. Your institutional email is used strictly for authentication and domain
+                                    assignment. Other students on the platform only see your username on uploaded
+                                    documents and ratings.
                                 </div>
                             </div>
                         </div>
 
                         <div class="accordion-item border-0 border-bottom">
                             <h3 class="accordion-header" id="headingThree">
-                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <button class="accordion-button collapsed fw-medium" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false"
+                                    aria-controls="collapseThree">
                                     What happens when my credit balance runs low?
                                 </button>
                             </h3>
                             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
                                 data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-body-secondary small">
-                                    Every new account receives {{ config.SIGNUP_BONUS }} welcome credits. When your balance drops, upload your own course notes or past exam solutions to earn +{{ config.UPLOAD_REWARD }} credits per document, up to {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads daily.
+                                    Every new account receives {{ config.SIGNUP_BONUS }} welcome credits. When your
+                                    balance drops, upload your own course notes or past exam solutions to earn +{{
+                                    config.UPLOAD_REWARD }} credits per document, up to {{
+                                    config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads daily.
                                 </div>
                             </div>
                         </div>
 
                         <div class="accordion-item border-0 border-bottom">
                             <h3 class="accordion-header" id="headingFour">
-                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <button class="accordion-button collapsed fw-medium" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false"
+                                    aria-controls="collapseFour">
                                     Can I upload scanned textbook chapters?
                                 </button>
                             </h3>
                             <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
                                 data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-body-secondary small">
-                                    No. Uploading commercial textbooks or copyrighted publisher content is prohibited. EduSpace is dedicated to student-authored lecture summaries, revision notes, formula sheets, and study guides.
+                                    No. Uploading commercial textbooks or copyrighted publisher content is prohibited.
+                                    EduSpace is dedicated to student-authored lecture summaries, revision notes, formula
+                                    sheets, and study guides.
                                 </div>
                             </div>
                         </div>
 
                         <div class="accordion-item border-0">
                             <h3 class="accordion-header" id="headingFive">
-                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                <button class="accordion-button collapsed fw-medium" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false"
+                                    aria-controls="collapseFive">
                                     How does the content reporting system function?
                                 </button>
                             </h3>
                             <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
                                 data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-body-secondary small">
-                                    Any registered student can report a document for incorrect material, inappropriate content, or copyright infringement. Institutional moderators review open reports from the administration dashboard, resolving valid reports or removing infringing files with credit reversal.
+                                    Any registered student can report a document for incorrect material, inappropriate
+                                    content, or copyright infringement. Institutional moderators review open reports
+                                    from the administration dashboard, resolving valid reports or removing infringing
+                                    files with credit reversal.
                                 </div>
                             </div>
                         </div>
@@ -448,7 +500,8 @@
                     <div class="p-4 border rounded-3 bg-body">
                         <h3 class="h6 fw-semibold text-body mb-2">Need assistance?</h3>
                         <p class="text-body-secondary small mb-3">
-                            For domain whitelist requests or technical issues with your campus account, review our platform documentation.
+                            For domain whitelist requests or technical issues with your campus account, review our
+                            platform documentation.
                         </p>
                         <a href="{{ url_for('pages.terms_page') }}" class="btn btn-sm btn-outline-secondary w-100">
                             Review terms and policies
@@ -467,10 +520,12 @@
                     Start exchanging study materials with your campus peers
                 </h2>
                 <p class="text-body-secondary text-measure mx-auto mb-4">
-                    Register with your institutional email address to receive {{ config.SIGNUP_BONUS }} welcome credits and browse resources from your college.
+                    Register with your institutional email address to receive {{ config.SIGNUP_BONUS }} welcome credits
+                    and browse resources from your college.
                 </p>
                 <div class="d-flex justify-content-center gap-3">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary">Register with university email</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary">Register with university
+                        email</a>
                     <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary">Sign in</a>
                 </div>
             </div>
@@ -487,13 +542,16 @@
             <div class="col-md-6 text-body-secondary small">
                 <div>&copy; 2026 EduSpace. Peer-to-peer academic resource exchange.</div>
                 <div class="mt-1">Student academic project. Built for institutional note exchange.</div>
-                <div class="mt-1 text-secondary opacity-75">AI Tools Disclosure: Built with the help of an AI coding agent.</div>
+                <div class="mt-1 text-secondary opacity-75">AI Tools Disclosure: Built with the help of an AI coding
+                    agent.</div>
             </div>
             <div class="col-md-6 text-md-end text-body-secondary small">
                 <div class="d-flex flex-wrap gap-3 justify-content-md-end">
-                    <a href="{{ url_for('pages.terms_page') }}" class="text-body-secondary text-decoration-none">Terms and Copyright</a>
+                    <a href="{{ url_for('pages.terms_page') }}" class="text-body-secondary text-decoration-none">Terms
+                        and Copyright</a>
                     <a href="{{ url_for('auth.login') }}" class="text-body-secondary text-decoration-none">Sign in</a>
-                    <a href="{{ url_for('auth.register') }}" class="text-body-secondary text-decoration-none">Create account</a>
+                    <a href="{{ url_for('auth.register') }}" class="text-body-secondary text-decoration-none">Create
+                        account</a>
                 </div>
             </div>
         </div>

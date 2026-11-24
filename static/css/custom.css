@@ -245,15 +245,6 @@
    Landing Page Extensions (Strictly under 40 lines, no hex values)
    ========================================================================== */
 
-/* Screenshot theme-swap: Bootstrap has no utility for showing/hiding based on ancestor [data-bs-theme] */
-[data-bs-theme="dark"] .landing-preview-light {
-    display: none !important;
-}
-:root:not([data-bs-theme="dark"]) .landing-preview-dark,
-[data-bs-theme="light"] .landing-preview-dark {
-    display: none !important;
-}
-
 /* Browser frame decorative dots: Bootstrap provides no fixed 8px circular indicator utility */
 .landing-window-dot {
     width: 8px;
