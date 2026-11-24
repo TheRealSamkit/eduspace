@@ -9,7 +9,7 @@ Depends on os, uuid, and werkzeug.utils.secure_filename.
 import os
 import uuid
 from werkzeug.utils import secure_filename
-from studyexchange.services.credits import reverse_upload_credits
+from eduspace.services.credits import reverse_upload_credits
 
 
 def validate_upload_input(title, subject, semester, file_type, confirm_copyright, uploaded_file, allowed_exts):

@@ -1,9 +1,9 @@
 """
-Core library routes for StudyExchange.
+Core library routes for EduSpace.
 
 Includes repository browsing, search/filter, material detail views, ratings,
 reporting, and credit-deducted file downloads with institutional isolation.
-Depends on Flask, db.get_db, and studyexchange.services.
+Depends on Flask, db.get_db, and eduspace.services.
 """
 
 from flask import (
@@ -12,9 +12,9 @@ from flask import (
 )
 from config import Config
 from db import get_db
-from studyexchange.security import login_required
-from studyexchange.services.files import query_browse_materials, get_file_detail_isolated
-from studyexchange.services.credits import process_download_transaction
+from eduspace.security import login_required
+from eduspace.services.files import query_browse_materials, get_file_detail_isolated
+from eduspace.services.credits import process_download_transaction
 
 bp = Blueprint('library', __name__)
 

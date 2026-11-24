@@ -449,7 +449,7 @@ def test_registration_atomic_success(client, app_instance):
     # Follow to consent page
     consent_page = client.get('/consent')
     assert consent_page.status_code == 200
-    assert b"Welcome to , atomic_user" in consent_page.data
+    assert b"Welcome to EduSpace, atomic_user" in consent_page.data
 
     with app_instance.app_context():
         db = get_db()

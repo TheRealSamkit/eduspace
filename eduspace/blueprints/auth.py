@@ -1,7 +1,7 @@
 """
 Authentication, registration, session termination, and research consent routes.
 
-Depends on Flask, werkzeug.security, db.get_db, and studyexchange.services.credits.
+Depends on Flask, werkzeug.security, db.get_db, and eduspace.services.credits.
 """
 
 import sqlite3
@@ -12,7 +12,7 @@ from flask import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from db import get_db
-from studyexchange.services.credits import record_ledger_entry
+from eduspace.services.credits import record_ledger_entry
 
 bp = Blueprint('auth', __name__)
 
@@ -144,7 +144,7 @@ def register():
             return render_template('register.html', username=username, email=email)
 
         session['user_id'] = user_id
-        flash(f"Welcome to StudyExchange, {username}! You have received {signup_bonus} bonus credits.", "success")
+        flash(f"Welcome to EduSpace, {username}! You have received {signup_bonus} bonus credits.", "success")
         return redirect(url_for('auth.consent'))
 
     return render_template('register.html')

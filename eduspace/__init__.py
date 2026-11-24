@@ -1,5 +1,5 @@
 """
-StudyExchange application package.
+EduSpace application package.
 
 Provides create_app() factory initializing configuration, database,
 request lifecycle hooks, error handlers, and modular blueprints.
@@ -9,21 +9,21 @@ import os
 from flask import Flask
 from config import Config
 from db import init_app
-from studyexchange.hooks import init_hooks
-from studyexchange.blueprints.errors import register_error_handlers
-from studyexchange.blueprints.pages import bp as pages_bp
-from studyexchange.blueprints.auth import bp as auth_bp
-from studyexchange.blueprints.library import bp as library_bp
-from studyexchange.blueprints.upload import bp as upload_bp
-from studyexchange.blueprints.dashboard import bp as dashboard_bp
-from studyexchange.blueprints.admin import bp as admin_bp
-from studyexchange.blueprints.research import bp as research_bp
-from studyexchange.blueprints.api import bp as api_bp
+from eduspace.hooks import init_hooks
+from eduspace.blueprints.errors import register_error_handlers
+from eduspace.blueprints.pages import bp as pages_bp
+from eduspace.blueprints.auth import bp as auth_bp
+from eduspace.blueprints.library import bp as library_bp
+from eduspace.blueprints.upload import bp as upload_bp
+from eduspace.blueprints.dashboard import bp as dashboard_bp
+from eduspace.blueprints.admin import bp as admin_bp
+from eduspace.blueprints.research import bp as research_bp
+from eduspace.blueprints.api import bp as api_bp
 
 
 def create_app(test_config=None):
     """
-    Application factory for StudyExchange.
+    Application factory for EduSpace.
 
     Args:
         test_config (dict, optional): Custom configuration overrides for testing.
@@ -32,7 +32,7 @@ def create_app(test_config=None):
         Flask: Fully configured Flask application instance.
     """
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    app = Flask('studyexchange', root_path=project_root)
+    app = Flask('eduspace', root_path=project_root)
     app.config.from_object(Config)
 
     if test_config:

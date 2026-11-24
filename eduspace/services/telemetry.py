@@ -1,5 +1,5 @@
 """
-Usage measurement and telemetry services for StudyExchange.
+Usage measurement and telemetry services for EduSpace.
 
 Encapsulates event stream logging, HCI task performance metrics,
 and user feedback persistence.

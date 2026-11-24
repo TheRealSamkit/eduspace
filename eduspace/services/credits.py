@@ -1,5 +1,5 @@
 """
-Credit economy service functions for StudyExchange.
+Credit economy service functions for EduSpace.
 
 Encapsulates ledger writes, daily upload reward caps, download charges
 with atomic credit checks, and moderation reward reversals.

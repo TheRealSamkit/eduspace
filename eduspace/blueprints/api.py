@@ -1,12 +1,12 @@
 """
 JSON API endpoints for client-side state, domain validation, telemetry, and live credit sync.
 
-Depends on Flask, db.get_db, and studyexchange.services.telemetry.
+Depends on Flask, db.get_db, and eduspace.services.telemetry.
 """
 
 from flask import Blueprint, request, jsonify, session, g, current_app
 from db import get_db
-from studyexchange.services.telemetry import log_event_entry
+from eduspace.services.telemetry import log_event_entry
 
 bp = Blueprint('api', __name__)
 

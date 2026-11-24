@@ -1,15 +1,15 @@
 """
-Application lifecycle hooks and context processors for StudyExchange.
+Application lifecycle hooks and context processors for EduSpace.
 
 Manages per-request session tracking, authentication state hydration,
 research consent gating, CSRF verification, and cache headers.
-Depends on Flask, db.get_db, and studyexchange.security.get_csrf_token.
+Depends on Flask, db.get_db, and eduspace.security.get_csrf_token.
 """
 
 import uuid
 from flask import request, session, g, redirect, url_for, abort
 from db import get_db
-from studyexchange.security import get_csrf_token
+from eduspace.security import get_csrf_token
 
 
 def init_hooks(app):

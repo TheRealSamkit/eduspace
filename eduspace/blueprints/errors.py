@@ -1,5 +1,5 @@
 """
-Global HTTP error handlers for StudyExchange.
+Global HTTP error handlers for EduSpace.
 
 Renders custom error pages for client and server status codes.
 Depends on Flask (render_template).

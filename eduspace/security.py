@@ -1,5 +1,5 @@
 """
-Security helpers and authorization decorators for StudyExchange.
+Security helpers and authorization decorators for EduSpace.
 
 Depends on Flask (session, g, request, redirect, url_for, flash, abort)
 and secrets.

@@ -76,8 +76,8 @@ def test_toast_on_registration(client):
 
     html = res.data.decode('utf-8')
     assert 'class="toast' in html or "class='toast" in html or "toast align-items-center" in html
-    assert 'text-bg-success' in html
-    assert 'Welcome to , toast_user!' in html
+    assert 'data-category="success"' in html
+    assert 'Welcome to EduSpace, toast_user!' in html
     # Ensure no leftover flash .alert
     assert 'alert-dismissible' not in html
     assert 'alert-success' not in html
@@ -92,7 +92,7 @@ def test_toast_on_login_failure(client):
 
     html = res.data.decode('utf-8')
     assert 'toast' in html
-    assert 'text-bg-danger' in html
+    assert 'data-category="danger"' in html
     assert 'Invalid email or password' in html
     assert 'alert-dismissible' not in html
     assert 'alert-danger' not in html
@@ -111,7 +111,7 @@ def test_toast_on_logout(client):
     res = client.post('/logout', follow_redirects=True)
     html = res.data.decode('utf-8')
     assert 'toast' in html
-    assert 'text-bg-info' in html
+    assert 'data-category="info"' in html
     assert 'You have been logged out' in html
     assert 'alert-dismissible' not in html
     assert 'alert-info' not in html
@@ -139,7 +139,7 @@ def test_toast_on_upload(client):
 
     html = res.data.decode('utf-8')
     assert 'toast' in html
-    assert 'text-bg-success' in html
+    assert 'data-category="success"' in html
     assert 'Material uploaded successfully!' in html
     assert 'alert-dismissible' not in html
     assert 'alert-success' not in html
@@ -190,7 +190,7 @@ def test_toast_on_download_insufficient_credits(client, app_instance):
     res = client.get(f'/download/{file_id}', follow_redirects=True)
     html = res.data.decode('utf-8')
     assert 'toast' in html
-    assert 'text-bg-danger' in html
+    assert 'data-category="danger"' in html
     assert 'Insufficient credits!' in html
     assert 'alert-dismissible' not in html
     assert 'alert-danger' not in html

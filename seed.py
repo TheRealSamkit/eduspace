@@ -1,5 +1,5 @@
 """
-StudyExchange Database Seeder
+EduSpace Database Seeder
 Populates demo universities, users, dummy PDF files, ledger entries,
 ratings, reports, events, and SUS responses to test and demonstrate the platform.
 """
@@ -33,7 +33,7 @@ def seed():
     conn.execute("PRAGMA foreign_keys = ON;")
     cursor = conn.cursor()
 
-    print("Seeding StudyExchange database...")
+    print("Seeding EduSpace database...")
 
     # Clear old data for a clean demonstration state
     cursor.execute("DELETE FROM reports;")
@@ -288,7 +288,7 @@ def seed():
     conn.close()
 
     print("\n========================================================")
-    print(" StudyExchange Demo Seed Complete!")
+    print(" EduSpace Demo Seed Complete!")
     print("========================================================")
     print(" Universities Created:")
     print("  1. XYZ University (Domain: xyz.edu)")

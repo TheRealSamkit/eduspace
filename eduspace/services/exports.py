@@ -64,5 +64,5 @@ def get_export_dataset(db, table_name):
 
     query, headers = EXPORT_TABLE_SCHEMAS[table_name]
     rows = db.execute(query).fetchall()
-    filename = f"studyexchange_{table_name}.csv"
+    filename = f"eduspace_{table_name}.csv"
     return headers, rows, filename

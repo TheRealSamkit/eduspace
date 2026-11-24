@@ -1,4 +1,4 @@
--- StudyExchange SQLite Database Schema
+-- EduSpace SQLite Database Schema
 
 PRAGMA foreign_keys = ON;
 

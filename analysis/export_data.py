@@ -1,5 +1,5 @@
 """
-StudyExchange Data Export Tool
+EduSpace Data Export Tool
 Exports system usage, task evaluation, SUS responses, feedback,
 and platform activity into CSV format for statistical analysis.
 
@@ -73,7 +73,7 @@ def export_all(db_path=None, output_dir=None):
         )
     }
 
-    print(f"Exporting StudyExchange data from '{db_path}' to '{output_dir}'...")
+    print(f"Exporting EduSpace data from '{db_path}' to '{output_dir}'...")
 
     for filename, (query, headers) in datasets.items():
         filepath = os.path.join(output_dir, filename)

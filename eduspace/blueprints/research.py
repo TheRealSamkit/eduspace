@@ -1,9 +1,9 @@
 """
-HCI research evaluation routes for StudyExchange.
+HCI research evaluation routes for EduSpace.
 
 Includes interactive test mode tasks, 10-item System Usability Scale (SUS) survey,
 and qualitative usability feedback collection.
-Depends on Flask, db.get_db, studyexchange.security, and studyexchange.services.
+Depends on Flask, db.get_db, eduspace.security, and eduspace.services.
 """
 
 from flask import (
@@ -11,12 +11,12 @@ from flask import (
     url_for, flash, session, g
 )
 from db import get_db
-from studyexchange.security import login_required
-from studyexchange.services.sus import (
+from eduspace.security import login_required
+from eduspace.services.sus import (
     SUS_ITEMS, validate_and_extract_sus_answers,
     calculate_sus_score, record_sus_evaluation
 )
-from studyexchange.services.telemetry import record_task_metric, record_user_feedback
+from eduspace.services.telemetry import record_task_metric, record_user_feedback
 
 bp = Blueprint('research', __name__)
 
@@ -154,7 +154,7 @@ def feedback_page():
 
         db = get_db()
         record_user_feedback(db, g.user['id'], text, usability_issue)
-        flash("Thank you for your valuable feedback! It will help improve StudyExchange.", "success")
+        flash("Thank you for your valuable feedback! It will help improve EduSpace.", "success")
         return redirect(url_for('library.browse'))
 
     return render_template('feedback.html')

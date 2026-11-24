@@ -276,7 +276,7 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
-- The application automatically initializes `study_exchange.db` with the schema on its first run if the database file is not present.
+- The application automatically initializes `eduspace.db` with the schema on its first run if the database file is not present.
 - The server starts at: **`http://127.0.0.1:5000`**
 
 ### 3. Seed Demo Data (Recommended)

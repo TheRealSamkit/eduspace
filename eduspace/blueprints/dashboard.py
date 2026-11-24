@@ -1,13 +1,13 @@
 """
-User personal dashboard route for StudyExchange.
+User personal dashboard route for EduSpace.
 
 Displays credit ledger history, uploaded materials, and downloaded documents.
-Depends on Flask, db.get_db, and studyexchange.security.login_required.
+Depends on Flask, db.get_db, and eduspace.security.login_required.
 """
 
 from flask import Blueprint, render_template, g
 from db import get_db
-from studyexchange.security import login_required
+from eduspace.security import login_required
 
 bp = Blueprint('dashboard', __name__)
 

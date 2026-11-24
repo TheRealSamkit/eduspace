@@ -23,9 +23,9 @@ class Config:
 
     # Base Paths
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    DATABASE = os.environ.get("DATABASE_PATH", os.path.join(BASE_DIR, "study_exchange.db"))
+    DATABASE = os.environ.get("DATABASE_PATH", os.path.join(BASE_DIR, "eduspace.db"))
     UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 
     # Security & Admin
-    SECRET_KEY = os.environ.get("SECRET_KEY", "studyexchange-secret-key-2026-secure")
+    SECRET_KEY = os.environ.get("SECRET_KEY", "eduspace-secret-key-2026-secure")
     ADMIN_EMAIL = "admin@xyz.edu"

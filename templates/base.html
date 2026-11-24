@@ -386,9 +386,9 @@
         {% set role = 'alert' if cat in ['danger', 'warning'] else 'status' %}
         {% set live = 'assertive' if cat in ['danger', 'warning'] else 'polite' %}
         {% set delay = 8000 if cat == 'danger' else (6000 if cat == 'warning' else 4000) %}
-        <div class="toast align-items-center border-0 bg-{{ cat }}-subtle mb-2 toast-server shadow-sm" role="{{ role }}"
-            aria-live="{{ live }}" aria-atomic="true" data-bs-delay="{{ delay }}" data-bs-autohide="true"
-            data-category="{{ cat }}">
+        <div class="toast align-items-center border-{{cat}} bg-{{ cat }}-subtle text-{{cat}} mb-2 toast-server shadow-sm"
+            role="{{ role }}" aria-live="{{ live }}" aria-atomic="true" data-bs-delay="{{ delay }}"
+            data-bs-autohide="true" data-category="{{ cat }}">
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-2">
                     {% if cat == 'success' %}
@@ -400,7 +400,7 @@
                     {% else %}
                     <i class="ti ti-info-circle fs-5 flex-shrink-0" aria-hidden="true"></i>
                     {% endif %}
-                    <div class="toast-message-text">{{ message }}</div>
+                    <div class="toast-message-text ">{{ message }}</div>
                 </div>
                 <button type="button"
                     class="btn-close {{ 'btn-close-white' if cat in ['danger', 'success'] else '' }} me-2 m-auto"

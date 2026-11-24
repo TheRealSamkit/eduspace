@@ -1,8 +1,8 @@
 """
-Upload route for StudyExchange.
+Upload route for EduSpace.
 
 Handles material submission, copyright affirmation, storage, and daily reward crediting.
-Depends on Flask, db.get_db, and studyexchange.services.
+Depends on Flask, db.get_db, and eduspace.services.
 """
 
 import os
@@ -12,9 +12,9 @@ from flask import (
 )
 from config import Config
 from db import get_db
-from studyexchange.security import login_required
-from studyexchange.services.files import validate_upload_input, save_uploaded_file
-from studyexchange.services.credits import process_upload_reward
+from eduspace.security import login_required
+from eduspace.services.files import validate_upload_input, save_uploaded_file
+from eduspace.services.credits import process_upload_reward
 
 bp = Blueprint('upload', __name__)
 

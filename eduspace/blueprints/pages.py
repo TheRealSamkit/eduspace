@@ -1,5 +1,5 @@
 """
-Public and informational page routes for StudyExchange.
+Public and informational page routes for EduSpace.
 
 Includes landing page, terms of service, and browser favicon.
 Depends on Flask (Blueprint, render_template, redirect, url_for, g).

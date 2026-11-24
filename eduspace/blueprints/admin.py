@@ -1,7 +1,7 @@
 """
 Administrator moderation, baseline evaluation entry, and data export routes.
 
-Depends on Flask, db.get_db, config.Config, studyexchange.security, and studyexchange.services.
+Depends on Flask, db.get_db, config.Config, eduspace.security, and eduspace.services.
 """
 
 import io
@@ -12,9 +12,9 @@ from flask import (
 )
 from config import Config
 from db import get_db
-from studyexchange.security import admin_required
-from studyexchange.services.files import takedown_file_admin
-from studyexchange.services.exports import get_export_dataset
+from eduspace.security import admin_required
+from eduspace.services.files import takedown_file_admin
+from eduspace.services.exports import get_export_dataset
 
 bp = Blueprint('admin', __name__)
 
