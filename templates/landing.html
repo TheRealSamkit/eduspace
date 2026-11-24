@@ -116,8 +116,8 @@
                                 Every semester, students write detailed lecture summaries and compile practice problem sets. Yet most of that work disappears into private group chats or dead shared folders.
                             </p>
                         </div>
-                        <div class="p-3 border rounded-2 bg-body-secondary small text-body-secondary">
-                            <i class="ti ti-info-circle me-1" aria-hidden="true"></i>
+                        <div class="pt-3 border-top small text-body-secondary">
+                            <i class="ti ti-info-circle me-1 text-primary" aria-hidden="true"></i>
                             EduSpace organizes materials by course, semester, and material type within your verified campus domain.
                         </div>
                     </div>
@@ -163,74 +163,52 @@
 
             <div class="row g-4">
                 <div class="col-lg-4">
-                    <div class="card h-100 border rounded-3 bg-body">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex align-items-center gap-2 mb-3">
-                                <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 1</span>
-                                <h3 class="h5 fw-semibold text-body mb-0">Upload notes</h3>
+                    <div class="h-100 p-4 border rounded-3 bg-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 1</span>
+                            <h3 class="h5 fw-semibold text-body mb-0">Upload notes</h3>
+                        </div>
+                        <p class="text-body-secondary small mb-4 flex-grow-1">
+                            Share your lecture notes, past exam questions, or lab reports in PDF, DOCX, or PPTX format. Tag by course code and term.
+                        </p>
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center text-body-secondary small">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="ti ti-file-text text-primary fs-5" aria-hidden="true"></i>
+                                <span class="fw-medium text-body">CS101_Summary.pdf</span>
                             </div>
-                            <p class="text-body-secondary small mb-4 flex-grow-1">
-                                Share your lecture notes, past exam questions, or lab reports in PDF, DOCX, or PPTX format. Tag by course code and term.
-                            </p>
-
-                            <!-- Mini file card preview -->
-                            <div class="p-3 border rounded-2 bg-body-tertiary">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <i class="ti ti-file-text text-primary fs-5" aria-hidden="true"></i>
-                                    <span class="fw-medium small text-body text-truncate">CS101_Summary.pdf</span>
-                                </div>
-                                <div class="d-flex justify-content-between text-body-secondary small">
-                                    <span>Computer Science</span>
-                                    <span>2.4 MB</span>
-                                </div>
-                            </div>
+                            <span>2.4 MB</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="card h-100 border rounded-3 bg-body">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex align-items-center gap-2 mb-3">
-                                <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 2</span>
-                                <h3 class="h5 fw-semibold text-body mb-0">Earn credits</h3>
-                            </div>
-                            <p class="text-body-secondary small mb-4 flex-grow-1">
-                                Earn +{{ config.UPLOAD_REWARD }} credits for every valid document you share, up to {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads each day.
-                            </p>
-
-                            <!-- Mini credit transaction card -->
-                            <div class="p-3 border rounded-2 bg-body-tertiary">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="small fw-medium text-body">Upload Reward</span>
-                                    <span class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{ config.UPLOAD_REWARD }} credits</span>
-                                </div>
-                                <span class="text-body-secondary small">Daily cap: {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} uploads rewarded</span>
-                            </div>
+                    <div class="h-100 p-4 border rounded-3 bg-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 2</span>
+                            <h3 class="h5 fw-semibold text-body mb-0">Earn credits</h3>
+                        </div>
+                        <p class="text-body-secondary small mb-4 flex-grow-1">
+                            Earn +{{ config.UPLOAD_REWARD }} credits for every valid document you share, up to {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads each day.
+                        </p>
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                            <span class="small text-body-secondary">Daily upload reward:</span>
+                            <span class="badge bg-brass-subtle text-brass-emphasis border border-brass-subtle">+{{ config.UPLOAD_REWARD }} credits</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="card h-100 border rounded-3 bg-body">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex align-items-center gap-2 mb-3">
-                                <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 3</span>
-                                <h3 class="h5 fw-semibold text-body mb-0">Download materials</h3>
-                            </div>
-                            <p class="text-body-secondary small mb-4 flex-grow-1">
-                                Spend {{ config.DOWNLOAD_COST }} credits to download any peer document. Once downloaded, re-downloads are permanently free.
-                            </p>
-
-                            <!-- Mini crop preview of file detail -->
-                            <div class="border rounded-2 overflow-hidden bg-body-tertiary">
-                                <img src="{{ url_for('static', filename='img/file-preview-light.png') }}"
-                                    class="img-fluid landing-preview-light w-100" width="1280" height="800"
-                                    alt="Resource preview detail view" loading="lazy">
-                                <img src="{{ url_for('static', filename='img/file-preview-dark.png') }}"
-                                    class="img-fluid landing-preview-dark w-100" width="1280" height="800"
-                                    alt="Resource preview detail view in dark theme" loading="lazy">
-                            </div>
+                    <div class="h-100 p-4 border rounded-3 bg-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-secondary-subtle text-body border fw-bold px-2 py-1">Step 3</span>
+                            <h3 class="h5 fw-semibold text-body mb-0">Download materials</h3>
+                        </div>
+                        <p class="text-body-secondary small mb-4 flex-grow-1">
+                            Spend {{ config.DOWNLOAD_COST }} credits to download any peer document. Once downloaded, re-downloads are permanently free.
+                        </p>
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                            <span class="small text-body-secondary">Per-download cost:</span>
+                            <span class="badge bg-secondary-subtle text-body border">-{{ config.DOWNLOAD_COST }} credits</span>
                         </div>
                     </div>
                 </div>
@@ -307,7 +285,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">-{{ config.UPLOAD_REWARD }} credits</span>
+                                    <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">-{{ config.UPLOAD_REWARD }} credits</span>
                                 </td>
                                 <td class="text-body-secondary small">Per violation</td>
                                 <td class="pe-4 text-body-secondary small">Upload rewards are reversed if a file is removed for copyright or content violations.</td>
