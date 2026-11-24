@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{% block title %}StudyExchange - Peer-to-Peer Academic Resource Exchange{% endblock %}</title>
+    <title>{% block title %}EduSpace - Peer-to-Peer Academic Resource Exchange{% endblock %}</title>
 
     <!-- Instant Theme Resolution (Zero Flash) -->
     <script>
@@ -36,15 +36,13 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     {% if current_user %}
-    <!-- ========================================================
-         AUTHENTICATED APPLICATION LAYOUT (Left Sidebar + Slim Topbar)
-         ======================================================== -->
+
     <div class="app-layout flex-grow-1">
         <!-- Desktop Fixed Sidebar -->
         <aside class="app-sidebar d-none d-lg-flex flex-column" aria-label="Primary Desktop Navigation">
-            <a class="sidebar-brand" href="{{ url_for('library.browse') }}">
-                <i class="ti ti-school text-primary fs-4 flex-shrink-0" aria-hidden="true"></i>
-                <span>StudyExchange</span>
+            <a class="sidebar-brand p-2 px-3" href="{{ url_for('library.browse') }}">
+                <div class="wrapper fw-bold fs-3"><span class="text-primary">Edu</span><span
+                        class="text-success">Space</span></div>
             </a>
 
             <ul class="sidebar-nav">
@@ -130,8 +128,8 @@
             aria-labelledby="mobileSidebarLabel">
             <div class="offcanvas-header border-bottom">
                 <h5 class="offcanvas-title d-flex align-items-center gap-2" id="mobileSidebarLabel">
-                    <i class="ti ti-school text-primary fs-4 flex-shrink-0" aria-hidden="true"></i>
-                    <span>StudyExchange</span>
+                    <div class="wrapper fw-bold fs-3"><span class="text-primary">Edu</span><span
+                            class="text-success">Space</span></div>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
@@ -210,7 +208,7 @@
                         <i class="ti ti-menu-2 fs-5 flex-shrink-0" aria-hidden="true"></i>
                     </button>
                     <span class="fw-semibold text-body d-none d-sm-inline">
-                        {% block topbar_title %}StudyExchange{% endblock %}
+                        {% block topbar_title %}EduSpace{% endblock %}
                     </span>
                 </div>
 
@@ -339,8 +337,8 @@
         <div class="px-3 px-lg-4 d-flex justify-content-between align-items-center">
             <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 text-body text-decoration-none"
                 href="{{ url_for('pages.index') }}">
-                <i class="ti ti-school text-primary fs-3 flex-shrink-0" aria-hidden="true"></i>
-                <span>StudyExchange</span>
+                <div class="wrapper fw-bold fs-3"><span class="text-primary">Edu</span><span
+                        class="text-success">Space</span></div>
             </a>
 
             <div class="d-flex align-items-center gap-2">
@@ -366,7 +364,7 @@
     <!-- Public Footer -->
     <footer class="py-3 px-3 px-lg-4 border-top bg-body mt-auto">
         <div class="d-flex flex-wrap justify-content-between align-items-center small text-body-secondary gap-2">
-            <span>&copy; 2026 StudyExchange. Peer-to-Peer Academic Resource Exchange.</span>
+            <span>&copy; 2026 EduSpace. Peer-to-Peer Academic Resource Exchange.</span>
             <div class="d-flex gap-3">
                 <a href="{{ url_for('pages.terms_page') }}" class="text-body-secondary text-decoration-none">Terms &
                     Copyright</a>
@@ -388,7 +386,7 @@
         {% set role = 'alert' if cat in ['danger', 'warning'] else 'status' %}
         {% set live = 'assertive' if cat in ['danger', 'warning'] else 'polite' %}
         {% set delay = 8000 if cat == 'danger' else (6000 if cat == 'warning' else 4000) %}
-        <div class="toast align-items-center border-0 text-bg-{{ cat }} mb-2 toast-server shadow-sm" role="{{ role }}"
+        <div class="toast align-items-center border-0 bg-{{ cat }}-subtle mb-2 toast-server shadow-sm" role="{{ role }}"
             aria-live="{{ live }}" aria-atomic="true" data-bs-delay="{{ delay }}" data-bs-autohide="true"
             data-category="{{ cat }}">
             <div class="d-flex">

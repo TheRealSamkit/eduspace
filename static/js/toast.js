@@ -1,5 +1,5 @@
 /**
- * StudyExchange Toast Notification Manager
+ * EduSpace Toast Notification Manager
  * 
  * Provides:
  * - window.showToast(message, category)

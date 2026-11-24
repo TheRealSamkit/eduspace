@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Create Account - StudyExchange{% endblock %}
+{% block title %}Create Account - EduSpace{% endblock %}
 
 {% block content_guest %}
 <div class="row justify-content-center py-4">
@@ -9,23 +9,28 @@
             <div class="card-body p-4 p-md-4">
                 <div class="text-center mb-4">
                     <h1 class="h4 fw-bold text-body mb-1">Create your account</h1>
-                    <p class="text-body-secondary small mb-0">Use your university email. Other students only see your username.</p>
+                    <p class="text-body-secondary small mb-0">Use your university email. Other students only see your
+                        username.</p>
                 </div>
 
-                <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate id="register-form">
+                <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate
+                    id="register-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <!-- 1. University Email -->
                     <div class="mb-3">
                         <label for="email" class="form-label fw-medium text-body mb-1">University email</label>
                         <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}"
-                               placeholder="e.g. student@xyz.edu" required autofocus>
-                        <div id="domain-feedback" class="form-text small text-body-secondary mt-1">Enter your university email address.</div>
+                            placeholder="e.g. student@xyz.edu" required autofocus>
+                        <div id="domain-feedback" class="form-text small text-body-secondary mt-1">Enter your university
+                            email address.</div>
                         <div class="invalid-feedback">Please enter your verified university email.</div>
 
                         <!-- Supported Universities Collapse -->
                         <div class="mt-1">
-                            <a class="small text-decoration-none" data-bs-toggle="collapse" href="#collapseSupportedUnis" role="button" aria-expanded="false" aria-controls="collapseSupportedUnis">
+                            <a class="small text-decoration-none" data-bs-toggle="collapse"
+                                href="#collapseSupportedUnis" role="button" aria-expanded="false"
+                                aria-controls="collapseSupportedUnis">
                                 Which emails are supported?
                             </a>
                             <div class="collapse mt-2" id="collapseSupportedUnis">
@@ -44,8 +49,9 @@
                     <!-- 2. Public Username -->
                     <div class="mb-3">
                         <label for="username" class="form-label fw-medium text-body mb-1">Public username</label>
-                        <input type="text" class="form-control" id="username" name="username" value="{{ username or '' }}"
-                               placeholder="e.g. alex_smith" minlength="3" maxlength="30" required>
+                        <input type="text" class="form-control" id="username" name="username"
+                            value="{{ username or '' }}" placeholder="e.g. alex_smith" minlength="3" maxlength="30"
+                            required>
                         <div class="invalid-feedback">Please choose a username of at least 3 characters.</div>
                     </div>
 
@@ -53,9 +59,10 @@
                     <div class="mb-3">
                         <label for="password" class="form-label fw-medium text-body mb-1">Password</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="password"
-                                   minlength="8" placeholder="At least 8 characters" required>
-                            <button class="btn btn-outline-secondary" type="button" id="toggle-password-btn" aria-label="Toggle password visibility">
+                            <input type="password" class="form-control" id="password" name="password" minlength="8"
+                                placeholder="At least 8 characters" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggle-password-btn"
+                                aria-label="Toggle password visibility">
                                 <i class="ti ti-eye" id="toggle-password-icon" aria-hidden="true"></i>
                             </button>
                             <div class="invalid-feedback">Password must be at least 8 characters long.</div>
@@ -72,7 +79,8 @@
                     <div class="mb-4 form-check">
                         <input type="checkbox" class="form-check-input" id="agree_terms" name="agree_terms" required>
                         <label class="form-check-label small text-body-secondary" for="agree_terms">
-                            I accept the <a href="{{ url_for('pages.terms_page') }}" target="_blank">Terms of Service</a> and confirm I will only share material I have the right to distribute.
+                            I accept the <a href="{{ url_for('pages.terms_page') }}" target="_blank">Terms of
+                                Service</a> and confirm I will only share material I have the right to distribute.
                         </label>
                         <div class="invalid-feedback">You must accept the terms to proceed.</div>
                     </div>
@@ -90,7 +98,9 @@
                         <span>Your email is never shown to other students.</span>
                     </div>
                     <div class="text-body-secondary small">
-                        <a href="{{ url_for('pages.terms_page') }}" class="text-body-secondary text-decoration-none">Terms</a> &bull; Anonymised academic research use.
+                        <a href="{{ url_for('pages.terms_page') }}"
+                            class="text-body-secondary text-decoration-none">Terms</a> &bull; Anonymised academic
+                        research use.
                     </div>
                 </div>
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}Test Mode - StudyExchange{% endblock %}
+{% block title %}Test Mode - EduSpace{% endblock %}
 {% block topbar_title %}Test Mode (HCI Evaluation){% endblock %}
 
 {% block content %}
@@ -14,11 +14,14 @@ subtitle="Complete timed resource-retrieval tasks to evaluate platform efficienc
 <div class="card border-{{ 'success' if latest_result.success else 'warning' }} mb-4" id="task-inline-result">
     <div class="card-body p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
-            <i class="ti ti-{{ 'circle-check text-success' if latest_result.success else 'alert-triangle text-warning' }} fs-4 flex-shrink-0" aria-hidden="true"></i>
+            <i class="ti ti-{{ 'circle-check text-success' if latest_result.success else 'alert-triangle text-warning' }} fs-4 flex-shrink-0"
+                aria-hidden="true"></i>
             <div>
-                <span class="fw-semibold text-body">Task {{ 'Completed' if latest_result.success else 'Abandoned' }}:</span>
+                <span class="fw-semibold text-body">Task {{ 'Completed' if latest_result.success else 'Abandoned'
+                    }}:</span>
                 <span class="text-body">{{ latest_result.task_name }}</span> &mdash;
-                <span class="text-body-secondary small">{{ latest_result.duration_sec }}s &bull; {{ latest_result.clicks }} clicks &bull; {{ latest_result.errors }} errors</span>
+                <span class="text-body-secondary small">{{ latest_result.duration_sec }}s &bull; {{ latest_result.clicks
+                    }} clicks &bull; {{ latest_result.errors }} errors</span>
             </div>
         </div>
         <span class="badge {{ 'bg-success text-white' if latest_result.success else 'bg-warning text-dark' }}">
@@ -115,7 +118,8 @@ subtitle="Complete timed resource-retrieval tasks to evaluate platform efficienc
         </div>
 
         <!-- Hidden form used to submit completed task telemetry -->
-        <form id="task-submit-form" action="{{ url_for('research.task_complete') }}" method="POST" style="display: none;">
+        <form id="task-submit-form" action="{{ url_for('research.task_complete') }}" method="POST"
+            style="display: none;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="task_name" id="form-task-name">
             <input type="hidden" name="started_at" id="form-started-at">

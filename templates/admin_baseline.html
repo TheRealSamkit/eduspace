@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}Facilitator Baseline Entry - StudyExchange{% endblock %}
+{% block title %}Facilitator Baseline EntryEduSpace{% endblock %}
 {% block topbar_title %}Baseline Data{% endblock %}
 
 {% block content %}
@@ -14,8 +14,8 @@
         </div>
 
         {{ ui.page_header(
-            "Facilitator Baseline Entry",
-            "Log baseline control measurements (e.g. students finding notes via chat groups or shared folders)."
+        "Facilitator Baseline Entry",
+        "Log baseline control measurements (e.g. students finding notes via chat groups or shared folders)."
         ) }}
 
         <div class="card mb-4">
@@ -35,7 +35,7 @@
                             Task Description <span class="text-danger" aria-hidden="true">*</span>
                         </label>
                         <input type="text" class="form-control" id="task_name" name="task_name"
-                               placeholder="e.g. Locate Calculus notes via Google Drive" required autofocus>
+                            placeholder="e.g. Locate Calculus notes via Google Drive" required autofocus>
                         <div class="invalid-feedback">Task name is required.</div>
                     </div>
 
@@ -44,7 +44,8 @@
                             <label for="duration_sec" class="form-label fw-medium text-body">
                                 Duration (Seconds) <span class="text-danger" aria-hidden="true">*</span>
                             </label>
-                            <input type="number" step="0.1" class="form-control" id="duration_sec" name="duration_sec" placeholder="e.g. 185.4" required>
+                            <input type="number" step="0.1" class="form-control" id="duration_sec" name="duration_sec"
+                                placeholder="e.g. 185.4" required>
                             <div class="invalid-feedback">Valid duration in seconds is required.</div>
                         </div>
 
@@ -109,9 +110,9 @@
                                 <td class="text-body-secondary">{{ b.errors }}</td>
                                 <td class="text-end pe-4">
                                     {% if b.success == 1 %}
-                                        <span class="badge border text-success">Success</span>
+                                    <span class="badge border text-success">Success</span>
                                     {% else %}
-                                        <span class="badge border text-danger">Failed</span>
+                                    <span class="badge border text-danger">Failed</span>
                                     {% endif %}
                                 </td>
                             </tr>

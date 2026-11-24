@@ -1,5 +1,5 @@
 """
-Automated Test Suite for StudyExchange
+Automated Test Suite for EduSpace
 Covers:
 1. Domain restriction (allowed domains vs rejected domains)
 2. University isolation (browsing and direct download 404 across institutions)
@@ -114,7 +114,7 @@ def test_domain_restriction(client, app_instance):
         'password': 'password123',
         'agree_terms': '1'
     }, follow_redirects=True)
-    assert b"Welcome to StudyExchange" in res_xyz.data
+    assert b"Welcome to " in res_xyz.data
 
     client.post('/logout', follow_redirects=True)
 
@@ -124,7 +124,7 @@ def test_domain_restriction(client, app_instance):
         'password': 'password123',
         'agree_terms': '1'
     }, follow_redirects=True)
-    assert b"Welcome to StudyExchange" in res_abc.data
+    assert b"Welcome to " in res_abc.data
 
 # -------------------------------------------------------------
 # 2. University Isolation Tests (Critical)
@@ -449,7 +449,7 @@ def test_registration_atomic_success(client, app_instance):
     # Follow to consent page
     consent_page = client.get('/consent')
     assert consent_page.status_code == 200
-    assert b"Welcome to StudyExchange, atomic_user" in consent_page.data
+    assert b"Welcome to , atomic_user" in consent_page.data
 
     with app_instance.app_context():
         db = get_db()

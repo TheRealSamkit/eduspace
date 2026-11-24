@@ -1,5 +1,5 @@
 """
-Comprehensive end-to-end user flows, isolation tests, and input validation for StudyExchange.
+Comprehensive end-to-end user flows, isolation tests, and input validation for Eduspace.
 Covers:
 1. Complete lifecycle flow:
    - Register -> Consent -> Upload (rewarded +10)

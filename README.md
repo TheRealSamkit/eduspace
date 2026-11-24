@@ -1,10 +1,10 @@
-# StudyExchange - Peer-to-Peer Academic Resource Sharing Platform
+# EduSpace - Peer-to-Peer Academic Resource Sharing Platform
 
 > **AI Tools Disclosure**: Built with the help of an AI coding agent.
 
-StudyExchange is a university-confined web platform where students within the **same university** create accounts, upload verified study material, and earn platform credits to spend on downloading other students' material.
+EduSpace is a university-confined web platform where students within the **same university** create accounts, upload verified study material, and earn platform credits to spend on downloading other students' material.
 
-A fundamental design invariant of StudyExchange is **strict institutional isolation**: students can only discover, search, view, rate, and download materials uploaded within their own university domain. Cross-institutional resource access is strictly blocked at the database and routing layer.
+A fundamental design invariant of EduSpace is **strict institutional isolation**: students can only discover, search, view, rate, and download materials uploaded within their own university domain. Cross-institutional resource access is strictly blocked at the database and routing layer.
 
 ---
 
@@ -36,7 +36,7 @@ To maintain strict architectural boundaries across the team, the codebase is par
   - `static/` (CSS styling at `static/css/`, vanilla JS at `static/js/`)
 - **Backend Team**:
   - `app.py` (Thin server runner script)
-  - `studyexchange/` (Modular application package, blueprints, services, hooks, security)
+  - `EduSpace/` (Modular application package, blueprints, services, hooks, security)
   - `db.py` (SQLite connection lifecycle, automatic initialization)
   - `schema.sql` (Relational schema, foreign keys, table indexes)
   - `config.py` (Configuration constants, domain mappings, credit rewards)
@@ -62,7 +62,7 @@ studyVerse/
 ├── config.py                          # Platform parameters (rewards, limits, domains)
 ├── requirements.txt                   # Python dependencies (flask, werkzeug, pytest)
 ├── README.md                          # Project documentation and architecture guide
-├── studyexchange/                     # Core application package
+├── EduSpace/                     # Core application package
 │   ├── __init__.py                    # create_app factory: config, init_app, hooks, blueprints
 │   ├── hooks.py                       # Context processors, before_request, after_request headers
 │   ├── security.py                    # CSRF helpers, login_required, admin_required decorators
@@ -127,7 +127,7 @@ studyVerse/
 
 ## What Each Module Does
 
-### Blueprints (`studyexchange/blueprints/`)
+### Blueprints (`EduSpace/blueprints/`)
 - **`pages.py`**: Public landing page (`/`), legal and copyright terms (`/terms`), and silent favicon handler (`/favicon.ico`).
 - **`auth.py`**: User authentication lifecycles including institutional domain-checked registration (`/register`), login (`/login`), logout (`/logout`), and research ethics consent (`/consent`).
 - **`library.py`**: Core student study material workflows: browsing with search/filters (`/browse`), material details (`/file/<id>`), 1–5 star ratings (`/file/<id>/rate`), content infringement reporting (`/file/<id>/report`), and credit-deducted file downloads (`/download/<id>`).
@@ -138,7 +138,7 @@ studyVerse/
 - **`api.py`**: JSON endpoints supporting dynamic client UI: auth status check (`/api/me`), real-time domain verification (`/api/domain-check`), live credit sync (`/api/credits`), and telemetry event logging (`/api/event`).
 - **`errors.py`**: Custom HTTP error handling rendering styled 400, 403, 404, and 500 error templates.
 
-### Services (`studyexchange/services/`)
+### Services (`EduSpace/services/`)
 - **`credits.py`**: Manages all credit transactions and ledger writes. Enforces the daily upload reward cap (`MAX_REWARDED_UPLOADS_PER_DAY`), performs atomic credit checks and deductions in a `BEGIN IMMEDIATE` transaction during downloads, and handles reward reversals upon moderation removal.
 - **`files.py`**: Handles upload metadata validation, disk persistence with randomized filenames, browse queries with strict `university_id` isolation, rating/report persistence, and content takedown.
 - **`telemetry.py`**: Persistence helpers for client-side events, prototype task metrics, and qualitative usability feedback.
@@ -152,13 +152,13 @@ studyVerse/
 To add a new route while preserving modular separation and testing invariants:
 
 1. **Implement Business Logic (Service)**:
-   Add any non-trivial database operations or domain logic to the relevant service module in `studyexchange/services/` (e.g. `files.py`, `credits.py`, or `telemetry.py`). Keep service functions decoupled from Flask request and response objects.
+   Add any non-trivial database operations or domain logic to the relevant service module in `EduSpace/services/` (e.g. `files.py`, `credits.py`, or `telemetry.py`). Keep service functions decoupled from Flask request and response objects.
 
 2. **Add View Function to Blueprint**:
-   Locate or create the appropriate blueprint in `studyexchange/blueprints/`:
+   Locate or create the appropriate blueprint in `EduSpace/blueprints/`:
    ```python
    from flask import Blueprint, render_template, request, redirect, url_for, flash
-   from studyexchange.security import login_required
+   from EduSpace.security import login_required
 
    @bp.route('/my-route', methods=['GET', 'POST'])
    @login_required
@@ -168,9 +168,9 @@ To add a new route while preserving modular separation and testing invariants:
    ```
 
 3. **Register Blueprint (if new)**:
-   If you created a new blueprint, register it inside `studyexchange/__init__.py`:
+   If you created a new blueprint, register it inside `EduSpace/__init__.py`:
    ```python
-   from studyexchange.blueprints.my_module import bp as my_bp
+   from EduSpace.blueprints.my_module import bp as my_bp
    app.register_blueprint(my_bp)
    ```
 
@@ -238,7 +238,7 @@ To add a new route while preserving modular separation and testing invariants:
 
 ## Keyboard Shortcuts & Accessibility
 
-StudyExchange provides full keyboard navigation via a single source of truth defined in `static/js/shortcuts.js`:
+EduSpace provides full keyboard navigation via a single source of truth defined in `static/js/shortcuts.js`:
 
 | Key Sequence | Action | Group | Notes |
 |:---|:---|:---|:---|

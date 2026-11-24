@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}Browse Materials - StudyExchange{% endblock %}
+{% block title %}Browse Materials - EduSpace{% endblock %}
 {% block topbar_title %}Browse Materials{% endblock %}
 
 {% block content %}
 {{ ui.page_header(
 title="Study Materials",
 subtitle="Compartmentalized exclusively for students of " + current_user.university_name,
-action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-primary btn-sm"><i class="ti ti-cloud-upload me-1"
-        aria-hidden="true"></i>Upload Material (+' + config.UPLOAD_REWARD|string + ')</a>'
+action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-primary btn-sm"><i
+        class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Upload Material (+' + config.UPLOAD_REWARD|string +
+    ')</a>'
 ) }}
 
 <!-- Search & Filtering Card -->
@@ -23,8 +24,8 @@ action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-prim
                     <span class="input-group-text bg-body-tertiary"><i class="ti ti-search"
                             aria-hidden="true"></i></span>
                     <input type="text" class="form-control" id="searchQuery" name="q" value="{{ search_query }}"
-                        placeholder="Search title, subject, or description..."
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Press / to search">
+                        placeholder="Search title, subject, or description..." data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" title="Press / to search">
                 </div>
             </div>
 
@@ -83,7 +84,8 @@ action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-prim
                 <button type="submit" class="btn btn-outline-secondary btn-sm">
                     <i class="ti ti-filter me-1" aria-hidden="true"></i>Apply Filters
                 </button>
-                <a href="{{ url_for('library.browse') }}" class="btn btn-link btn-sm text-body-secondary text-decoration-none">
+                <a href="{{ url_for('library.browse') }}"
+                    class="btn btn-link btn-sm text-body-secondary text-decoration-none">
                     Reset
                 </a>
                 <span class="ms-auto text-body-secondary small">

@@ -1,5 +1,5 @@
 /**
- * StudyExchange Keyboard Shortcuts and Help Modal
+ * EduSpace Keyboard Shortcuts and Help Modal
  * 
  * Single source of truth driving:
  * (a) Keyboard event routing & sequence handling (G then key)

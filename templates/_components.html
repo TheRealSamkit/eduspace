@@ -1,4 +1,4 @@
-{# Reusable Jinja UI Components for StudyExchange #}
+{# Reusable Jinja UI Components for EduSpace #}
 
 {# 1. Page Header: Consistent title, subtitle, and primary/secondary action #}
 {% macro page_header(title, subtitle=None, action_html=None) %}
@@ -89,11 +89,15 @@
         <!-- Meta footer -->
         <div class="pt-3 border-top small text-body-secondary mt-auto">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="d-flex align-items-center gap-1"><i class="ti ti-user fs-6 flex-shrink-0" aria-hidden="true"></i>{{ f.uploader_username }}</span>
-                <span class="d-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Download count"><i class="ti ti-download fs-6 flex-shrink-0" aria-hidden="true"></i>{{ f.download_count }}</span>
+                <span class="d-flex align-items-center gap-1"><i class="ti ti-user fs-6 flex-shrink-0"
+                        aria-hidden="true"></i>{{ f.uploader_username }}</span>
+                <span class="d-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="Download count"><i class="ti ti-download fs-6 flex-shrink-0" aria-hidden="true"></i>{{
+                    f.download_count }}</span>
             </div>
             <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-placement="top" title="User rating">
+                <div class="d-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="User rating">
                     <span class="text-brass"><i class="ti ti-star-filled" aria-hidden="true"></i></span>
                     <span class="fw-medium text-body">{{ "%.1f"|format(f.avg_rating) }}</span>
                     <span class="text-body-secondary">({{ f.rating_count }})</span>
@@ -105,7 +109,7 @@
         </div>
 
         <div class="mt-3">
-            <a href="{{ url_for('library.file_detail', file_id=f.id) }}" class="btn btn-outline-secondary w-100 btn-sm">
+            <a href="{{ url_for('library.file_detail', file_id=f.id) }}" class="btn btn-secondary w-100 btn-sm">
                 View & Download
             </a>
         </div>
@@ -114,7 +118,8 @@
 {% endmacro %}
 
 {# 5. Form Field: Standardized Bootstrap 5 form input with label and feedback #}
-{% macro form_field(name, label, type='text', value='', placeholder='', required=False, feedback=None, options=None, rows=3, help_text=None) %}
+{% macro form_field(name, label, type='text', value='', placeholder='', required=False, feedback=None, options=None,
+rows=3, help_text=None) %}
 <div class="mb-3">
     <label for="{{ name }}" class="form-label fw-medium text-body">
         {{ label }} {% if required %}<span class="text-danger" aria-hidden="true">*</span>{% endif %}

@@ -1,5 +1,5 @@
 """
-Smoke tests for StudyExchange routes.
+Smoke tests for  routes.
 Iterates app.url_map for GET routes under four security contexts:
 1. Anonymous user
 2. Normal student user (alice@xyz.edu)

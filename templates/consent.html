@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}Research Ethics Consent - StudyExchange{% endblock %}
+{% block title %}Research Ethics Consent - EduSpace{% endblock %}
 {% block topbar_title %}Participant Consent{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
         {{ ui.page_header(
-            title="Academic Research Evaluation & Consent",
-            subtitle="Please review our anonymized evaluation policy before accessing study materials"
+        title="Academic Research Evaluation & Consent",
+        subtitle="Please review our anonymized evaluation policy before accessing study materials"
         ) }}
 
         <div class="card">
@@ -18,29 +18,37 @@
             </div>
             <div class="card-body p-4 p-md-5">
                 <h2 class="h5 fw-semibold text-body mb-3">
-                    Welcome to StudyExchange, {{ current_user.username }}
+                    Welcome to EduSpace, {{ current_user.username }}
                 </h2>
                 <p class="text-body-secondary mb-4">
-                    Before accessing study materials from <strong>{{ current_user.university_name }}</strong>, please review our anonymized academic evaluation policy.
+                    Before accessing study materials from <strong>{{ current_user.university_name }}</strong>, please
+                    review our anonymized academic evaluation policy.
                 </p>
 
                 <div class="border rounded-3 p-3 bg-body-tertiary mb-4">
                     <div class="fw-medium text-body mb-2">Data Protection Guarantees:</div>
                     <ul class="text-body-secondary small mb-0 d-flex flex-column gap-2">
-                        <li><strong>Anonymised Telemetry:</strong> Interaction durations and click events are measured solely to evaluate system usability.</li>
-                        <li><strong>Strict Confidentiality:</strong> Your email address and password hashes are never exported or disclosed. Only your public username is displayed to peers.</li>
-                        <li><strong>Voluntary Scales:</strong> You may optionally participate in the 10-item System Usability Scale (SUS) survey.</li>
-                        <li><strong>Institutional Compartmentalization:</strong> Materials and exchanges are kept strictly within your university domain.</li>
+                        <li><strong>Anonymised Telemetry:</strong> Interaction durations and click events are measured
+                            solely to evaluate system usability.</li>
+                        <li><strong>Strict Confidentiality:</strong> Your email address and password hashes are never
+                            exported or disclosed. Only your public username is displayed to peers.</li>
+                        <li><strong>Voluntary Scales:</strong> You may optionally participate in the 10-item System
+                            Usability Scale (SUS) survey.</li>
+                        <li><strong>Institutional Compartmentalization:</strong> Materials and exchanges are kept
+                            strictly within your university domain.</li>
                     </ul>
                 </div>
 
-                <form id="consent-form" action="{{ url_for('auth.consent') }}" method="POST" class="needs-validation" novalidate>
+                <form id="consent-form" action="{{ url_for('auth.consent') }}" method="POST" class="needs-validation"
+                    novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-check p-3 border rounded-3 bg-body mb-4">
-                        <input class="form-check-input ms-0 me-3" type="checkbox" id="agree_consent" name="agree_consent" value="1" required>
+                        <input class="form-check-input ms-0 me-3" type="checkbox" id="agree_consent"
+                            name="agree_consent" value="1" required>
                         <label class="form-check-label text-body small" for="agree_consent">
-                            I consent to having my anonymized interaction metrics used for academic evaluation, and agree to use StudyExchange in accordance with institutional academic integrity policies.
+                            I consent to having my anonymized interaction metrics used for academic evaluation, and
+                            agree to use EduSpace in accordance with institutional academic integrity policies.
                         </label>
                         <div class="invalid-feedback ms-4">You must confirm consent to enter the repository.</div>
                     </div>

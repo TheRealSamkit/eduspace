@@ -1,5 +1,5 @@
 /**
- * StudyExchange Main JavaScript
+ * EduSpace Main JavaScript
  * Handles:
  * - Bootstrap form validation (without double-submission)
  * - Submit button spinners
@@ -55,7 +55,7 @@
                     window.updateCreditUI(data.credits);
                 }
             })
-            .catch(function () {});
+            .catch(function () { });
     };
 
     // Sync theme toggle icons with current data-bs-theme
@@ -80,12 +80,12 @@
         html.setAttribute('data-bs-theme', newTheme);
         try {
             localStorage.setItem('theme', newTheme);
-        } catch (e) {}
+        } catch (e) { }
         syncThemeIcons();
     };
 
     // --- Task Test Mode Tracker ---
-    const TASK_STORAGE_KEY = 'studyexchange_active_task';
+    const TASK_STORAGE_KEY = 'EduSpace_active_task';
 
     window.TaskTracker = {
         get: function () {
@@ -282,7 +282,7 @@
 
         window.addEventListener('pagehide', function () {
             tooltipInstances.forEach(function (t) {
-                try { t.dispose(); } catch (e) {}
+                try { t.dispose(); } catch (e) { }
             });
             tooltipInstances = [];
         });

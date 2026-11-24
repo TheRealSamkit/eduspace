@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ error_title or "Page Not Found" }} - StudyExchange{% endblock %}
+{% block title %}{{ error_title or "Page Not Found" }} - EduSpace{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center py-5">
@@ -11,10 +11,12 @@
             </div>
             <h1 class="h3 fw-bold text-body mb-3">{{ error_title or "Resource Not Found" }}</h1>
             <p class="text-body-secondary mb-4 mx-auto" style="max-width: 480px;">
-                {{ error_message or "The page or study material you requested could not be located, or access is strictly limited to students of another university." }}
+                {{ error_message or "The page or study material you requested could not be located, or access is
+                strictly limited to students of another university." }}
             </p>
             <div>
-                <a href="{{ url_for('library.browse') if current_user else url_for('pages.index') }}" class="btn btn-primary px-4 fw-medium">
+                <a href="{{ url_for('library.browse') if current_user else url_for('pages.index') }}"
+                    class="btn btn-primary px-4 fw-medium">
                     <i class="ti ti-home me-1" aria-hidden="true"></i>Back to Safety
                 </a>
             </div>

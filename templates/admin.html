@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}Administrator Panel - StudyExchange{% endblock %}
+{% block title %}Administrator Panel - EduSpace{% endblock %}
 {% block topbar_title %}Admin Panel{% endblock %}
 
 {% block content %}
 {{ ui.page_header(
 "Administrator Control Panel",
 "Supervise content moderation, view usage metrics, and export evaluation data.",
-action_html='<a href="' ~ url_for('admin.admin_baseline') ~ '" class="btn btn-primary btn-sm"><i class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
+action_html='<a href="' ~ url_for('admin.admin_baseline') ~ '" class="btn btn-primary btn-sm"><i
+        class="ti ti-adjustments me-1" aria-hidden="true"></i>Record Baseline Data</a>'
 ) }}
 
 <!-- Stats Grid -->
@@ -47,31 +48,36 @@ action_html='<a href="' ~ url_for('admin.admin_baseline') ~ '" class="btn btn-pr
             dataset is strictly anonymized (user emails and password hashes are never exported).
         </p>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ url_for('admin.admin_export_csv', table_name='events') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='events') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Events Telemetry CSV
             </a>
-            <a href="{{ url_for('admin.admin_export_csv', table_name='tasks') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='tasks') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Tasks Performance CSV
             </a>
             <a href="{{ url_for('admin.admin_export_csv', table_name='sus_responses') }}"
                 class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>SUS Responses CSV
             </a>
-            <a href="{{ url_for('admin.admin_export_csv', table_name='feedback') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='feedback') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Feedback CSV
             </a>
             <a href="{{ url_for('admin.admin_export_csv', table_name='users_anonymized') }}"
                 class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Anonymized Users CSV
             </a>
-            <a href="{{ url_for('admin.admin_export_csv', table_name='files') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='files') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Files Metadata CSV
             </a>
             <a href="{{ url_for('admin.admin_export_csv', table_name='downloads') }}"
                 class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Downloads CSV
             </a>
-            <a href="{{ url_for('admin.admin_export_csv', table_name='ledger') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ url_for('admin.admin_export_csv', table_name='ledger') }}"
+                class="btn btn-outline-secondary btn-sm">
                 <i class="ti ti-download me-1" aria-hidden="true"></i>Credit Ledger CSV
             </a>
         </div>
@@ -89,7 +95,7 @@ action_html='<a href="' ~ url_for('admin.admin_baseline') ~ '" class="btn btn-pr
         <span class="badge border text-body-secondary">{{ reports|length }} Open</span>
         {% endif %}
     </div>
-    <div class="card-body p-0">
+    <div class="card-body p-4">
         {% if reports %}
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -142,7 +148,8 @@ action_html='<a href="' ~ url_for('admin.admin_baseline') ~ '" class="btn btn-pr
             </table>
         </div>
         {% else %}
-        {{ ui.empty_state("ti-circle-check", "No Open Reports", "All uploaded materials are clear and compliant with university policies.") }}
+        {{ ui.empty_state("ti-circle-check", "No Open Reports", "All uploaded materials are clear and compliant with
+        university policies.") }}
         {% endif %}
     </div>
 </div>

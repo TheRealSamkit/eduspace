@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}Dashboard - StudyExchange{% endblock %}
+{% block title %}Dashboard - EduSpace{% endblock %}
 {% block topbar_title %}Dashboard{% endblock %}
 
 {% block content %}
 {{ ui.page_header(
 title="Dashboard & Credit Ledger",
 subtitle="Track your platform credit balance, uploads, and download history",
-action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-primary btn-sm"><i class="ti ti-cloud-upload me-1"
-        aria-hidden="true"></i>Upload Material</a>'
+action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-primary btn-sm"><i
+        class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Upload Material</a>'
 ) }}
 
 <!-- Stat Cards Row (Neutral-first) -->
@@ -268,7 +268,8 @@ action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-prim
             </div>
             <div class="col-sm-6 col-lg-3">
                 <div class="small fw-semibold text-body">Upload reward</div>
-                <div class="small text-body-secondary">{{ config.UPLOAD_REWARD }} credits per material (daily cap: {{ config.MAX_REWARDED_UPLOADS_PER_DAY }})</div>
+                <div class="small text-body-secondary">{{ config.UPLOAD_REWARD }} credits per material (daily cap: {{
+                    config.MAX_REWARDED_UPLOADS_PER_DAY }})</div>
             </div>
             <div class="col-sm-6 col-lg-3">
                 <div class="small fw-semibold text-body">Download cost</div>

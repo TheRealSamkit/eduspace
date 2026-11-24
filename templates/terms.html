@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}Terms of Service & Copyright Policy - StudyExchange{% endblock %}
+{% block title %}Terms of Service & Copyright Policy - EduSpace{% endblock %}
 {% block topbar_title %}Terms & Copyright{% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
                 <div class="mb-4">
                     <h2 class="h6 fw-semibold text-body">1. Ownership of Academic Materials</h2>
                     <p class="text-body-secondary small mb-2">
-                        StudyExchange is an academic peer-to-peer sharing ecosystem designed solely for students within
+                        EduSpace is an academic peer-to-peer sharing ecosystem designed solely for students within
                         verified university domains. Users are legally and ethically obligated to upload <strong>only
                             materials they own or have the explicit right to share</strong> (such as original student
                         notes, student study summaries, and personal worked solutions).
@@ -32,7 +32,7 @@
                 <div class="mb-4">
                     <h2 class="h6 fw-semibold text-body">2. Institutional Isolation & Privacy</h2>
                     <p class="text-body-secondary small mb-0">
-                        Materials uploaded to StudyExchange are strictly isolated to verified students who hold an email
+                        Materials uploaded to EduSpace are strictly isolated to verified students who hold an email
                         address from the corresponding institutional domain. Students from other institutions can never
                         browse, search, or download your materials.
                     </p>
@@ -63,13 +63,18 @@
                 <div class="mb-4">
                     <h2 class="h6 fw-semibold text-body">5. How Credits Work</h2>
                     <p class="text-body-secondary small mb-2">
-                        StudyExchange operates an academic credit economy designed to encourage fair peer-to-peer exchange:
+                        EduSpace operates an academic credit economy designed to encourage fair peer-to-peer exchange:
                     </p>
                     <ul class="text-body-secondary small mb-0 d-flex flex-column gap-1">
-                        <li><strong>Starting balance:</strong> New student accounts receive {{ config.SIGNUP_BONUS }} credits upon registration.</li>
-                        <li><strong>Uploading:</strong> Verified uploads award {{ config.UPLOAD_REWARD }} credits (capped at {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads daily).</li>
-                        <li><strong>Downloading:</strong> Downloading peer study material costs {{ config.DOWNLOAD_COST }} credits. Re-downloading previously purchased documents or your own uploads is always free.</li>
-                        <li><strong>Balance protection:</strong> Downloads require an adequate credit balance. Credits never go below zero.</li>
+                        <li><strong>Starting balance:</strong> New student accounts receive {{ config.SIGNUP_BONUS }}
+                            credits upon registration.</li>
+                        <li><strong>Uploading:</strong> Verified uploads award {{ config.UPLOAD_REWARD }} credits
+                            (capped at {{ config.MAX_REWARDED_UPLOADS_PER_DAY }} rewarded uploads daily).</li>
+                        <li><strong>Downloading:</strong> Downloading peer study material costs {{ config.DOWNLOAD_COST
+                            }} credits. Re-downloading previously purchased documents or your own uploads is always
+                            free.</li>
+                        <li><strong>Balance protection:</strong> Downloads require an adequate credit balance. Credits
+                            never go below zero.</li>
                     </ul>
                 </div>
 

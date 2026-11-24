@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Sign In - StudyExchange{% endblock %}
+{% block title %}Sign In - EduSpace{% endblock %}
 
 {% block content_guest %}
 <div class="row justify-content-center py-4">
@@ -12,13 +12,14 @@
                     <p class="text-body-secondary small mb-0">Enter your university credentials to continue.</p>
                 </div>
 
-                <form action="{{ url_for('auth.login', next=request.args.get('next')) }}" method="POST" class="needs-validation" novalidate id="login-form">
+                <form action="{{ url_for('auth.login', next=request.args.get('next')) }}" method="POST"
+                    class="needs-validation" novalidate id="login-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="mb-3">
                         <label for="email" class="form-label fw-medium text-body mb-1">University email</label>
-                        <input type="email" class="form-control" id="email" name="email"
-                               placeholder="student@xyz.edu" required autofocus>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="student@xyz.edu"
+                            required autofocus>
                         <div class="invalid-feedback">Please enter your university email.</div>
                     </div>
 
@@ -26,8 +27,9 @@
                         <label for="password" class="form-label fw-medium text-body mb-1">Password</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="password" name="password"
-                                   placeholder="••••••••" required>
-                            <button class="btn btn-outline-secondary" type="button" id="toggle-password-btn" aria-label="Toggle password visibility">
+                                placeholder="••••••••" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggle-password-btn"
+                                aria-label="Toggle password visibility">
                                 <i class="ti ti-eye" id="toggle-password-icon" aria-hidden="true"></i>
                             </button>
                             <div class="invalid-feedback">Please enter your password.</div>

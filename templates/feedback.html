@@ -1,20 +1,21 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 
-{% block title %}User Feedback - StudyExchange{% endblock %}
+{% block title %}User Feedback - EduSpace{% endblock %}
 {% block topbar_title %}Feedback{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-7">
         {{ ui.page_header(
-            title="User Feedback & Usability Issues",
-            subtitle="Help us refine StudyExchange by sharing qualitative insights or reporting friction points"
+        title="User Feedback & Usability Issues",
+        subtitle="Help us refine EduSpace by sharing qualitative insights or reporting friction points"
         ) }}
 
         <div class="card">
             <div class="card-body p-4 p-md-5">
-                <form action="{{ url_for('research.feedback_page') }}" method="POST" class="needs-validation" novalidate>
+                <form action="{{ url_for('research.feedback_page') }}" method="POST" class="needs-validation"
+                    novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="mb-3">
@@ -22,15 +23,18 @@
                             Your Experience & Suggestions <span class="text-danger" aria-hidden="true">*</span>
                         </label>
                         <textarea class="form-control" id="feedbackText" name="text" rows="5"
-                                  placeholder="What worked well? What felt confusing or difficult? How did the credit economy feel?" required></textarea>
+                            placeholder="What worked well? What felt confusing or difficult? How did the credit economy feel?"
+                            required></textarea>
                         <div class="invalid-feedback">Please enter your feedback comments.</div>
                     </div>
 
                     <div class="mb-4">
-                        <label for="usabilityIssue" class="form-label fw-medium text-body">Specific Usability Issue / Bug Encountered (Optional)</label>
+                        <label for="usabilityIssue" class="form-label fw-medium text-body">Specific Usability Issue /
+                            Bug Encountered (Optional)</label>
                         <input type="text" class="form-control" id="usabilityIssue" name="usability_issue"
-                               placeholder="e.g. Filter dropdown reset unexpectedly or file button was hard to find">
-                        <div class="form-text text-body-secondary small">Identify any unexpected behavior during search, download, or navigation.</div>
+                            placeholder="e.g. Filter dropdown reset unexpectedly or file button was hard to find">
+                        <div class="form-text text-body-secondary small">Identify any unexpected behavior during search,
+                            download, or navigation.</div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">

@@ -77,7 +77,7 @@ def test_toast_on_registration(client):
     html = res.data.decode('utf-8')
     assert 'class="toast' in html or "class='toast" in html or "toast align-items-center" in html
     assert 'text-bg-success' in html
-    assert 'Welcome to StudyExchange, toast_user!' in html
+    assert 'Welcome to , toast_user!' in html
     # Ensure no leftover flash .alert
     assert 'alert-dismissible' not in html
     assert 'alert-success' not in html
