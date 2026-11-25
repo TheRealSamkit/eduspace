@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ file.title }} - Public Library - EduSpace{% endblock %}
+
+{% block guest_header %}
+<header class="border-bottom bg-body sticky-top">
+    <nav class="navbar navbar-expand-lg py-2" aria-label="Public library navigation">
+        <div class="container-xl">
+            <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 text-body text-decoration-none"
+                href="{{ url_for('pages.index') }}">
+                <span class="fs-4 fw-bold"><span class="text-primary">Edu</span><span class="text-success">Space</span></span>
+            </a>
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <a href="{{ url_for('public.public_library') }}" class="btn btn-sm btn-link text-body fw-medium text-decoration-none">Public library</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-secondary">Sign in</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-primary">Register</a>
+            </div>
+        </div>
+    </nav>
+</header>
+{% endblock %}
+
+{% block content_guest %}
+<div class="container-xl py-4">
+    <div class="mb-3">
+        <a href="{{ url_for('public.public_library') }}" class="text-decoration-none text-body-secondary small">
+            <i class="ti ti-arrow-left me-1" aria-hidden="true"></i>Back to Public Library
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge border text-body-secondary fw-medium">{{ file.type }}</span>
+                    <span class="badge border text-body-secondary fw-medium">Semester {{ file.semester }}</span>
+                    <span class="badge border text-body-secondary fw-medium">{{ file.subject }}</span>
+                    {% if file.license %}
+                    <span class="badge border text-body-secondary fw-medium">Licence: {{ file.license }}</span>
+                    {% endif %}
+                </div>
+                <span class="text-body-secondary small">Uploaded {{ file.created_at[:10] if file.created_at else '' }}</span>
+            </div>
+
+            <h1 class="h4 fw-bold text-body mb-3">{{ file.title }}</h1>
+
+            <div class="d-flex flex-wrap align-items-center gap-3 text-body-secondary small mb-4 pb-3 border-bottom">
+                <span><i class="ti ti-user me-1" aria-hidden="true"></i>Uploader: <strong>{{ file.uploader_username }}</strong></span>
+                <span>&middot;</span>
+                <span><i class="ti ti-star-filled text-warning me-1" aria-hidden="true"></i>{{ "%.1f"|format(file.avg_rating) }} ({{ file.rating_count }} ratings)</span>
+                <span>&middot;</span>
+                <span><i class="ti ti-download me-1" aria-hidden="true"></i>{{ file.download_count }} downloads</span>
+            </div>
+
+            <h2 class="h6 fw-semibold text-body mb-2">Description</h2>
+            <div class="p-3 rounded-3 bg-body-tertiary mb-4 text-body-secondary">
+                {% if file.description %}
+                {{ file.description }}
+                {% else %}
+                <span class="fst-italic">No detailed description provided by uploader.</span>
+                {% endif %}
+            </div>
+
+            <div class="p-4 rounded-3 border bg-body-tertiary d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <div class="fw-semibold text-body">Sign in or create an account to preview and download</div>
+                    <div class="small text-body-secondary">
+                        Download cost: {{ config.DOWNLOAD_COST }} credits. Students without a partner university can join via open sign-up.
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('auth.register_public') }}" class="btn btn-outline-secondary btn-sm">Open sign-up</a>
+                    <a href="{{ url_for('auth.login', next=url_for('library.file_detail', file_id=file.id)) }}" class="btn btn-primary btn-sm">Sign in to unlock</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -19,7 +19,7 @@ from eduspace.services.files import (
 )
 from eduspace.services.credits import process_upload_reward
 from eduspace.services.telemetry import log_event_entry
-from eduspace.services.visibility import can_view_file
+from eduspace.services.visibility import can_view_file, is_public_member
 
 bp = Blueprint('upload', __name__)
 
@@ -47,10 +47,19 @@ def upload_file():
         confirm_copyright = request.form.get('confirm_copyright')
         uploaded_file = request.files.get('file')
 
+        public_member = is_public_member(g.user)
+        visibility = 'public' if public_member else request.form.get('visibility', 'university').strip()
+        if visibility not in ('university', 'public'):
+            visibility = 'university'
+        license_val = request.form.get('license', '').strip() or None
+        valid_licenses = {code for code, _ in current_app.config.get('LICENSE_CHOICES', Config.LICENSE_CHOICES)}
+
         allowed_exts = current_app.config.get('ALLOWED_EXT', Config.ALLOWED_EXT)
         errors, original_filename, ext = validate_upload_input(
             title, subject, semester, file_type, confirm_copyright, uploaded_file, allowed_exts
         )
+        if visibility == 'public' and license_val not in valid_licenses:
+            errors.append("Please select a valid licence for public uploads.")
         if errors:
             for err in errors:
                 flash(err, "danger")
@@ -69,7 +78,6 @@ def upload_file():
         db = get_db()
         cursor = db.cursor()
         stored_path = os.path.join(upload_dir, random_filename)
-        visibility = 'university'
 
         try:
             cursor.execute("BEGIN IMMEDIATE")
@@ -105,13 +113,14 @@ def upload_file():
                 INSERT INTO files (
                     uploader_id, university_id, title, subject, semester,
                     type, description, stored_name, original_name, size,
-                    status, visibility, content_hash
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
+                    status, visibility, content_hash, license
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
                 """,
                 (
                     g.user['id'], g.user['university_id'], title, subject,
                     semester, file_type, description, random_filename,
-                    original_filename, file_size, visibility, content_hash
+                    original_filename, file_size, visibility, content_hash,
+                    license_val if visibility == 'public' else None
                 )
             )
             file_id = cursor.lastrowid

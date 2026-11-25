@@ -104,10 +104,17 @@
                     </div>
                 </div>
 
-                <!-- 8. Link to Sign In -->
-                <div class="text-center mt-3">
-                    <span class="text-body-secondary small">Already have an account? </span>
-                    <a href="{{ url_for('auth.login') }}" class="small text-decoration-none">Sign in</a>
+                <!-- 8. Link to Sign In & Public Sign-up -->
+                <div class="text-center mt-3 d-flex flex-column gap-2">
+                    <div>
+                        <span class="text-body-secondary small">Already have an account? </span>
+                        <a href="{{ url_for('auth.login') }}" class="small text-decoration-none">Sign in</a>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('auth.register_public') }}" class="btn btn-outline-secondary btn-sm w-100">
+                            My university isn't listed
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,8 +150,12 @@
                         })
                         .then(function (result) {
                             if (result.status === 200 && result.data.valid) {
-                                feedbackEl.className = 'form-text text-success small mt-1';
-                                feedbackEl.textContent = 'Recognised: ' + result.data.university_name;
+                                feedbackEl.className = result.data.tier === 'public'
+                                    ? 'form-text text-info small mt-1'
+                                    : 'form-text text-success small mt-1';
+                                feedbackEl.textContent = result.data.tier === 'public'
+                                    ? result.data.university_name
+                                    : ('Recognised: ' + result.data.university_name);
                             } else {
                                 feedbackEl.className = 'form-text text-danger small mt-1';
                                 feedbackEl.textContent = 'This email domain is not supported yet';

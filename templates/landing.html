@@ -33,6 +33,9 @@
             <div class="collapse navbar-collapse" id="landingNavbar">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
                     <li class="nav-item">
+                        <a class="nav-link text-body-secondary" href="{{ url_for('public.public_library') }}">Public library</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-body-secondary" href="#how-it-works">How it works</a>
                     </li>
                     <li class="nav-item">
@@ -510,6 +513,58 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Public Library Section (Real DB count & recent items) -->
+    <section class="py-5 border-bottom bg-body-tertiary landing-section" id="public-library" aria-labelledby="public-lib-heading">
+        <div class="container-xl">
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+                <div>
+                    <h2 id="public-lib-heading" class="h3 fw-semibold text-body mb-2">
+                        Public library ({{ public_count }} {{ 'resource' if public_count == 1 else 'resources' }})
+                    </h2>
+                    <p class="text-body-secondary text-measure mb-0">
+                        Openly licensed notes shared across institutions. If your university isn't listed yet, join as a
+                        <a href="{{ url_for('auth.register_public') }}" class="text-body text-decoration-underline">public member</a>
+                        using just a username and password.
+                    </p>
+                </div>
+                <a href="{{ url_for('public.public_library') }}" class="btn btn-sm btn-outline-secondary">
+                    Browse public library
+                </a>
+            </div>
+
+            {% if recent_public_files %}
+            <div class="row g-3">
+                {% for pf in recent_public_files %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="h-100 p-4 border rounded-3 bg-body d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                                <span class="badge border text-body-secondary fw-medium">{{ pf.type }}</span>
+                                <span class="small text-body-secondary">Sem {{ pf.semester }}</span>
+                            </div>
+                            <h3 class="h6 fw-semibold text-body mb-1 text-truncate" title="{{ pf.title }}">
+                                <a href="{{ url_for('public.public_detail', file_id=pf.id) }}" class="text-body text-decoration-none">
+                                    {{ pf.title }}
+                                </a>
+                            </h3>
+                            <div class="small text-body-secondary mb-3">{{ pf.subject }}</div>
+                        </div>
+                        <div class="pt-2 border-top d-flex justify-content-between align-items-center small text-body-secondary">
+                            <span>{{ pf.uploader_username }}</span>
+                            <a href="{{ url_for('public.public_detail', file_id=pf.id) }}" class="text-body text-decoration-underline">View</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="p-4 border rounded-3 bg-body text-center text-body-secondary small">
+                No public materials have been published yet. Create an account to share the first open resource.
+            </div>
+            {% endif %}
         </div>
     </section>
 

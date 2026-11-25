@@ -31,6 +31,12 @@
     ]
   },
   {
+    "rule": "/admin/file/<int:file_id>/restore",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
     "rule": "/admin/report/<int:report_id>/resolve",
     "methods": [
       "POST"
@@ -123,6 +129,18 @@
     ]
   },
   {
+    "rule": "/library",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "rule": "/library/<int:file_id>",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
     "rule": "/login",
     "methods": [
       "GET",
@@ -144,6 +162,13 @@
   },
   {
     "rule": "/register",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "rule": "/register/public",
     "methods": [
       "GET",
       "POST"

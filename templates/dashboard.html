@@ -7,7 +7,7 @@
 {% block content %}
 {{ ui.page_header(
 title="Dashboard & Credit Ledger",
-subtitle="Track your platform credit balance, uploads, and download history",
+subtitle=("Public member" if current_user.university_kind == 'public' else "Track your platform credit balance, uploads, and download history"),
 action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-primary btn-sm"><i
         class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Upload Material</a>'
 ) }}

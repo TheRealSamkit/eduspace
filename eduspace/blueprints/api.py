@@ -50,10 +50,20 @@ def api_domain_check():
         return jsonify({'valid': False, 'message': 'Invalid email format'}), 400
 
     domain = email.split('@')[-1]
+    public_domain = current_app.config.get('PUBLIC_EMAIL_DOMAIN', 'eduspace.public')
+    if domain == public_domain:
+        return jsonify({
+            'valid': True,
+            'tier': 'public',
+            'domain': domain,
+            'university_name': 'Open sign-up: public library only'
+        }), 200
+
     allowed_domains = current_app.config.get('ALLOWED_DOMAINS', {})
     if domain in allowed_domains:
         return jsonify({
             'valid': True,
+            'tier': 'partner',
             'domain': domain,
             'university_name': allowed_domains[domain]
         }), 200

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Open Sign-up - EduSpace{% endblock %}
+
+{% block content_guest %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-5 col-xl-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h1 class="h4 fw-bold text-body mb-1">Open sign-up</h1>
+                    <p class="text-body-secondary small mb-0">
+                        For students whose university isn't partnered yet. Access and share in the Public Library.
+                    </p>
+                </div>
+
+                <form action="{{ url_for('auth.register_public') }}" method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Honeypot field -->
+                    <div class="d-none" aria-hidden="true">
+                        <label for="website">Website</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-medium text-body mb-1">Public username</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                            value="{{ username or '' }}" placeholder="e.g. alex_smith" minlength="3" maxlength="30"
+                            required autofocus>
+                        <div class="invalid-feedback">Please choose a username of 3-30 characters.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-medium text-body mb-1">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" minlength="8"
+                                placeholder="At least 8 characters" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggle-pub-pwd"
+                                aria-label="Toggle password visibility">
+                                <i class="ti ti-eye" id="toggle-pub-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                        </div>
+                    </div>
+
+                    <div class="small text-body-secondary mb-3">
+                        Public members start with {{ config.PUBLIC_SIGNUP_BONUS }} credits and can sign in using their username.
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="agree_terms" name="agree_terms" required>
+                        <label class="form-check-label small text-body-secondary" for="agree_terms">
+                            I accept the <a href="{{ url_for('pages.terms_page') }}" target="_blank">Terms of Service</a>
+                            and will only upload material I created or that is openly licensed.
+                        </label>
+                        <div class="invalid-feedback">You must accept the terms to proceed.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        Create public account
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 pt-3 border-top d-flex flex-column gap-1">
+                    <a href="{{ url_for('auth.register') }}" class="small text-decoration-none">
+                        Back to university email registration
+                    </a>
+                    <div>
+                        <span class="text-body-secondary small">Already have an account? </span>
+                        <a href="{{ url_for('auth.login') }}" class="small text-decoration-none">Sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('toggle-pub-pwd');
+    const inp = document.getElementById('password');
+    const ico = document.getElementById('toggle-pub-icon');
+    if (btn && inp && ico) {
+        btn.addEventListener('click', function () {
+            const isPwd = inp.type === 'password';
+            inp.type = isPwd ? 'text' : 'password';
+            ico.classList.toggle('ti-eye', !isPwd);
+            ico.classList.toggle('ti-eye-off', isPwd);
+        });
+    }
+});
+</script>
+{% endblock %}

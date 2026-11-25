@@ -19,19 +19,27 @@ from eduspace.services.exports import get_export_dataset
 bp = Blueprint('admin', __name__)
 
 
+def _admin_can_moderate(file_row):
+    """Return True if the current admin may moderate the given file (public or own university)."""
+    if not file_row or not g.user or not g.user['is_admin']:
+        return False
+    return file_row['visibility'] == 'public' or file_row['university_id'] == g.user['university_id']
+
+
 @bp.route('/admin')
 @admin_required
 def admin_panel():
     """
     Administrator overview:
-    - Reports moderation.
-    - System statistics.
-    - Direct export triggers.
+    - Reports moderation (public files + admin's university private files).
+    - Auto-hidden files awaiting review.
+    - System statistics and direct export triggers.
 
     Returns:
-        Response: Rendered admin.html with statistics and open moderation reports.
+        Response: Rendered admin.html with statistics, hidden files, and open moderation reports.
     """
     db = get_db()
+    admin_uni_id = g.user['university_id']
 
     stats = {
         'users_count': db.execute("SELECT COUNT(*) FROM users").fetchone()[0],
@@ -44,7 +52,7 @@ def admin_panel():
 
     reports = db.execute(
         """
-        SELECT r.*, f.title as file_title, f.status as file_status,
+        SELECT r.*, f.title as file_title, f.status as file_status, f.visibility as file_visibility,
                reporter.username as reporter_username,
                uploader.username as uploader_username, uploader.id as uploader_id,
                un.name as university_name
@@ -54,11 +62,29 @@ def admin_panel():
         JOIN users uploader ON f.uploader_id = uploader.id
         JOIN universities un ON f.university_id = un.id
         WHERE r.status = 'open'
+          AND (f.visibility = 'public' OR f.university_id = ?)
         ORDER BY r.created_at DESC
-        """
+        """,
+        (admin_uni_id,)
     ).fetchall()
 
-    return render_template('admin.html', stats=stats, reports=reports)
+    hidden_files = db.execute(
+        """
+        SELECT f.*, u.username as uploader_username, un.name as university_name,
+               COUNT(DISTINCT r.user_id) as report_count
+        FROM files f
+        JOIN users u ON f.uploader_id = u.id
+        JOIN universities un ON f.university_id = un.id
+        LEFT JOIN reports r ON f.id = r.file_id AND r.status = 'open'
+        WHERE f.status = 'hidden'
+          AND (f.visibility = 'public' OR f.university_id = ?)
+        GROUP BY f.id
+        ORDER BY f.created_at DESC
+        """,
+        (admin_uni_id,)
+    ).fetchall()
+
+    return render_template('admin.html', stats=stats, reports=reports, hidden_files=hidden_files)
 
 
 @bp.route('/admin/report/<int:report_id>/resolve', methods=['POST'])
@@ -66,17 +92,38 @@ def admin_panel():
 def resolve_report(report_id):
     """
     Mark an open moderation report as resolved without removing material.
-
-    Args:
-        report_id (int): Primary key of report.
-
-    Returns:
-        Response: Redirect to admin panel.
     """
     db = get_db()
+    row = db.execute(
+        """
+        SELECT r.id, f.visibility, f.university_id
+        FROM reports r JOIN files f ON r.file_id = f.id
+        WHERE r.id = ?
+        """,
+        (report_id,)
+    ).fetchone()
+    if not row or not _admin_can_moderate(row):
+        abort(404, description="Report not found.")
     db.execute("UPDATE reports SET status = 'resolved' WHERE id = ?", (report_id,))
     db.commit()
     flash("Report resolved.", "success")
+    return redirect(url_for('admin.admin_panel'))
+
+
+@bp.route('/admin/file/<int:file_id>/restore', methods=['POST'])
+@admin_required
+def restore_file_admin(file_id):
+    """
+    Restore an auto-hidden file back to active status and resolve its open reports.
+    """
+    db = get_db()
+    file_row = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
+    if not _admin_can_moderate(file_row):
+        abort(404, description="File not found.")
+    db.execute("UPDATE files SET status = 'active' WHERE id = ?", (file_id,))
+    db.execute("UPDATE reports SET status = 'resolved' WHERE file_id = ? AND status = 'open'", (file_id,))
+    db.commit()
+    flash(f"Material '{file_row['title']}' restored to active.", "success")
     return redirect(url_for('admin.admin_panel'))
 
 
@@ -88,14 +135,11 @@ def remove_file_admin(file_id):
     - Marks file status as 'removed'.
     - Reverses uploader credit reward in ledger.
     - Resolves associated moderation reports.
-
-    Args:
-        file_id (int): Primary key of file.
-
-    Returns:
-        Response: Redirect to admin panel.
     """
     db = get_db()
+    file_row = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
+    if not _admin_can_moderate(file_row):
+        abort(404, description="File not found.")
     default_reward = current_app.config.get('UPLOAD_REWARD', Config.UPLOAD_REWARD)
     success, title, reversed_credits = takedown_file_admin(db, file_id, default_reward)
 

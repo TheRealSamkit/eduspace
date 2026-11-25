@@ -70,9 +70,15 @@
         </div>
 
         <h2 class="h6 fw-semibold mb-1 text-truncate" title="{{ f.title }}">
+            {% if is_guest %}
+            <a href="{{ url_for('public.public_detail', file_id=f.id) }}" class="text-body text-decoration-none">
+                {{ f.title }}
+            </a>
+            {% else %}
             <a href="{{ url_for('library.file_detail', file_id=f.id) }}" class="text-body text-decoration-none">
                 {{ f.title }}
             </a>
+            {% endif %}
         </h2>
 
         <div class="small text-body-secondary mb-2">
@@ -110,6 +116,11 @@
         </div>
 
         <div class="mt-3 d-flex align-items-center gap-2">
+            {% if is_guest %}
+            <a href="{{ url_for('public.public_detail', file_id=f.id) }}" class="btn btn-outline-secondary w-100 btn-sm">
+                Sign in to unlock
+            </a>
+            {% else %}
             <a href="{{ url_for('library.file_detail', file_id=f.id) }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
                 View &amp; Download
             </a>
@@ -137,6 +148,7 @@
                 title="{{ 'Remove from saved' if is_bookmarked else 'Save material' }}">
                 <i class="ti {{ 'ti-bookmark-filled text-primary' if is_bookmarked else 'ti-bookmark' }} fs-5 flex-shrink-0" aria-hidden="true"></i>
             </button>
+            {% endif %}
             {% endif %}
         </div>
     </div>

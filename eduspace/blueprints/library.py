@@ -20,7 +20,7 @@ from eduspace.services.files import (
     get_bookmarked_file_ids, query_saved_materials
 )
 from eduspace.services.credits import process_download_transaction
-from eduspace.services.visibility import can_view_file
+from eduspace.services.visibility import can_view_file, is_public_member
 from eduspace.services.preview import (
     is_file_unlocked, get_preview_kind,
     get_or_create_locked_pdf, get_or_create_locked_image
@@ -39,6 +39,9 @@ def browse():
     Returns:
         Response: Rendered browse.html with isolated files and filter options.
     """
+    if is_public_member(g.user):
+        return redirect(url_for('public.public_library'))
+
     search_query = request.args.get('q', '').strip()
     subject_filter = request.args.get('subject', '').strip()
     semester_filter = request.args.get('semester', '').strip()
@@ -212,6 +215,14 @@ def report_file(file_id):
         """,
         (g.user['id'], file_id, reason)
     )
+    if file['visibility'] == 'public':
+        threshold = current_app.config.get('REPORTS_TO_AUTOHIDE', Config.REPORTS_TO_AUTOHIDE)
+        distinct_reporters = db.execute(
+            "SELECT COUNT(DISTINCT user_id) FROM reports WHERE file_id = ? AND status = 'open'",
+            (file_id,)
+        ).fetchone()[0]
+        if distinct_reporters >= threshold:
+            db.execute("UPDATE files SET status = 'hidden' WHERE id = ? AND status = 'active'", (file_id,))
     db.commit()
     flash("Your report has been received and will be reviewed by university administrators.", "info")
     return redirect(url_for('library.file_detail', file_id=file_id))
@@ -254,6 +265,12 @@ def download_file(file_id):
     if not success:
         flash(err_msg, "danger")
         return redirect(url_for('library.file_detail', file_id=file_id))
+
+    if file['visibility'] == 'public':
+        try:
+            log_event_entry(db, g.session_id, g.user['id'], 'public_download', request.path, f"file_id={file_id}")
+        except Exception:
+            pass
 
     upload_folder = current_app.config.get('UPLOAD_FOLDER', Config.UPLOAD_FOLDER)
     return send_from_directory(

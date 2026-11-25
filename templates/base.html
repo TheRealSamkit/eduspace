@@ -50,11 +50,20 @@
             </a>
 
             <ul class="sidebar-nav">
+                {% if current_user.university_kind != 'public' %}
                 <li class="sidebar-nav-item {% if request.endpoint == 'library.browse' %}active{% endif %}">
                     <a href="{{ url_for('library.browse') }}" data-shortcut="g b" aria-keyshortcuts="g b"
                         data-bs-toggle="tooltip" data-bs-placement="right" title="Browse (G then B)">
                         <i class="ti ti-compass fs-5 flex-shrink-0" aria-hidden="true"></i>
                         <span>Browse</span>
+                    </a>
+                </li>
+                {% endif %}
+                <li class="sidebar-nav-item {% if request.endpoint == 'public.public_library' %}active{% endif %}">
+                    <a href="{{ url_for('public.public_library') }}" data-shortcut="g p" aria-keyshortcuts="g p"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Public library (G then P)">
+                        <i class="ti ti-world fs-5 flex-shrink-0" aria-hidden="true"></i>
+                        <span>Public library</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'library.saved' %}active{% endif %}">
@@ -146,10 +155,18 @@
             </div>
             <div class="offcanvas-body d-flex flex-column p-0">
                 <ul class="sidebar-nav p-3">
+                    {% if current_user.university_kind != 'public' %}
                     <li class="sidebar-nav-item {% if request.endpoint == 'library.browse' %}active{% endif %}">
                         <a href="{{ url_for('library.browse') }}" data-shortcut="g b" aria-keyshortcuts="g b">
                             <i class="ti ti-compass fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Browse</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="sidebar-nav-item {% if request.endpoint == 'public.public_library' %}active{% endif %}">
+                        <a href="{{ url_for('public.public_library') }}" data-shortcut="g p" aria-keyshortcuts="g p">
+                            <i class="ti ti-world fs-5 flex-shrink-0" aria-hidden="true"></i>
+                            <span>Public library</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'library.saved' %}active{% endif %}">
