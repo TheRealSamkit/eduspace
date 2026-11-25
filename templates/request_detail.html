@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}{{ req.title }} - Requests - EduSpace{% endblock %}
+{% block topbar_title %}Resource Request{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('requests.list_requests') }}" class="text-decoration-none text-body-secondary small">
+        <i class="ti ti-arrow-left me-1" aria-hidden="true"></i>Back to Requests
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div class="d-flex align-items-center gap-2">
+                {% set badge_cls = 'text-bg-success' if req.status == 'fulfilled' else ('text-bg-info' if req.status == 'answered' else ('text-bg-warning' if req.status == 'open' else 'text-bg-danger')) %}
+                <span class="badge {{ badge_cls }}">{{ req.status|capitalize }}</span>
+                <span class="badge border text-body-secondary">{{ req.subject }}</span>
+                <span class="badge border text-body-secondary">Sem {{ req.semester }}</span>
+                <span class="badge border text-body-secondary">{{ req.material_type }}</span>
+                <span class="badge border text-body-secondary">{{ 'Public' if req.visibility == 'public' else 'University only' }}</span>
+            </div>
+            <span class="badge border text-body fw-semibold">
+                Reward: +<span class="req-reward-val" data-req-id="{{ req.id }}">{{ req.reward_paid if req.status == 'fulfilled' else current_reward }}</span> credits
+            </span>
+        </div>
+
+        <h1 class="h4 fw-bold text-body mb-2">{{ req.title }}</h1>
+        <p class="text-body-secondary mb-3">
+            {{ req.description if req.description else 'No additional details provided.' }}
+        </p>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+            <div class="small text-body-secondary">
+                Requested by <strong>{{ req.requester_username }}</strong> &middot;
+                <span class="req-interest-count" data-req-id="{{ req.id }}">{{ req.interest_count }}</span> students interested
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                {% if req.requester_id != current_user.id and req.status in ('open', 'answered') %}
+                <button type="button"
+                    class="btn btn-outline-secondary btn-sm btn-request-interest"
+                    data-req-id="{{ req.id }}"
+                    data-interested="{{ 'true' if req.user_interested else 'false' }}"
+                    aria-pressed="{{ 'true' if req.user_interested else 'false' }}">
+                    <i class="ti {{ 'ti-hand-stop text-primary' if req.user_interested else 'ti-hand-finger' }} me-1" aria-hidden="true"></i>
+                    <span class="interest-label">{{ 'Interested' if req.user_interested else "I'm interested" }}</span>
+                </button>
+                {% elif req.requester_id == current_user.id and req.status in ('open', 'answered') %}
+                <form action="{{ url_for('requests.close_request_route', request_id=req.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Close Request</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Submissions -->
+<div class="card mb-4">
+    <div class="card-header py-3 px-4 border-bottom">
+        <h2 class="h6 fw-semibold mb-0">Submissions ({{ submissions|length }})</h2>
+    </div>
+    <div class="card-body p-4">
+        {% if submissions %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-body-secondary small">
+                        <th scope="col">Material</th>
+                        <th scope="col">Contributor</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in submissions %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('library.file_detail', file_id=sub.file_id) }}" class="fw-semibold text-decoration-none">
+                                {{ sub.file_title }}
+                            </a>
+                            <div class="small text-body-secondary">{{ sub.original_name }}</div>
+                        </td>
+                        <td>{{ sub.submitter_username }}</td>
+                        <td>
+                            {% set sub_badge = 'text-bg-success' if sub.status == 'accepted' else ('text-bg-warning' if sub.status == 'pending' else 'text-bg-danger') %}
+                            <span class="badge {{ sub_badge }}">{{ sub.status|capitalize }}</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm btn-preview"
+                                    data-file-id="{{ sub.file_id }}"
+                                    data-file-title="{{ sub.file_title }}"
+                                    data-file-ext="{{ sub.original_name.rsplit('.', 1)[-1].lower() if '.' in sub.original_name else 'pdf' }}"
+                                    data-locked="{{ 'false' if (req.requester_id == current_user.id or sub.submitter_id == current_user.id or current_user.is_admin) else 'true' }}">
+                                    <i class="ti ti-eye me-1" aria-hidden="true"></i>Preview
+                                </button>
+                                <a href="{{ url_for('library.download_file', file_id=sub.file_id) }}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="ti ti-download me-1" aria-hidden="true"></i>{{ 'Download (Free)' if req.requester_id == current_user.id else 'Download' }}
+                                </a>
+                                {% if req.requester_id == current_user.id and sub.status == 'pending' and req.status in ('open', 'answered') %}
+                                <form action="{{ url_for('requests.accept_request_submission', request_id=req.id, submission_id=sub.id) }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        Accept &amp; Pay (+{{ current_reward }})
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-body-secondary small mb-0">No submissions yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Fulfil Request Form (non-requester when open/answered) -->
+{% if req.requester_id != current_user.id and req.status in ('open', 'answered') %}
+<div class="card">
+    <div class="card-header py-3 px-4 border-bottom">
+        <h2 class="h6 fw-semibold mb-0">Fulfil This Request</h2>
+    </div>
+    <div class="card-body p-4">
+        <form action="{{ url_for('requests.submit_to_request', request_id=req.id) }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="subTitle" class="form-label fw-medium">Material Title</label>
+                    <input type="text" class="form-control" id="subTitle" name="title" value="{{ req.title }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="subFile" class="form-label fw-medium">Choose File <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control" id="subFile" name="file" accept=".pdf,.docx,.pptx,.png,.jpg" required>
+                </div>
+                {% if req.visibility == 'public' %}
+                <div class="col-md-6">
+                    <label for="subLicense" class="form-label fw-medium">Licence <span class="text-danger">*</span></label>
+                    <select class="form-select" id="subLicense" name="license" required>
+                        <option value="" disabled selected>Select licence</option>
+                        {% for code, label in config.LICENSE_CHOICES %}
+                        <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <div class="col-12">
+                    <label for="subDesc" class="form-label fw-medium">Notes</label>
+                    <textarea class="form-control" id="subDesc" name="description" rows="2" placeholder="Optional description..."></textarea>
+                </div>
+                <div class="col-12 form-check ms-2">
+                    <input class="form-check-input" type="checkbox" id="subConfirm" name="confirm_copyright" required>
+                    <label class="form-check-label small text-body-secondary" for="subConfirm">
+                        I created this material or it is openly licensed for sharing, and I accept the Terms.
+                    </label>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="ti ti-cloud-upload me-1" aria-hidden="true"></i>Upload &amp; Submit
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

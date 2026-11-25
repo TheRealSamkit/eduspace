@@ -73,6 +73,12 @@
     ]
   },
   {
+    "rule": "/api/requests/<int:request_id>/interest",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
     "rule": "/browse",
     "methods": [
       "GET"
@@ -171,6 +177,37 @@
     "rule": "/register/public",
     "methods": [
       "GET",
+      "POST"
+    ]
+  },
+  {
+    "rule": "/requests",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "rule": "/requests/<int:request_id>",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "rule": "/requests/<int:request_id>/accept/<int:submission_id>",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "rule": "/requests/<int:request_id>/close",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "rule": "/requests/<int:request_id>/submit",
+    "methods": [
       "POST"
     ]
   },

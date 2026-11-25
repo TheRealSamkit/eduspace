@@ -73,6 +73,13 @@
                         <span>Saved</span>
                     </a>
                 </li>
+                <li class="sidebar-nav-item {% if request.endpoint in ('requests.list_requests', 'requests.request_detail') %}active{% endif %}">
+                    <a href="{{ url_for('requests.list_requests') }}" data-shortcut="g r" aria-keyshortcuts="g r"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Requests (G then R)">
+                        <i class="ti ti-message-plus fs-5 flex-shrink-0" aria-hidden="true"></i>
+                        <span>Requests</span>
+                    </a>
+                </li>
                 <li class="sidebar-nav-item {% if request.endpoint == 'upload.upload_file' %}active{% endif %}">
                     <a href="{{ url_for('upload.upload_file') }}" data-shortcut="g u" aria-keyshortcuts="g u"
                         data-bs-toggle="tooltip" data-bs-placement="right" title="Upload (G then U)">
@@ -173,6 +180,12 @@
                         <a href="{{ url_for('library.saved') }}" data-shortcut="g v" aria-keyshortcuts="g v">
                             <i class="ti ti-bookmark fs-5 flex-shrink-0" aria-hidden="true"></i>
                             <span>Saved</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.endpoint in ('requests.list_requests', 'requests.request_detail') %}active{% endif %}">
+                        <a href="{{ url_for('requests.list_requests') }}" data-shortcut="g r" aria-keyshortcuts="g r">
+                            <i class="ti ti-message-plus fs-5 flex-shrink-0" aria-hidden="true"></i>
+                            <span>Requests</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.endpoint == 'upload.upload_file' %}active{% endif %}">

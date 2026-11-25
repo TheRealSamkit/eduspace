@@ -137,11 +137,11 @@ def reverse_upload_credits(cursor, file_id, uploader_id, default_reward):
         Decrements uploader credits (bounded at 0) and records reversal in ledger.
     """
     upload_ledger = cursor.execute(
-        "SELECT amount FROM ledger WHERE file_id = ? AND user_id = ? AND reason = 'upload' AND amount > 0",
+        "SELECT COALESCE(SUM(amount), 0) as total FROM ledger WHERE file_id = ? AND user_id = ? AND reason IN ('upload', 'request_reward') AND amount > 0",
         (file_id, uploader_id)
     ).fetchone()
 
-    reversal_amount = upload_ledger['amount'] if upload_ledger else default_reward
+    reversal_amount = upload_ledger['total'] if (upload_ledger and upload_ledger['total'] > 0) else default_reward
 
     # Ensure credits never become negative from administrative reversal
     cursor.execute(

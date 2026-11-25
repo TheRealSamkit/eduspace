@@ -345,6 +345,49 @@
                     delete btn.dataset.pending;
                 });
         });
+
+        // 8. Optimistic Request Interest Toggle
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-request-interest');
+            if (!btn) return;
+            e.preventDefault();
+            const reqId = btn.dataset.reqId;
+            if (!reqId || btn.dataset.pending === 'true') return;
+            btn.dataset.pending = 'true';
+
+            fetch('/api/requests/' + encodeURIComponent(reqId) + '/interest', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCsrfToken() }
+            })
+                .then(function (res) {
+                    if (!res.ok) throw new Error('Failed');
+                    return res.json();
+                })
+                .then(function (data) {
+                    const interested = Boolean(data.interested);
+                    btn.dataset.interested = interested ? 'true' : 'false';
+                    btn.setAttribute('aria-pressed', interested ? 'true' : 'false');
+                    const lbl = btn.querySelector('.interest-label');
+                    if (lbl) lbl.textContent = interested ? 'Interested' : "I'm interested";
+                    document.querySelectorAll('.req-interest-count[data-req-id="' + reqId + '"]').forEach(function (el) {
+                        el.textContent = data.count;
+                    });
+                    document.querySelectorAll('.req-reward-val[data-req-id="' + reqId + '"]').forEach(function (el) {
+                        el.textContent = data.reward;
+                    });
+                    if (window.showToast) {
+                        window.showToast(interested ? 'Marked as interested' : 'Removed interest', 'success');
+                    }
+                })
+                .catch(function () {
+                    if (window.showToast) {
+                        window.showToast('Could not update interest.', 'danger');
+                    }
+                })
+                .finally(function () {
+                    delete btn.dataset.pending;
+                });
+        });
     });
 
     // Make TaskTracker available globally

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% import "_components.html" as ui %}
+
+{% block title %}Resource Requests - EduSpace{% endblock %}
+{% block topbar_title %}Resource Requests{% endblock %}
+
+{% block content %}
+{{ ui.page_header(
+    title="Resource Requests",
+    subtitle="Request missing study materials or earn bonus credits by fulfilling peer requests",
+    action_html='<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newRequestModal"><i class="ti ti-plus me-1" aria-hidden="true"></i>New request</button>'
+) }}
+
+<div class="card mb-4">
+    <div class="card-body p-3 p-md-4">
+        <form method="GET" action="{{ url_for('requests.list_requests') }}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="reqSearch" class="form-label small fw-medium text-body-secondary">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-body-tertiary"><i class="ti ti-search" aria-hidden="true"></i></span>
+                    <input type="text" class="form-control" id="reqSearch" name="q" value="{{ search_query }}"
+                        placeholder="Search requested topics...">
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+                <label for="reqStatus" class="form-label small fw-medium text-body-secondary">Status</label>
+                <select class="form-select" id="reqStatus" name="status">
+                    <option value="">All Requests</option>
+                    <option value="open" {% if status_filter=='open' %}selected{% endif %}>Open</option>
+                    <option value="answered" {% if status_filter=='answered' %}selected{% endif %}>Answered</option>
+                    <option value="fulfilled" {% if status_filter=='fulfilled' %}selected{% endif %}>Fulfilled</option>
+                    <option value="mine" {% if status_filter=='mine' %}selected{% endif %}>Mine</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-3">
+                <label for="reqSubject" class="form-label small fw-medium text-body-secondary">Subject</label>
+                <select class="form-select" id="reqSubject" name="subject">
+                    <option value="">All Subjects</option>
+                    {% for subj in subjects %}
+                    <option value="{{ subj }}" {% if subject_filter==subj %}selected{% endif %}>{{ subj }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-center gap-2">
+                <button type="submit" class="btn btn-outline-secondary btn-sm flex-grow-1">Apply</button>
+                <a href="{{ url_for('requests.list_requests') }}" class="btn btn-link btn-sm text-body-secondary text-decoration-none">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if requests_list %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-4">
+    {% for r in requests_list %}
+    {% set badge_cls = 'text-bg-success' if r.status == 'fulfilled' else ('text-bg-info' if r.status == 'answered' else ('text-bg-warning' if r.status == 'open' else 'text-bg-danger')) %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body p-3 p-md-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                    <span class="badge {{ badge_cls }}">{{ r.status|capitalize }}</span>
+                    <span class="badge border text-body fw-medium">+{{ r.current_reward }} credits</span>
+                </div>
+
+                <h2 class="h6 fw-semibold mb-1 text-truncate" title="{{ r.title }}">
+                    <a href="{{ url_for('requests.request_detail', request_id=r.id) }}" class="text-body text-decoration-none">
+                        {{ r.title }}
+                    </a>
+                </h2>
+                <div class="small text-body-secondary mb-2">
+                    {{ r.subject }} &middot; Sem {{ r.semester }} &middot; {{ r.material_type }}
+                    {% if r.visibility == 'public' %}&middot; Public{% endif %}
+                </div>
+
+                <p class="small text-body-secondary flex-grow-1 mb-3">
+                    {{ r.description[:120] if r.description else 'No extra details provided.' }}
+                </p>
+
+                <div class="pt-3 border-top small text-body-secondary d-flex justify-content-between align-items-center mb-3">
+                    <span><span class="req-interest-count" data-req-id="{{ r.id }}">{{ r.interest_count }}</span> students interested</span>
+                    <span>by {{ r.requester_username }}</span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('requests.request_detail', request_id=r.id) }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                        View Request
+                    </a>
+                    {% if r.requester_id != current_user.id and r.status in ('open', 'answered') %}
+                    <button type="button"
+                        class="btn btn-outline-secondary btn-sm btn-request-interest"
+                        data-req-id="{{ r.id }}"
+                        data-interested="{{ 'true' if r.user_interested else 'false' }}"
+                        aria-pressed="{{ 'true' if r.user_interested else 'false' }}">
+                        <i class="ti {{ 'ti-hand-stop text-primary' if r.user_interested else 'ti-hand-finger' }} me-1" aria-hidden="true"></i>
+                        <span class="interest-label">{{ 'Interested' if r.user_interested else "I'm interested" }}</span>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+{{ ui.empty_state(
+    icon="ti-message-plus",
+    title="No resource requests found",
+    message="Need notes or past papers for a course? Post a request so classmates can share them."
+) }}
+{% endif %}
+
+<!-- New Request Modal -->
+<div class="modal fade" id="newRequestModal" tabindex="-1" aria-labelledby="newRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{ url_for('requests.list_requests') }}" method="POST" class="needs-validation" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header">
+                    <h2 class="modal-title h6 fw-semibold mb-0" id="newRequestModalLabel">New Resource Request</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="reqTitle" class="form-label fw-medium">Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="reqTitle" name="title"
+                            placeholder="e.g. CS301 Operating Systems Midterm Solutions" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-5">
+                            <label for="reqSubjInput" class="form-label fw-medium">Subject <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="reqSubjInput" name="subject" placeholder="e.g. Computer Science" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="reqSemInput" class="form-label fw-medium">Semester <span class="text-danger">*</span></label>
+                            <select class="form-select" id="reqSemInput" name="semester" required>
+                                <option value="" disabled selected>Select</option>
+                                {% for s in range(1, 9) %}
+                                <option value="{{ s }}">Sem {{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="reqTypeInput" class="form-label fw-medium">Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="reqTypeInput" name="material_type" required>
+                                <option value="" disabled selected>Select</option>
+                                <option value="Lecture Notes">Lecture Notes</option>
+                                <option value="Past Exams">Past Exams</option>
+                                <option value="Summaries">Summaries</option>
+                                <option value="Solutions">Solutions</option>
+                                <option value="Textbook Guides">Textbook Guides</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reqVisInput" class="form-label fw-medium">Visibility</label>
+                        {% if current_user.university_kind == 'public' %}
+                        <input type="hidden" name="visibility" value="public">
+                        <div class="form-control-plaintext small text-body-secondary py-1">Public (anyone can fulfil)</div>
+                        {% else %}
+                        <select class="form-select" id="reqVisInput" name="visibility">
+                            <option value="university" selected>My university ({{ current_user.university_name }})</option>
+                            <option value="public">Public (anyone can fulfil)</option>
+                        </select>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="reqDescInput" class="form-label fw-medium">Details</label>
+                        <textarea class="form-control" id="reqDescInput" name="description" rows="3"
+                            placeholder="Specific chapters, exam year, or topics needed..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Post Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

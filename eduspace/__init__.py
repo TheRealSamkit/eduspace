@@ -15,6 +15,7 @@ from eduspace.blueprints.pages import bp as pages_bp
 from eduspace.blueprints.auth import bp as auth_bp
 from eduspace.blueprints.library import bp as library_bp
 from eduspace.blueprints.public import bp as public_bp
+from eduspace.blueprints.requests import bp as requests_bp
 from eduspace.blueprints.upload import bp as upload_bp
 from eduspace.blueprints.dashboard import bp as dashboard_bp
 from eduspace.blueprints.admin import bp as admin_bp
@@ -53,6 +54,7 @@ def create_app(test_config=None):
     app.register_blueprint(auth_bp)
     app.register_blueprint(library_bp)
     app.register_blueprint(public_bp)
+    app.register_blueprint(requests_bp)
     app.register_blueprint(upload_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)

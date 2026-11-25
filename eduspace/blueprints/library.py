@@ -247,6 +247,14 @@ def download_file(file_id):
         abort(404, description="Material not found or access restricted to students of its institution.")
 
     is_uploader = (file['uploader_id'] == g.user['id'])
+    is_request_requester = db.execute(
+        """
+        SELECT 1 FROM request_submissions rs
+        JOIN resource_requests rr ON rs.request_id = rr.id
+        WHERE rs.file_id = ? AND rr.requester_id = ?
+        """,
+        (file_id, g.user['id'])
+    ).fetchone() is not None
     already_downloaded = db.execute(
         "SELECT 1 FROM downloads WHERE user_id = ? AND file_id = ?",
         (g.user['id'], file_id)
@@ -258,7 +266,7 @@ def download_file(file_id):
         user_id=g.user['id'],
         file_id=file_id,
         cost=cost,
-        is_uploader=is_uploader,
+        is_uploader=(is_uploader or is_request_requester),
         already_downloaded=already_downloaded
     )
 

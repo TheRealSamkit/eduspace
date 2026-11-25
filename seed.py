@@ -295,6 +295,27 @@ def seed():
         (user_ids["alice@xyz.edu"],)
     )
 
+    # 9. Demo Resource Requests (clearly demo data)
+    cursor.execute(
+        """
+        INSERT INTO resource_requests (requester_id, university_id, visibility, title, subject, semester, material_type, description, status)
+        VALUES (?, ?, 'university', 'CS304: Transaction Concurrency & Locking Cheat Sheet (Demo)', 'Computer Science', 4, 'Summaries', 'Looking for a concise summary of 2PL, timestamps, and isolation levels.', 'open')
+        """,
+        (user_ids["carol@xyz.edu"], uni_ids["xyz.edu"])
+    )
+    req1_id = cursor.lastrowid
+    cursor.execute("INSERT INTO request_interest (request_id, user_id) VALUES (?, ?)", (req1_id, user_ids["bob@xyz.edu"]))
+
+    cursor.execute(
+        """
+        INSERT INTO resource_requests (requester_id, university_id, visibility, title, subject, semester, material_type, description, status)
+        VALUES (?, ?, 'public', 'Linear Algebra Eigenvalues & Diagonalization Worked Examples (Demo)', 'Mathematics', 2, 'Solutions', 'Step-by-step worked examples for 3x3 matrices.', 'open')
+        """,
+        (user_ids["david@abc.edu"], uni_ids["abc.edu"])
+    )
+    req2_id = cursor.lastrowid
+    cursor.execute("INSERT INTO request_interest (request_id, user_id) VALUES (?, ?)", (req2_id, user_ids["alice@xyz.edu"]))
+
     conn.commit()
     conn.close()
 
