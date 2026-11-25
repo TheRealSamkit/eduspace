@@ -22,8 +22,10 @@ The technology stack was chosen strictly to prioritize rapid prototyping, zero-b
   - *Why Bootstrap?* Industry-standard responsive grid, accessible form components, was-validated validation styling, modals, badges, and dismissible alerts without requiring build tools or bundlers.
 - **Icons**: **Tabler Icons (v3.19.0 webfont via jsDelivr CDN)**
   - *Why Tabler Icons?* Clean, modern SVG-based icon font rendered with semantic `<i class="ti ti-*"></i>` tags, providing icons for coins, files, ratings, dashboards, and shields.
-- **Frontend Behavior**: **Vanilla JavaScript (ES6)**
-  - *Why Vanilla JS?* Zero npm dependencies and no build step. Handles client-side Bootstrap form validation, live evaluation timers, debounced user click/error tracking to `/api/event`, and submit button spinners.
+- **Frontend Behavior**: **Vanilla JavaScript (ES6)** & **pdf.js (v3.11.174, Apache-2.0, vendored)**
+  - *Why Vanilla JS + vendored pdf.js?* Zero npm dependencies and no build step. Handles client-side Bootstrap form validation, optimistic bookmark/interest toggles, document/image preview modals, live evaluation timers, debounced user click/error tracking to `/api/event`, and submit button spinners.
+- **Document & Image Processing**: **pypdf** and **Pillow**
+  - Used server-side to generate cached locked previews (first `PREVIEW_LOCKED_PAGES` pages of PDFs; downscaled images bounded by `PREVIEW_IMAGE_MAX_PX`).
 
 ---
 
@@ -242,7 +244,10 @@ EduSpace provides full keyboard navigation via a single source of truth defined 
 
 | Key Sequence | Action | Group | Notes |
 |:---|:---|:---|:---|
-| <kbd>G</kbd> then <kbd>B</kbd> | Navigate to Browse | Navigation | 1.5s sequence window with hint pill |
+| <kbd>G</kbd> then <kbd>B</kbd> | Navigate to Browse | Navigation | 1.5s sequence window with hint pill (partner students) |
+| <kbd>G</kbd> then <kbd>P</kbd> | Navigate to Public Library | Navigation | |
+| <kbd>G</kbd> then <kbd>V</kbd> | Navigate to Saved | Navigation | |
+| <kbd>G</kbd> then <kbd>R</kbd> | Navigate to Resource Requests | Navigation | |
 | <kbd>G</kbd> then <kbd>U</kbd> | Navigate to Upload | Navigation | |
 | <kbd>G</kbd> then <kbd>D</kbd> | Navigate to Dashboard | Navigation | |
 | <kbd>G</kbd> then <kbd>T</kbd> | Navigate to Test Mode | Navigation | |
@@ -270,7 +275,7 @@ Ensure Python 3.10 or later is installed. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-*(Dependencies: `flask`, `werkzeug`, `pytest`)*
+*(Dependencies: `flask`, `werkzeug`, `pytest`, `pypdf`, `Pillow`)*
 
 ### 2. Single Command to Run
 ```bash
@@ -403,3 +408,43 @@ pytest
 - **Email Verification**: In this prototype, email verification is performed via domain suffix checking (`@xyz.edu`, `@abc.edu`) rather than sending live SMTP verification emails.
 - **Local File Storage**: Files are stored in the local `uploads/` directory with randomized UUID filenames. In a high-availability cloud deployment, this would be backed by an S3-compatible object store.
 - **Single-Host SQLite**: SQLite is utilized for simplicity and zero-configuration prototyping; production scaling across concurrent multi-server nodes would utilize PostgreSQL with row-level security.
+
+---
+
+## Extended Features & Architecture (Phases 0–6)
+
+### New Modules
+- **`eduspace/services/visibility.py`**: Centralised access control (`can_view_file`, `file_visibility_where`, `can_view_request`, `request_visibility_where`, `is_public_member`).
+- **`eduspace/services/preview.py`**: Server-side locked preview generation (`get_or_create_locked_pdf`, `get_or_create_locked_image`, `is_file_unlocked`).
+- **`eduspace/services/requests.py`**: Resource requests lifecycle (`create_request`, `query_requests`, `toggle_request_interest`, `submit_file_to_request`, `accept_submission`).
+- **`eduspace/blueprints/public.py`**: Guest-accessible `/library` and `/library/<id>` routes.
+- **`eduspace/blueprints/requests.py`**: `/requests`, `/requests/<id>`, `/api/requests/<id>/interest`, `/requests/<id>/submit`, `/requests/<id>/accept/<sub_id>`, `/requests/<id>/close`.
+- **`static/js/preview.js`**: Accessible PDF (vendored `pdf.js`) and image preview modal with fullscreen, zoom, and keyboard navigation.
+
+### New Configuration Constants (`config.py`)
+- `PUBLIC_EMAIL_DOMAIN = "eduspace.public"`, `PUBLIC_UNI_NAME = "EduSpace Public"`
+- `PUBLIC_SIGNUP_BONUS = 10`, `PUBLIC_SIGNUPS_PER_HOUR_PER_IP = 5`
+- `PREVIEW_LOCKED_PAGES = 3`, `PREVIEW_IMAGE_MAX_PX = 900`
+- `REPORTS_TO_AUTOHIDE = 3`
+- `REQUEST_BASE_REWARD = 15`, `REQUEST_INTEREST_BONUS = 1`, `REQUEST_BONUS_CAP = 10`
+- `MAX_OPEN_REQUESTS_PER_USER = 3`, `MAX_REQUEST_REWARDS_PER_DAY = 2`
+- `LICENSE_CHOICES`: Own original work, CC BY 4.0, CC BY-SA 4.0, CC0, Public Domain.
+
+### Visibility Model & Public Members
+- **Private (`visibility='university'`)**: Visible only to logged-in partner-university students of the same `university_id`. Public-member accounts (`kind='public'`) can never see private files or private requests.
+- **Public (`visibility='public'`)**: Listing and detail (`/library`, `/library/<id>`) are visible to guests and all users; preview, download, rating, reporting, and bookmarking require login.
+- **Moderation (`status='hidden'`)**: Public files auto-hide after `REPORTS_TO_AUTOHIDE` distinct reporters; admins can restore or remove them.
+- **Public Members & Anti-Abuse**: Students whose university isn't listed register via `/register/public` (username + password only, internal `username@eduspace.public` email never shown). Protected by a hidden honeypot field, per-IP hourly rate limit (`PUBLIC_SIGNUPS_PER_HOUR_PER_IP`), lower `PUBLIC_SIGNUP_BONUS` (10 vs 20), and licence requirement on public uploads.
+
+### Duplicate Detection & Preview Limits
+- **Deduplication**: Upload streams compute SHA-256 and check within the same `BEGIN IMMEDIATE` transaction (private uploads check same-university + public; public uploads check public only so cross-university private files never leak). Removed/hidden file hashes remain blocklisted. *Limitation*: only byte-identical files are detected; re-exported PDFs with different metadata/bytes are not matched.
+- **Server-Side Preview Limits**: Locked PDFs are truncated server-side via `pypdf` to `PREVIEW_LOCKED_PAGES` (3 pages) and cached under `previews/` (never served statically). Locked images are downscaled via `Pillow` to `PREVIEW_IMAGE_MAX_PX` (900px). Corrupt or encrypted PDFs return a graceful error state rather than a 500.
+
+### Resource Request Economics & Inflation Risk
+- **Reward Formula**: `REQUEST_BASE_REWARD + min(REQUEST_BONUS_CAP, interested_count * REQUEST_INTEREST_BONUS)`.
+- **Minting & Inflation Risk**: Request rewards are platform-minted (no escrow is deducted from the requester), and requesters download submitted files free of charge. While `MAX_OPEN_REQUESTS_PER_USER` and `MAX_REQUEST_REWARDS_PER_DAY` bound abuse, minted rewards can increase total credit supply over time if many requests are fulfilled.
+
+### Third-Party Credits & AI Disclosure
+- **pdf.js (`pdfjs-dist` v3.11.174)**: Vendored under `static/vendor/pdfjs/`, licensed under **Apache-2.0**.
+- **pypdf** & **Pillow**: Python libraries for server-side PDF/image preview generation.
+- **AI Tools Disclosure**: Initial prototype and Phases 0–7 extensions (visibility model, dedupe, bookmarks, preview modal, public library/members, resource requests, tests, and UI polish) were built with the assistance of an AI coding agent.

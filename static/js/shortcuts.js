@@ -23,6 +23,36 @@
             adminOnly: false
         },
         {
+            key: 'g p',
+            sequence: ['g', 'p'],
+            keysDisplay: ['G', 'P'],
+            group: 'Navigation',
+            description: 'Public library',
+            tooltip: 'Public library (G then P)',
+            targetShortcut: 'g p',
+            adminOnly: false
+        },
+        {
+            key: 'g v',
+            sequence: ['g', 'v'],
+            keysDisplay: ['G', 'V'],
+            group: 'Navigation',
+            description: 'Saved bookmarks',
+            tooltip: 'Saved (G then V)',
+            targetShortcut: 'g v',
+            adminOnly: false
+        },
+        {
+            key: 'g r',
+            sequence: ['g', 'r'],
+            keysDisplay: ['G', 'R'],
+            group: 'Navigation',
+            description: 'Resource requests',
+            tooltip: 'Requests (G then R)',
+            targetShortcut: 'g r',
+            adminOnly: false
+        },
+        {
             key: 'g u',
             sequence: ['g', 'u'],
             keysDisplay: ['G', 'U'],
@@ -166,7 +196,7 @@
             el.className = 'position-fixed bottom-0 start-0 m-3 px-3 py-2 bg-body border rounded-3 shadow-sm small text-body';
             el.style.zIndex = '1090';
             el.style.display = 'none';
-            el.innerHTML = '<kbd class="border px-1 me-1">G</kbd> <span class="text-body-secondary">then B, U, D, T, S, F...</span>';
+            el.innerHTML = '<kbd class="border px-1 me-1">G</kbd> <span class="text-body-secondary">then B, P, V, R, U, D, T, S, F...</span>';
             document.body.appendChild(el);
         }
         return el;

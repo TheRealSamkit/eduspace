@@ -91,7 +91,7 @@ def test_shortcuts_js_definitions():
         assert 'enter' not in k.lower(), f"Shortcut key '{k}' must not use Enter"
 
     # Verify presence of expected core shortcuts
-    expected = ['g b', 'g u', 'g d', 'g t', 'g s', 'g f', 'g a', 'g l', 't', '/', '?', 'Escape']
+    expected = ['g b', 'g p', 'g v', 'g r', 'g u', 'g d', 'g t', 'g s', 'g f', 'g a', 'g l', 't', '/', '?', 'Escape']
     for exp in expected:
         assert exp in keys, f"Expected shortcut '{exp}' in SHORTCUTS_DEF"
 
@@ -109,7 +109,7 @@ def test_shortcuts_markup_for_student(client):
     assert 'toast.js' in html
 
     # Student navigation shortcuts present
-    student_shortcuts = ['g b', 'g u', 'g d', 'g t', 'g s', 'g f']
+    student_shortcuts = ['g b', 'g p', 'g v', 'g r', 'g u', 'g d', 'g t', 'g s', 'g f']
     for sc in student_shortcuts:
         assert f'data-shortcut="{sc}"' in html, f"Missing data-shortcut='{sc}' for student"
         assert f'aria-keyshortcuts="{sc}"' in html, f"Missing aria-keyshortcuts='{sc}' for student"
