@@ -98,13 +98,15 @@
 
     function applyImageZoom() {
         const els = getEls();
+        const imgEl = els.imgEl;
+        if (!imgEl) return;
         if (imgFit) {
-            els.imgEl.style.maxWidth = '100%';
-            els.imgEl.style.width = 'auto';
+            imgEl.style.maxWidth = '100%';
+            imgEl.style.width = 'auto';
         } else {
-            els.imgEl.style.maxWidth = 'none';
-            const natW = els.imgEl.naturalWidth || 800;
-            els.imgEl.style.width = Math.round(natW * imgScale) + 'px';
+            imgEl.style.maxWidth = 'none';
+            const natW = imgEl.naturalWidth || 800;
+            imgEl.style.width = Math.round(natW * imgScale) + 'px';
         }
     }
 
@@ -179,13 +181,21 @@
                 })
                 .then(function (blob) {
                     const objUrl = URL.createObjectURL(blob);
-                    els.imgEl.onload = function () {
+                    let imgEl = document.getElementById('previewImgEl');
+                    if (!imgEl) {
+                        imgEl = document.createElement('img');
+                        imgEl.id = 'previewImgEl';
+                        imgEl.alt = 'Document preview';
+                        imgEl.className = 'border shadow-sm';
+                        els.imgWrap.appendChild(imgEl);
+                    }
+                    imgEl.onload = function () {
                         URL.revokeObjectURL(objUrl);
                         els.spinner.classList.add('d-none');
                         els.imgWrap.classList.remove('d-none');
                         applyImageZoom();
                     };
-                    els.imgEl.src = objUrl;
+                    imgEl.src = objUrl;
                 })
                 .catch(function (err) {
                     showError(err.message || 'Preview not available for this image.');
@@ -228,7 +238,7 @@
             els.canvas.height = 0;
         }
         if (els.imgEl) {
-            els.imgEl.removeAttribute('src');
+            els.imgEl.remove();
         }
         activeKind = null;
         if (lastTrigger && typeof lastTrigger.focus === 'function') {
