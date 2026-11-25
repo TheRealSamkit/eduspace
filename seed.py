@@ -4,6 +4,7 @@ Populates demo universities, users, dummy PDF files, ledger entries,
 ratings, reports, events, and SUS responses to test and demonstrate the platform.
 """
 
+import hashlib
 import os
 import uuid
 import sqlite3
@@ -12,10 +13,11 @@ from werkzeug.security import generate_password_hash
 from config import Config
 from db import init_db
 
-def generate_minimal_pdf():
-    """Generate minimal valid PDF-1.4 file bytes without external libraries."""
+def generate_minimal_pdf(label=""):
+    """Generate minimal valid PDF-1.4 file bytes with an optional unique comment label."""
+    comment = f"% {label}\n".encode("utf-8") if label else b""
     return (
-        b"%PDF-1.4\n"
+        b"%PDF-1.4\n" + comment +
         b"1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n"
         b"2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n"
         b"3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\n"
@@ -106,7 +108,6 @@ def seed():
     # 3. Dummy PDF Files (12 files: 8 in XYZ, 4 in ABC)
     upload_folder = Config.UPLOAD_FOLDER
     os.makedirs(upload_folder, exist_ok=True)
-    pdf_bytes = generate_minimal_pdf()
 
     files_data = [
         # XYZ University Files (8 files)
@@ -200,6 +201,8 @@ def seed():
 
     file_ids = []
     for uploader_id, uni_id, title, subj, sem, ftype, desc, orig_name in files_data:
+        pdf_bytes = generate_minimal_pdf(orig_name)
+        content_hash = hashlib.sha256(pdf_bytes).hexdigest()
         stored_name = f"{uuid.uuid4().hex}.pdf"
         stored_path = os.path.join(upload_folder, stored_name)
         with open(stored_path, 'wb') as f:
@@ -208,10 +211,10 @@ def seed():
         file_size = len(pdf_bytes)
         cursor.execute(
             """
-            INSERT INTO files (uploader_id, university_id, title, subject, semester, type, description, stored_name, original_name, size, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
+            INSERT INTO files (uploader_id, university_id, title, subject, semester, type, description, stored_name, original_name, size, status, visibility, content_hash)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', 'university', ?)
             """,
-            (uploader_id, uni_id, title, subj, sem, ftype, desc, stored_name, orig_name, file_size)
+            (uploader_id, uni_id, title, subj, sem, ftype, desc, stored_name, orig_name, file_size, content_hash)
         )
         fid = cursor.lastrowid
         file_ids.append((fid, uploader_id, uni_id))

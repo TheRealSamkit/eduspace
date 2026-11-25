@@ -6,6 +6,7 @@ search queries, and moderation takedowns with strict university isolation.
 Depends on os, uuid, and werkzeug.utils.secure_filename.
 """
 
+import hashlib
 import os
 import uuid
 from werkzeug.utils import secure_filename
@@ -53,7 +54,7 @@ def validate_upload_input(title, subject, semester, file_type, confirm_copyright
 
 def save_uploaded_file(uploaded_file, upload_dir, ext, max_bytes):
     """
-    Verify file size limit and save file with a random UUID filename.
+    Stream file to disk with a random UUID filename while computing SHA-256 and checking size.
 
     Args:
         uploaded_file: Werkzeug FileStorage object.
@@ -62,22 +63,58 @@ def save_uploaded_file(uploaded_file, upload_dir, ext, max_bytes):
         max_bytes (int): Maximum permitted file size in bytes.
 
     Returns:
-        tuple: (random_filename: str or None, file_size: int, error: str or None)
-    Side effects:
-        Writes file to disk under upload_dir.
+        tuple: (random_filename: str or None, file_size: int, content_hash: str or None, error: str or None)
     """
-    uploaded_file.seek(0, os.SEEK_END)
-    file_size = uploaded_file.tell()
     uploaded_file.seek(0)
-
-    if file_size > max_bytes:
-        return None, file_size, "File exceeds maximum allowed size."
-
     random_filename = f"{uuid.uuid4().hex}.{ext}"
     os.makedirs(upload_dir, exist_ok=True)
     stored_path = os.path.join(upload_dir, random_filename)
-    uploaded_file.save(stored_path)
-    return random_filename, file_size, None
+
+    hasher = hashlib.sha256()
+    file_size = 0
+    stream = uploaded_file.stream
+    with open(stored_path, 'wb') as out:
+        while True:
+            chunk = stream.read(65536)
+            if not chunk:
+                break
+            file_size += len(chunk)
+            if file_size > max_bytes:
+                out.close()
+                os.remove(stored_path)
+                return None, file_size, None, "File exceeds maximum allowed size."
+            hasher.update(chunk)
+            out.write(chunk)
+
+    return random_filename, file_size, hasher.hexdigest(), None
+
+
+def find_duplicate_in_scope(cursor, content_hash, visibility, university_id):
+    """
+    Check for an existing file with the same SHA-256 content_hash in the allowed scope.
+
+    Private uploads check same-university private files and public files.
+    Public uploads check public files only (never leaks another university's private files).
+    """
+    if visibility == 'public':
+        sql = """
+            SELECT id, status, visibility, university_id, uploader_id
+            FROM files
+            WHERE content_hash = ? AND visibility = 'public'
+            ORDER BY CASE WHEN status IN ('removed', 'hidden') THEN 0 ELSE 1 END, id ASC
+            LIMIT 1
+        """
+        return cursor.execute(sql, (content_hash,)).fetchone()
+
+    sql = """
+        SELECT id, status, visibility, university_id, uploader_id
+        FROM files
+        WHERE content_hash = ?
+          AND ((visibility = 'university' AND university_id = ?) OR visibility = 'public')
+        ORDER BY CASE WHEN status IN ('removed', 'hidden') THEN 0 ELSE 1 END, id ASC
+        LIMIT 1
+    """
+    return cursor.execute(sql, (content_hash, university_id)).fetchone()
 
 
 def query_browse_materials(db, user, search_query, subject_filter, semester_filter, type_filter, sort_by, page, per_page=9, scope='university'):
