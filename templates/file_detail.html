@@ -94,26 +94,39 @@
                             <div class="small text-body-secondary mb-2">
                                 <i class="ti ti-check text-success me-1" aria-hidden="true"></i>You uploaded this file
                             </div>
-                            <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
-                                <i class="ti ti-download me-1" aria-hidden="true"></i>Download Your File (Free)
-                            </a>
                             {% elif already_downloaded %}
                             <div class="small text-body-secondary mb-2">
                                 <i class="ti ti-history text-primary me-1" aria-hidden="true"></i>Previously unlocked
                             </div>
-                            <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
-                                <i class="ti ti-download me-1" aria-hidden="true"></i>Download Again (Free)
-                            </a>
                             {% else %}
                             <div class="small text-body-secondary mb-2">
                                 Your balance: <strong><span class="credit-balance-val">{{ current_user.credits }}</span>
                                     credits</strong>
                             </div>
-                            <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
-                                <i class="ti ti-download me-1" aria-hidden="true"></i>Download ({{ config.DOWNLOAD_COST
-                                }} credits)
-                            </a>
                             {% endif %}
+                            <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-preview"
+                                    data-file-id="{{ file.id }}"
+                                    data-file-title="{{ file.title }}"
+                                    data-file-ext="{{ file.original_name.rsplit('.', 1)[-1].lower() if '.' in file.original_name else '' }}"
+                                    data-locked="{{ 'false' if (is_uploader or already_downloaded or current_user.is_admin) else 'true' }}"
+                                    aria-label="Preview {{ file.title }}">
+                                    <i class="ti ti-eye me-1" aria-hidden="true"></i>Preview
+                                </button>
+                                {% if is_uploader %}
+                                <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
+                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Download Your File (Free)
+                                </a>
+                                {% elif already_downloaded %}
+                                <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
+                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Download Again (Free)
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
+                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Download ({{ config.DOWNLOAD_COST }} credits)
+                                </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

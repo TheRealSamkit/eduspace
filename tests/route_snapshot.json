@@ -137,6 +137,12 @@
     ]
   },
   {
+    "rule": "/preview/<int:file_id>",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
     "rule": "/register",
     "methods": [
       "GET",

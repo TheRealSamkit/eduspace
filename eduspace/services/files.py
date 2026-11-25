@@ -178,7 +178,7 @@ def query_browse_materials(db, user, search_query, subject_filter, semester_filt
 
     select_sql = f"""
         SELECT f.id, f.title, f.subject, f.semester, f.type, f.description,
-               f.size, f.visibility, f.license, f.created_at, u.username as uploader_username,
+               f.size, f.original_name, f.visibility, f.license, f.created_at, u.username as uploader_username,
                COALESCE(AVG(r.stars), 0.0) as avg_rating,
                COUNT(DISTINCT r.id) as rating_count,
                COUNT(DISTINCT d.id) as download_count
@@ -247,7 +247,7 @@ def query_saved_materials(db, user, search_query, sort_by, page, per_page=9):
 
     select_sql = f"""
         SELECT f.id, f.title, f.subject, f.semester, f.type, f.description,
-               f.size, f.visibility, f.license, f.created_at, u.username as uploader_username,
+               f.size, f.original_name, f.visibility, f.license, f.created_at, u.username as uploader_username,
                COALESCE(AVG(r.stars), 0.0) as avg_rating,
                COUNT(DISTINCT r.id) as rating_count,
                COUNT(DISTINCT d.id) as download_count

@@ -113,6 +113,19 @@
             <a href="{{ url_for('library.file_detail', file_id=f.id) }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
                 View &amp; Download
             </a>
+            {% if not is_guest %}
+            <button type="button"
+                class="btn btn-outline-secondary btn-sm btn-preview"
+                data-file-id="{{ f.id }}"
+                data-file-title="{{ f.title }}"
+                data-file-ext="{{ f.original_name.rsplit('.', 1)[-1].lower() if f.original_name and '.' in f.original_name else 'pdf' }}"
+                data-locked="true"
+                aria-label="Preview {{ f.title }}"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                title="Preview">
+                <i class="ti ti-eye fs-5 flex-shrink-0" aria-hidden="true"></i>
+            </button>
+            {% endif %}
             {% if show_bookmark and not is_guest %}
             <button type="button"
                 class="btn btn-outline-secondary btn-sm btn-bookmark"

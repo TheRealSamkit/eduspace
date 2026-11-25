@@ -6,9 +6,11 @@ reporting, and credit-deducted file downloads with institutional isolation.
 Depends on Flask, db.get_db, and eduspace.services.
 """
 
+import os
 from flask import (
     Blueprint, render_template, request, redirect,
-    url_for, flash, g, abort, send_from_directory, current_app
+    url_for, flash, g, abort, send_from_directory, send_file,
+    jsonify, current_app
 )
 from config import Config
 from db import get_db
@@ -19,6 +21,11 @@ from eduspace.services.files import (
 )
 from eduspace.services.credits import process_download_transaction
 from eduspace.services.visibility import can_view_file
+from eduspace.services.preview import (
+    is_file_unlocked, get_preview_kind,
+    get_or_create_locked_pdf, get_or_create_locked_image
+)
+from eduspace.services.telemetry import log_event_entry
 
 bp = Blueprint('library', __name__)
 
@@ -255,3 +262,59 @@ def download_file(file_id):
         as_attachment=True,
         download_name=file['original_name']
     )
+
+
+@bp.route('/preview/<int:file_id>')
+@login_required
+def preview_file(file_id):
+    """
+    Serve an inline preview of a study material (server-enforced lock for unpaid users).
+
+    Returns:
+        Response: Inline PDF/image stream with no-store and nosniff headers, or JSON error.
+    """
+    db = get_db()
+    file = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
+    if not can_view_file(g.user, file):
+        abort(404, description="Material not found or access restricted.")
+
+    kind = get_preview_kind(file['original_name'])
+    if kind == 'unsupported':
+        return jsonify({'error': 'Preview not available for this file type.'}), 415
+
+    upload_folder = current_app.config.get('UPLOAD_FOLDER', Config.UPLOAD_FOLDER)
+    source_path = os.path.join(upload_folder, file['stored_name'])
+    if not os.path.isfile(source_path):
+        return jsonify({'error': 'File not found on server.'}), 404
+
+    unlocked = is_file_unlocked(db, g.user, file)
+    content_hash = file['content_hash'] or file['stored_name']
+    cache_dir = os.path.join(os.path.dirname(os.path.abspath(upload_folder)), 'previews')
+    ext = file['original_name'].rsplit('.', 1)[-1].lower()
+
+    if unlocked:
+        target_path = source_path
+    else:
+        try:
+            if kind == 'pdf':
+                max_pages = current_app.config.get('PREVIEW_LOCKED_PAGES', Config.PREVIEW_LOCKED_PAGES)
+                target_path = get_or_create_locked_pdf(source_path, content_hash, cache_dir, max_pages)
+            else:
+                max_px = current_app.config.get('PREVIEW_IMAGE_MAX_PX', Config.PREVIEW_IMAGE_MAX_PX)
+                target_path = get_or_create_locked_image(source_path, content_hash, ext, cache_dir, max_px)
+        except ValueError as exc:
+            return jsonify({'error': str(exc)}), 422
+
+    try:
+        log_event_entry(
+            db, g.session_id, g.user['id'],
+            'preview_open', request.path, f"file_id={file_id},locked={not unlocked}"
+        )
+    except Exception:
+        pass
+
+    mimetype = 'application/pdf' if kind == 'pdf' else ('image/png' if ext == 'png' else 'image/jpeg')
+    resp = send_file(target_path, mimetype=mimetype, as_attachment=False)
+    resp.headers['Cache-Control'] = 'private, no-store'
+    resp.headers['X-Content-Type-Options'] = 'nosniff'
+    return resp

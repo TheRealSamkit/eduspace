@@ -317,6 +317,12 @@
 
         const key = e.key;
         const isLoggedIn = !!document.querySelector('.app-sidebar');
+        const hasOpenModal = !!document.querySelector('.modal.show');
+
+        // Disable global shortcuts while any dialog/modal is open (except Escape)
+        if (hasOpenModal && key !== 'Escape') {
+            return;
+        }
 
         // Escape handler: close modal or dismiss top toast
         if (key === 'Escape') {
