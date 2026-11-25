@@ -101,7 +101,7 @@ action_html='<a href="' + url_for('upload.upload_file') + '" class="btn btn-prim
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-4">
     {% for f in files %}
     <div class="col">
-        {{ ui.file_card(f, config) }}
+        {{ ui.file_card(f, config, bookmarked_ids=bookmarked_ids) }}
     </div>
     {% endfor %}
 </div>

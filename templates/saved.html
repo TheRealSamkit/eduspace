@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% import "_components.html" as ui %}
+
+{% block title %}Saved Materials - EduSpace{% endblock %}
+{% block topbar_title %}Saved Materials{% endblock %}
+
+{% block content %}
+{{ ui.page_header(
+    title="Saved Materials",
+    subtitle="Bookmarked study resources you currently have access to",
+    action_html='<a href="' + url_for('library.browse') + '" class="btn btn-primary btn-sm"><i class="ti ti-books me-1" aria-hidden="true"></i>Browse Library</a>'
+) }}
+
+<div class="card mb-4">
+    <div class="card-body p-3 p-md-4">
+        <form method="GET" action="{{ url_for('library.saved') }}" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label for="searchSaved" class="form-label small fw-medium text-body-secondary">Search Saved</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-body-tertiary"><i class="ti ti-search" aria-hidden="true"></i></span>
+                    <input type="text" class="form-control" id="searchSaved" name="q" value="{{ search_query }}"
+                        placeholder="Search title, subject, or description...">
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+                <label for="sortSaved" class="form-label small fw-medium text-body-secondary">Sort By</label>
+                <select class="form-select" id="sortSaved" name="sort">
+                    <option value="newest" {% if sort_by=='newest' %}selected{% endif %}>Recently Saved</option>
+                    <option value="top_rated" {% if sort_by=='top_rated' %}selected{% endif %}>Top Rated</option>
+                    <option value="most_downloaded" {% if sort_by=='most_downloaded' %}selected{% endif %}>Most Downloaded</option>
+                    <option value="oldest" {% if sort_by=='oldest' %}selected{% endif %}>Oldest Saved</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-md-3 d-flex align-items-center gap-2">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-filter me-1" aria-hidden="true"></i>Apply
+                </button>
+                <a href="{{ url_for('library.saved') }}" class="btn btn-link btn-sm text-body-secondary text-decoration-none">
+                    Reset
+                </a>
+                <span class="ms-auto text-body-secondary small">
+                    <strong>{{ total_items }}</strong> saved
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if files %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-4">
+    {% for f in files %}
+    <div class="col">
+        {{ ui.file_card(f, config, bookmarked_ids=bookmarked_ids) }}
+    </div>
+    {% endfor %}
+</div>
+
+{% if total_pages > 1 %}
+<nav aria-label="Saved materials pagination" class="d-flex justify-content-center my-4">
+    <ul class="pagination pagination-sm">
+        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('library.saved', page=page-1, q=search_query, sort=sort_by) }}">&laquo; Prev</a>
+        </li>
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+            <a class="page-link" href="{{ url_for('library.saved', page=p, q=search_query, sort=sort_by) }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('library.saved', page=page+1, q=search_query, sort=sort_by) }}">Next &raquo;</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+{{ ui.empty_state(
+    icon="ti-bookmark",
+    title="No saved materials yet",
+    message="Bookmark study materials while browsing so you can quickly return to them here.",
+    action_url=url_for('library.browse'),
+    action_text="Explore Materials"
+) }}
+{% endif %}
+{% endblock %}

@@ -13,7 +13,10 @@ from flask import (
 from config import Config
 from db import get_db
 from eduspace.security import login_required
-from eduspace.services.files import query_browse_materials, get_file_detail_isolated
+from eduspace.services.files import (
+    query_browse_materials, get_file_detail_isolated,
+    get_bookmarked_file_ids, query_saved_materials
+)
 from eduspace.services.credits import process_download_transaction
 from eduspace.services.visibility import can_view_file
 
@@ -61,7 +64,35 @@ def browse():
         semester_filter=semester_filter,
         type_filter=type_filter,
         sort_by=sort_by,
-        subjects=result['subjects']
+        subjects=result['subjects'],
+        bookmarked_ids=get_bookmarked_file_ids(db, g.user['id'])
+    )
+
+
+@bp.route('/saved')
+@login_required
+def saved():
+    """
+    Display materials bookmarked by the current user that they are still permitted to view.
+
+    Returns:
+        Response: Rendered saved.html.
+    """
+    search_query = request.args.get('q', '').strip()
+    sort_by = request.args.get('sort', 'newest')
+    page = max(1, request.args.get('page', 1, type=int))
+
+    db = get_db()
+    result = query_saved_materials(db, g.user, search_query, sort_by, page, per_page=9)
+    return render_template(
+        'saved.html',
+        files=result['files'],
+        total_items=result['total_items'],
+        page=page,
+        total_pages=result['total_pages'],
+        search_query=search_query,
+        sort_by=sort_by,
+        bookmarked_ids=get_bookmarked_file_ids(db, g.user['id'])
     )
 
 
@@ -93,11 +124,17 @@ def file_detail(file_id):
         (g.user['id'], file_id)
     ).fetchone()
 
+    is_bookmarked = db.execute(
+        "SELECT 1 FROM bookmarks WHERE user_id = ? AND file_id = ?",
+        (g.user['id'], file_id)
+    ).fetchone() is not None
+
     return render_template(
         'file_detail.html',
         file=file,
         is_uploader=is_uploader,
         already_downloaded=already_downloaded,
+        is_bookmarked=is_bookmarked,
         user_stars=user_rating['stars'] if user_rating else None
     )
 

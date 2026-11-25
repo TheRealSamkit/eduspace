@@ -6,7 +6,9 @@ Depends on Flask, db.get_db, and eduspace.services.telemetry.
 
 from flask import Blueprint, request, jsonify, session, g, current_app
 from db import get_db
+from eduspace.security import login_required
 from eduspace.services.telemetry import log_event_entry
+from eduspace.services.visibility import can_view_file
 
 bp = Blueprint('api', __name__)
 
@@ -105,3 +107,48 @@ def api_event():
         return jsonify({'status': 'ok'}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+@bp.route('/api/bookmark/<int:file_id>', methods=['POST'])
+@login_required
+def api_toggle_bookmark(file_id):
+    """
+    Toggle a bookmark for a visible active file for the authenticated user.
+
+    Returns:
+        tuple: JSON {bookmarked: bool, count: int} and HTTP status code.
+    """
+    db = get_db()
+    file = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
+    if not can_view_file(g.user, file) or file['status'] != 'active':
+        return jsonify({'error': 'Material not found or access restricted.'}), 404
+
+    existing = db.execute(
+        "SELECT id FROM bookmarks WHERE user_id = ? AND file_id = ?",
+        (g.user['id'], file_id)
+    ).fetchone()
+
+    if existing:
+        db.execute("DELETE FROM bookmarks WHERE id = ?", (existing['id'],))
+        bookmarked = False
+        evt = 'bookmark_remove'
+    else:
+        db.execute(
+            "INSERT INTO bookmarks (user_id, file_id) VALUES (?, ?)",
+            (g.user['id'], file_id)
+        )
+        bookmarked = True
+        evt = 'bookmark_add'
+    db.commit()
+
+    count = db.execute(
+        "SELECT COUNT(*) FROM bookmarks WHERE file_id = ?",
+        (file_id,)
+    ).fetchone()[0]
+
+    try:
+        log_event_entry(db, g.session_id, g.user['id'], evt, request.path, f"file_id={file_id}")
+    except Exception:
+        pass
+
+    return jsonify({'bookmarked': bookmarked, 'count': count}), 200

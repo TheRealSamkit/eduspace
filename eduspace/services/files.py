@@ -202,6 +202,64 @@ def query_browse_materials(db, user, search_query, subject_filter, semester_filt
     }
 
 
+def get_bookmarked_file_ids(db, user_id):
+    """Return a set of file IDs bookmarked by the given user."""
+    if not user_id:
+        return set()
+    rows = db.execute("SELECT file_id FROM bookmarks WHERE user_id = ?", (user_id,)).fetchall()
+    return {row['file_id'] for row in rows}
+
+
+def query_saved_materials(db, user, search_query, sort_by, page, per_page=9):
+    """
+    Query bookmarked active materials that the user is still permitted to view.
+
+    Returns:
+        dict: files, total_items, total_pages.
+    """
+    vis_clause, vis_params = file_visibility_where(user, scope='visible', alias='f')
+    sql_base = f"""
+        FROM bookmarks b
+        JOIN files f ON b.file_id = f.id
+        JOIN users u ON f.uploader_id = u.id
+        LEFT JOIN ratings r ON f.id = r.file_id
+        LEFT JOIN downloads d ON f.id = d.file_id
+        WHERE b.user_id = ? AND {vis_clause}
+    """
+    params = [user['id']] + list(vis_params)
+
+    if search_query:
+        sql_base += " AND (f.title LIKE ? OR f.subject LIKE ? OR f.description LIKE ?)"
+        term = f"%{search_query}%"
+        params.extend([term, term, term])
+
+    total_items = db.execute(f"SELECT COUNT(DISTINCT f.id) {sql_base}", params).fetchone()[0]
+    total_pages = max(1, (total_items + per_page - 1) // per_page)
+    offset = (page - 1) * per_page
+
+    order_clause = "ORDER BY b.created_at DESC"
+    if sort_by == 'top_rated':
+        order_clause = "ORDER BY avg_rating DESC, rating_count DESC, b.created_at DESC"
+    elif sort_by == 'most_downloaded':
+        order_clause = "ORDER BY download_count DESC, b.created_at DESC"
+    elif sort_by == 'oldest':
+        order_clause = "ORDER BY b.created_at ASC"
+
+    select_sql = f"""
+        SELECT f.id, f.title, f.subject, f.semester, f.type, f.description,
+               f.size, f.visibility, f.license, f.created_at, u.username as uploader_username,
+               COALESCE(AVG(r.stars), 0.0) as avg_rating,
+               COUNT(DISTINCT r.id) as rating_count,
+               COUNT(DISTINCT d.id) as download_count
+        {sql_base}
+        GROUP BY f.id
+        {order_clause}
+        LIMIT ? OFFSET ?
+    """
+    files = db.execute(select_sql, list(params) + [per_page, offset]).fetchall()
+    return {'files': files, 'total_items': total_items, 'total_pages': total_pages}
+
+
 def get_file_detail_isolated(db, file_id, user):
     """
     Fetch single file record with aggregated ratings and download counts if user can view it.

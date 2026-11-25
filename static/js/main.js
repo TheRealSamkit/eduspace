@@ -286,6 +286,65 @@
             });
             tooltipInstances = [];
         });
+
+        // 7. Optimistic Bookmark Toggle
+        function setBookmarkButtonState(btn, bookmarked) {
+            btn.dataset.bookmarked = bookmarked ? 'true' : 'false';
+            btn.setAttribute('aria-pressed', bookmarked ? 'true' : 'false');
+            const labelText = bookmarked ? 'Remove from saved' : 'Save material';
+            btn.setAttribute('aria-label', labelText);
+            btn.setAttribute('title', labelText);
+            const icon = btn.querySelector('i.ti');
+            if (icon) {
+                icon.classList.remove('ti-bookmark', 'ti-bookmark-filled', 'text-primary');
+                if (bookmarked) {
+                    icon.classList.add('ti-bookmark-filled', 'text-primary');
+                } else {
+                    icon.classList.add('ti-bookmark');
+                }
+            }
+            const textSpan = btn.querySelector('.bookmark-btn-label');
+            if (textSpan) {
+                textSpan.textContent = bookmarked ? 'Saved' : 'Save';
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-bookmark');
+            if (!btn) return;
+            e.preventDefault();
+            const fileId = btn.dataset.fileId;
+            if (!fileId || btn.dataset.pending === 'true') return;
+
+            const prevState = btn.dataset.bookmarked === 'true';
+            const nextState = !prevState;
+            btn.dataset.pending = 'true';
+            setBookmarkButtonState(btn, nextState);
+
+            fetch('/api/bookmark/' + encodeURIComponent(fileId), {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCsrfToken() }
+            })
+                .then(function (res) {
+                    if (!res.ok) throw new Error('Request failed');
+                    return res.json();
+                })
+                .then(function (data) {
+                    setBookmarkButtonState(btn, Boolean(data.bookmarked));
+                    if (window.showToast) {
+                        window.showToast(data.bookmarked ? 'Saved' : 'Removed from saved', 'success');
+                    }
+                })
+                .catch(function () {
+                    setBookmarkButtonState(btn, prevState);
+                    if (window.showToast) {
+                        window.showToast('Could not update bookmark. Please try again.', 'danger');
+                    }
+                })
+                .finally(function () {
+                    delete btn.dataset.pending;
+                });
+        });
     });
 
     // Make TaskTracker available globally

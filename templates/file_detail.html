@@ -141,8 +141,19 @@
                         </form>
                     </div>
 
-                    <!-- Report Button -->
-                    <div class="col-md-5 text-md-end">
+                    <!-- Bookmark & Report Buttons -->
+                    <div class="col-md-5 text-md-end d-flex flex-wrap justify-content-md-end gap-2">
+                        <button type="button"
+                            class="btn btn-outline-secondary btn-sm btn-bookmark"
+                            data-file-id="{{ file.id }}"
+                            data-bookmarked="{{ 'true' if is_bookmarked else 'false' }}"
+                            aria-label="{{ 'Remove from saved' if is_bookmarked else 'Save material' }}"
+                            aria-pressed="{{ 'true' if is_bookmarked else 'false' }}"
+                            data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="{{ 'Remove from saved' if is_bookmarked else 'Save material' }}">
+                            <i class="ti {{ 'ti-bookmark-filled text-primary' if is_bookmarked else 'ti-bookmark' }} me-1" aria-hidden="true"></i>
+                            <span class="bookmark-btn-label">{{ 'Saved' if is_bookmarked else 'Save' }}</span>
+                        </button>
                         <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top"
                             title="Report this material">
                             <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"

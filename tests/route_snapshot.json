@@ -3,232 +3,188 @@
     "rule": "/",
     "methods": [
       "GET"
-    ],
-    "endpoint": "index",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/admin",
     "methods": [
       "GET"
-    ],
-    "endpoint": "admin_panel",
-    "auth": "admin_required"
+    ]
   },
   {
     "rule": "/admin/baseline",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "admin_baseline",
-    "auth": "admin_required"
+    ]
   },
   {
     "rule": "/admin/export/<string:table_name>",
     "methods": [
       "GET"
-    ],
-    "endpoint": "admin_export_csv",
-    "auth": "admin_required"
+    ]
   },
   {
     "rule": "/admin/file/<int:file_id>/remove",
     "methods": [
       "POST"
-    ],
-    "endpoint": "remove_file_admin",
-    "auth": "admin_required"
+    ]
   },
   {
     "rule": "/admin/report/<int:report_id>/resolve",
     "methods": [
       "POST"
-    ],
-    "endpoint": "resolve_report",
-    "auth": "admin_required"
+    ]
+  },
+  {
+    "rule": "/api/bookmark/<int:file_id>",
+    "methods": [
+      "POST"
+    ]
   },
   {
     "rule": "/api/credits",
     "methods": [
       "GET"
-    ],
-    "endpoint": "api_credits",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/api/domain-check",
     "methods": [
       "GET"
-    ],
-    "endpoint": "api_domain_check",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/api/event",
     "methods": [
       "POST"
-    ],
-    "endpoint": "api_event",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/api/me",
     "methods": [
       "GET"
-    ],
-    "endpoint": "api_me",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/browse",
     "methods": [
       "GET"
-    ],
-    "endpoint": "browse",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/consent",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "consent",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/dashboard",
     "methods": [
       "GET"
-    ],
-    "endpoint": "dashboard",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/download/<int:file_id>",
     "methods": [
       "GET"
-    ],
-    "endpoint": "download_file",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/favicon.ico",
     "methods": [
       "GET"
-    ],
-    "endpoint": "favicon",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/feedback",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "feedback_page",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/file/<int:file_id>",
     "methods": [
       "GET"
-    ],
-    "endpoint": "file_detail",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/file/<int:file_id>/rate",
     "methods": [
       "POST"
-    ],
-    "endpoint": "rate_file",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/file/<int:file_id>/report",
     "methods": [
       "POST"
-    ],
-    "endpoint": "report_file",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/login",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "login",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/logout",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "logout",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/register",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "register",
-    "auth": "public"
+    ]
+  },
+  {
+    "rule": "/saved",
+    "methods": [
+      "GET"
+    ]
   },
   {
     "rule": "/static/<path:filename>",
     "methods": [
       "GET"
-    ],
-    "endpoint": "static",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/sus",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "sus_survey",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/task",
     "methods": [
       "GET"
-    ],
-    "endpoint": "task_page",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/task/complete",
     "methods": [
       "POST"
-    ],
-    "endpoint": "task_complete",
-    "auth": "login_required"
+    ]
   },
   {
     "rule": "/terms",
     "methods": [
       "GET"
-    ],
-    "endpoint": "terms_page",
-    "auth": "public"
+    ]
   },
   {
     "rule": "/upload",
     "methods": [
       "GET",
       "POST"
-    ],
-    "endpoint": "upload_file",
-    "auth": "login_required"
+    ]
   }
 ]
