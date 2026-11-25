@@ -16,6 +16,33 @@ class Config:
     DOWNLOAD_COST = 5
     MAX_REWARDED_UPLOADS_PER_DAY = 3
 
+    # Public Library & Open Sign-up Settings
+    PUBLIC_EMAIL_DOMAIN = "eduspace.public"
+    PUBLIC_UNI_NAME = "EduSpace Public"
+    PUBLIC_SIGNUP_BONUS = 10
+    PUBLIC_SIGNUPS_PER_HOUR_PER_IP = 5
+
+    # Preview & Moderation Settings
+    PREVIEW_LOCKED_PAGES = 3
+    PREVIEW_IMAGE_MAX_PX = 900
+    REPORTS_TO_AUTOHIDE = 3
+
+    # Resource Requests Settings
+    REQUEST_BASE_REWARD = 15
+    REQUEST_INTEREST_BONUS = 1
+    REQUEST_BONUS_CAP = 10
+    MAX_OPEN_REQUESTS_PER_USER = 3
+    MAX_REQUEST_REWARDS_PER_DAY = 2
+
+    # Licensing Choices for Public Uploads
+    LICENSE_CHOICES = [
+        ("own_work", "Own original work"),
+        ("cc_by", "Open licence: CC BY 4.0"),
+        ("cc_by_sa", "Open licence: CC BY-SA 4.0"),
+        ("cc0", "Open licence: CC0 (No Rights Reserved)"),
+        ("public_domain", "Public Domain"),
+    ]
+
     # File Upload Limits
     MAX_FILE_MB = 10
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB in bytes

@@ -10,6 +10,7 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 from eduspace.services.credits import reverse_upload_credits
+from eduspace.services.visibility import can_view_file, file_visibility_where
 
 
 def validate_upload_input(title, subject, semester, file_type, confirm_copyright, uploaded_file, allowed_exts):
@@ -79,13 +80,13 @@ def save_uploaded_file(uploaded_file, upload_dir, ext, max_bytes):
     return random_filename, file_size, None
 
 
-def query_browse_materials(db, university_id, search_query, subject_filter, semester_filter, type_filter, sort_by, page, per_page=9):
+def query_browse_materials(db, user, search_query, subject_filter, semester_filter, type_filter, sort_by, page, per_page=9, scope='university'):
     """
-    Execute paginated query for active study materials strictly filtered by university_id.
+    Execute paginated query for active study materials filtered by visibility rules.
 
     Args:
         db: SQLite database connection.
-        university_id (int): Student's university ID.
+        user (Row|dict|None): Current user or None for guest.
         search_query (str): Optional search query.
         subject_filter (str): Optional subject filter.
         semester_filter (str): Optional semester number filter.
@@ -93,19 +94,20 @@ def query_browse_materials(db, university_id, search_query, subject_filter, seme
         sort_by (str): Sort key ('newest', 'top_rated', 'most_downloaded', 'oldest').
         page (int): Current page number (1-indexed).
         per_page (int): Items per page.
+        scope (str): 'university', 'public', or 'visible'.
 
     Returns:
         dict: Query results containing files, total_items, total_pages, and subjects.
     """
-    # Strict university isolation filter
-    sql_base = """
+    vis_clause, vis_params = file_visibility_where(user, scope=scope, alias='f')
+    sql_base = f"""
         FROM files f
         JOIN users u ON f.uploader_id = u.id
         LEFT JOIN ratings r ON f.id = r.file_id
         LEFT JOIN downloads d ON f.id = d.file_id
-        WHERE f.university_id = ? AND f.status = 'active'
+        WHERE {vis_clause}
     """
-    params = [university_id]
+    params = list(vis_params)
 
     if search_query:
         sql_base += " AND (f.title LIKE ? OR f.subject LIKE ? OR f.description LIKE ?)"
@@ -139,7 +141,7 @@ def query_browse_materials(db, university_id, search_query, subject_filter, seme
 
     select_sql = f"""
         SELECT f.id, f.title, f.subject, f.semester, f.type, f.description,
-               f.size, f.created_at, u.username as uploader_username,
+               f.size, f.visibility, f.license, f.created_at, u.username as uploader_username,
                COALESCE(AVG(r.stars), 0.0) as avg_rating,
                COUNT(DISTINCT r.id) as rating_count,
                COUNT(DISTINCT d.id) as download_count
@@ -151,8 +153,8 @@ def query_browse_materials(db, university_id, search_query, subject_filter, seme
     files = db.execute(select_sql, list(params) + [per_page, offset]).fetchall()
 
     subjects_raw = db.execute(
-        "SELECT DISTINCT subject FROM files WHERE university_id = ? AND status = 'active' ORDER BY subject",
-        (university_id,)
+        f"SELECT DISTINCT f.subject FROM files f WHERE {vis_clause} ORDER BY f.subject",
+        vis_params
     ).fetchall()
 
     return {
@@ -163,21 +165,21 @@ def query_browse_materials(db, university_id, search_query, subject_filter, seme
     }
 
 
-def get_file_detail_isolated(db, file_id, university_id):
+def get_file_detail_isolated(db, file_id, user):
     """
-    Fetch single file record with aggregated ratings and download counts.
+    Fetch single file record with aggregated ratings and download counts if user can view it.
 
-    Returns None if file does not exist or does not match the user's university_id.
+    Returns None if file does not exist or user is not authorized to view it.
 
     Args:
         db: SQLite database connection.
         file_id (int): File primary key.
-        university_id (int): Student's university ID.
+        user (Row|dict|None): Current user or None for guest.
 
     Returns:
         Row or None: File record or None if unauthorized/missing.
     """
-    return db.execute(
+    file = db.execute(
         """
         SELECT f.*, u.username as uploader_username,
                COALESCE(AVG(r.stars), 0.0) as avg_rating,
@@ -187,11 +189,14 @@ def get_file_detail_isolated(db, file_id, university_id):
         JOIN users u ON f.uploader_id = u.id
         LEFT JOIN ratings r ON f.id = r.file_id
         LEFT JOIN downloads d ON f.id = d.file_id
-        WHERE f.id = ? AND f.university_id = ? AND f.status = 'active'
+        WHERE f.id = ?
         GROUP BY f.id
         """,
-        (file_id, university_id)
+        (file_id,)
     ).fetchone()
+    if not can_view_file(user, file):
+        return None
+    return file
 
 
 def takedown_file_admin(db, file_id, default_reward):

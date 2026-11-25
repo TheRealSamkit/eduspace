@@ -8,6 +8,7 @@ Depends on Flask, db.get_db, and eduspace.security.login_required.
 from flask import Blueprint, render_template, g
 from db import get_db
 from eduspace.security import login_required
+from eduspace.services.visibility import file_visibility_where
 
 bp = Blueprint('dashboard', __name__)
 
@@ -52,17 +53,18 @@ def dashboard():
         (user_id,)
     ).fetchall()
 
+    vis_clause, vis_params = file_visibility_where(g.user, scope='visible', alias='f')
     downloads = db.execute(
-        """
+        f"""
         SELECT d.created_at as downloaded_at, f.id as file_id, f.title, f.subject,
                f.semester, f.type, f.size, f.status, u.username as uploader_username
         FROM downloads d
         JOIN files f ON d.file_id = f.id
         JOIN users u ON f.uploader_id = u.id
-        WHERE d.user_id = ? AND f.university_id = ?
+        WHERE d.user_id = ? AND {vis_clause}
         ORDER BY d.created_at DESC
         """,
-        (user_id, g.user['university_id'])
+        [user_id] + vis_params
     ).fetchall()
 
     return render_template(

@@ -36,6 +36,10 @@ def seed():
     print("Seeding EduSpace database...")
 
     # Clear old data for a clean demonstration state
+    cursor.execute("DELETE FROM request_submissions;")
+    cursor.execute("DELETE FROM request_interest;")
+    cursor.execute("DELETE FROM resource_requests;")
+    cursor.execute("DELETE FROM bookmarks;")
     cursor.execute("DELETE FROM reports;")
     cursor.execute("DELETE FROM ratings;")
     cursor.execute("DELETE FROM downloads;")
@@ -51,12 +55,16 @@ def seed():
 
     # 1. Universities
     unis = [
-        ("XYZ University", "xyz.edu"),
-        ("ABC College", "abc.edu")
+        ("XYZ University", "xyz.edu", "partner"),
+        ("ABC College", "abc.edu", "partner"),
+        (Config.PUBLIC_UNI_NAME, Config.PUBLIC_EMAIL_DOMAIN, "public"),
     ]
     uni_ids = {}
-    for name, domain in unis:
-        cursor.execute("INSERT INTO universities (name, domain) VALUES (?, ?)", (name, domain))
+    for name, domain, kind in unis:
+        cursor.execute(
+            "INSERT INTO universities (name, domain, kind) VALUES (?, ?, ?)",
+            (name, domain, kind)
+        )
         uni_ids[domain] = cursor.lastrowid
 
     # 2. Users (6 demo users: 4 in XYZ University, 2 in ABC College)

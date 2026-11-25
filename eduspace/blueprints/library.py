@@ -15,6 +15,7 @@ from db import get_db
 from eduspace.security import login_required
 from eduspace.services.files import query_browse_materials, get_file_detail_isolated
 from eduspace.services.credits import process_download_transaction
+from eduspace.services.visibility import can_view_file
 
 bp = Blueprint('library', __name__)
 
@@ -38,14 +39,15 @@ def browse():
     db = get_db()
     result = query_browse_materials(
         db=db,
-        university_id=g.user['university_id'],
+        user=g.user,
         search_query=search_query,
         subject_filter=subject_filter,
         semester_filter=semester_filter,
         type_filter=type_filter,
         sort_by=sort_by,
         page=page,
-        per_page=9
+        per_page=9,
+        scope='university'
     )
 
     return render_template(
@@ -76,7 +78,7 @@ def file_detail(file_id):
         Response: Rendered file_detail.html or 404 if not found / different university.
     """
     db = get_db()
-    file = get_file_detail_isolated(db, file_id, g.user['university_id'])
+    file = get_file_detail_isolated(db, file_id, g.user)
     if not file:
         abort(404, description="Material not found or access restricted to its institution.")
 
@@ -113,12 +115,9 @@ def rate_file(file_id):
         Response: Redirect to file_detail page.
     """
     db = get_db()
-    file = db.execute(
-        "SELECT id FROM files WHERE id = ? AND university_id = ? AND status = 'active'",
-        (file_id, g.user['university_id'])
-    ).fetchone()
+    file = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
 
-    if not file:
+    if not can_view_file(g.user, file) or file['status'] != 'active':
         abort(404, description="Material not found or access restricted.")
 
     stars = request.form.get('stars', type=int)
@@ -152,12 +151,9 @@ def report_file(file_id):
         Response: Redirect to file_detail page.
     """
     db = get_db()
-    file = db.execute(
-        "SELECT id FROM files WHERE id = ? AND university_id = ? AND status = 'active'",
-        (file_id, g.user['university_id'])
-    ).fetchone()
+    file = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
 
-    if not file:
+    if not can_view_file(g.user, file) or file['status'] != 'active':
         abort(404, description="Material not found or access restricted.")
 
     reason = request.form.get('reason', '').strip()
@@ -190,13 +186,9 @@ def download_file(file_id):
         Response: File attachment or redirect on error.
     """
     db = get_db()
-    # Strict university isolation check
-    file = db.execute(
-        "SELECT * FROM files WHERE id = ? AND university_id = ? AND status = 'active'",
-        (file_id, g.user['university_id'])
-    ).fetchone()
+    file = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
 
-    if not file:
+    if not can_view_file(g.user, file) or file['status'] != 'active':
         abort(404, description="Material not found or access restricted to students of its institution.")
 
     is_uploader = (file['uploader_id'] == g.user['id'])

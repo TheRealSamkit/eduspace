@@ -36,7 +36,8 @@ def init_hooks(app):
                 fresh_user = db.execute(
                     """
                     SELECT u.id, u.email, u.username, u.credits, u.is_admin,
-                           u.university_id, un.name as university_name, un.domain as university_domain
+                           u.university_id, un.name as university_name,
+                           un.domain as university_domain, un.kind as university_kind
                     FROM users u
                     JOIN universities un ON u.university_id = un.id
                     WHERE u.id = ?
@@ -78,7 +79,8 @@ def init_hooks(app):
             user = db.execute(
                 """
                 SELECT u.id, u.email, u.username, u.credits, u.is_admin,
-                       u.university_id, un.name as university_name, un.domain as university_domain
+                       u.university_id, un.name as university_name,
+                       un.domain as university_domain, un.kind as university_kind
                 FROM users u
                 JOIN universities un ON u.university_id = un.id
                 WHERE u.id = ?
