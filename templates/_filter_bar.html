@@ -1,0 +1,125 @@
+{# Shared Search & Filter Bar with responsive lg-offcanvas for mobile #}
+{% macro filter_bar(
+    form_action,
+    reset_url,
+    search_query,
+    subject_filter,
+    semester_filter,
+    type_filter,
+    sort_by,
+    subjects,
+    material_types,
+    files_count,
+    total_items,
+    items_label="materials",
+    id_prefix="filter",
+    offcanvas_id="filtersOffcanvas"
+) %}
+{% set active_filter_count = (1 if subject_filter else 0) + (1 if semester_filter else 0) + (1 if type_filter else 0) + (1 if sort_by and sort_by != 'newest' else 0) %}
+<div class="card mb-4">
+    <div class="card-body p-3 p-md-4">
+        <form method="GET" action="{{ form_action }}" class="row g-3 align-items-end">
+            <!-- Keyword Search + Mobile Filters Trigger -->
+            <div class="col-12 col-lg-4">
+                <label for="{{ id_prefix }}Search" class="form-label small fw-medium text-body-secondary">Keyword Search</label>
+                <div class="d-flex gap-2">
+                    <div class="input-group flex-grow-1">
+                        <span class="input-group-text bg-body-tertiary"><i class="ti ti-search" aria-hidden="true"></i></span>
+                        <input type="text" class="form-control" id="{{ id_prefix }}Search" name="q" value="{{ search_query }}"
+                            placeholder="Search title, subject, or description..." data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" title="Press / to search">
+                    </div>
+                    <button type="button"
+                        class="btn btn-outline-secondary d-lg-none flex-shrink-0 d-inline-flex align-items-center gap-1"
+                        data-bs-toggle="offcanvas" data-bs-target="#{{ offcanvas_id }}"
+                        aria-controls="{{ offcanvas_id }}">
+                        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+                        <span>Filters</span>
+                        {% if active_filter_count > 0 %}
+                        <span class="badge text-bg-primary rounded-pill">{{ active_filter_count }}</span>
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inline on lg+, Offcanvas on < lg -->
+            <div class="col-12 col-lg-8">
+                <div class="offcanvas-lg offcanvas-end" tabindex="-1" id="{{ offcanvas_id }}"
+                    aria-labelledby="{{ offcanvas_id }}Label">
+                    <div class="offcanvas-header border-bottom">
+                        <h2 class="offcanvas-title h6 fw-semibold mb-0" id="{{ offcanvas_id }}Label">Filters</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                            data-bs-target="#{{ offcanvas_id }}" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body p-3 p-lg-0">
+                        <div class="row g-3 align-items-end w-100 m-0">
+                            <div class="col-12 col-lg-3 px-0 px-lg-2">
+                                <label for="{{ id_prefix }}Subject" class="form-label small fw-medium text-body-secondary">Subject</label>
+                                <select class="form-select" id="{{ id_prefix }}Subject" name="subject">
+                                    <option value="">All Subjects</option>
+                                    {% for subj in subjects %}
+                                    <option value="{{ subj }}" {% if subject_filter==subj %}selected{% endif %}>{{ subj }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-lg-3 px-0 px-lg-2">
+                                <label for="{{ id_prefix }}Semester" class="form-label small fw-medium text-body-secondary">Semester</label>
+                                <select class="form-select" id="{{ id_prefix }}Semester" name="semester">
+                                    <option value="">All Semesters</option>
+                                    {% for sem in range(1, 9) %}
+                                    <option value="{{ sem }}" {% if semester_filter==sem|string %}selected{% endif %}>Semester {{ sem }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-lg-3 px-0 px-lg-2">
+                                <label for="{{ id_prefix }}Type" class="form-label small fw-medium text-body-secondary">Type</label>
+                                <select class="form-select" id="{{ id_prefix }}Type" name="type">
+                                    <option value="">All Types</option>
+                                    {% for t in material_types %}
+                                    <option value="{{ t }}" {% if type_filter==t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-lg-3 px-0 px-lg-2">
+                                <label for="{{ id_prefix }}Sort" class="form-label small fw-medium text-body-secondary">Sort By</label>
+                                <select class="form-select" id="{{ id_prefix }}Sort" name="sort">
+                                    <option value="newest" {% if sort_by=='newest' %}selected{% endif %}>Newest</option>
+                                    <option value="top_rated" {% if sort_by=='top_rated' %}selected{% endif %}>Top Rated</option>
+                                    <option value="most_downloaded" {% if sort_by=='most_downloaded' %}selected{% endif %}>Most Downloaded</option>
+                                    <option value="oldest" {% if sort_by=='oldest' %}selected{% endif %}>Oldest</option>
+                                </select>
+                            </div>
+
+                            <!-- Mobile-only Apply & Reset inside offcanvas surface -->
+                            <div class="col-12 d-flex d-lg-none gap-2 px-0 pt-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1"
+                                    data-bs-dismiss="offcanvas" data-bs-target="#{{ offcanvas_id }}">
+                                    Apply
+                                </button>
+                                <a href="{{ reset_url }}" class="btn btn-outline-secondary">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Filter Controls & Result Count -->
+            <div class="col-12 d-flex flex-wrap align-items-center gap-2 pt-1">
+                <button type="submit" class="btn btn-outline-secondary btn-sm d-none d-lg-inline-flex align-items-center">
+                    <i class="ti ti-filter me-1" aria-hidden="true"></i>Apply Filters
+                </button>
+                <a href="{{ reset_url }}"
+                    class="btn btn-link btn-sm text-body-secondary text-decoration-none d-none d-lg-inline-block">
+                    Reset
+                </a>
+                <span class="ms-lg-auto text-body-secondary small">
+                    Showing <strong>{{ files_count }}</strong> of <strong>{{ total_items }}</strong> {{ items_label }}
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+{% endmacro %}

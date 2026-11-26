@@ -388,6 +388,15 @@
                     delete btn.dataset.pending;
                 });
         });
+        // 9. Mutual exclusion for Bootstrap offcanvases (e.g. site menu vs filters)
+        document.addEventListener('show.bs.offcanvas', function (e) {
+            document.querySelectorAll('.offcanvas.show, .offcanvas-lg.show').forEach(function (openEl) {
+                if (openEl !== e.target) {
+                    const inst = bootstrap.Offcanvas.getInstance(openEl);
+                    if (inst) inst.hide();
+                }
+            });
+        });
     });
 
     // Make TaskTracker available globally
