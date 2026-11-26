@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_licence_select.html" as lic_ui %}
 
 {% block title %}Upload Study Material - EduSpace{% endblock %}
 {% block topbar_title %}Upload Material{% endblock %}
@@ -102,16 +103,13 @@
 
                         <!-- Licence Select (required for public uploads) -->
                         <div class="mb-2 {% if current_user.university_kind != 'public' %}d-none{% endif %}" id="licenseFieldGroup">
-                            <label for="license" class="form-label fw-medium text-body mb-1">
-                                Licence <span class="text-danger" aria-hidden="true">*</span>
-                            </label>
-                            <select class="form-select form-select-sm" id="license" name="license"
-                                {% if current_user.university_kind == 'public' %}required{% endif %}>
-                                <option value="" disabled selected>Select licence</option>
-                                {% for code, label in config.LICENSE_CHOICES %}
-                                <option value="{{ code }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
+                            {{ lic_ui.licence_select(
+                                select_id='license',
+                                select_name='license',
+                                required=(current_user.university_kind == 'public'),
+                                small=True,
+                                collapse_id='uploadLicenceGuide'
+                            ) }}
                             <div class="invalid-feedback">Please choose a licence for public sharing.</div>
                         </div>
 

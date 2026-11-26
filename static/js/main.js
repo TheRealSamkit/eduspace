@@ -414,6 +414,18 @@
                 }
             });
         }
+        // 10. Plain-language licence live description
+        document.querySelectorAll('[data-licence-select="true"]').forEach(function (selectEl) {
+            const targetId = selectEl.dataset.summaryTarget;
+            const summaryEl = targetId ? document.getElementById(targetId) : null;
+            if (!summaryEl) return;
+            function updateSummary() {
+                const opt = selectEl.options[selectEl.selectedIndex];
+                summaryEl.textContent = (opt && opt.dataset.summary) ? opt.dataset.summary : '';
+            }
+            selectEl.addEventListener('change', updateSummary);
+            updateSummary();
+        });
     });
 
     // Make TaskTracker available globally

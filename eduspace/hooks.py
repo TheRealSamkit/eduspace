@@ -10,6 +10,7 @@ import uuid
 from flask import request, session, g, redirect, url_for, abort
 from db import get_db
 from eduspace.security import get_csrf_token
+from eduspace.services.licences import LICENCES, LICENCES_BY_KEY, LICENCE_WARNING
 
 
 def init_hooks(app):
@@ -51,7 +52,10 @@ def init_hooks(app):
         return {
             'current_user': fresh_user,
             'csrf_token': get_csrf_token,
-            'config': app.config
+            'config': app.config,
+            'licences': LICENCES,
+            'licences_by_key': LICENCES_BY_KEY,
+            'licence_warning': LICENCE_WARNING,
         }
 
     @app.before_request

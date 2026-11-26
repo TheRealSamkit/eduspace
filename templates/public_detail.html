@@ -17,7 +17,15 @@
                     <span class="badge border text-body-secondary fw-medium">Semester {{ file.semester }}</span>
                     <span class="badge border text-body-secondary fw-medium">{{ file.subject }}</span>
                     {% if file.license %}
-                    <span class="badge border text-body-secondary fw-medium">Licence: {{ file.license }}</span>
+                    {% set lic_info = licences_by_key.get(file.license) %}
+                    <span class="badge border text-body-secondary fw-medium d-inline-flex align-items-center gap-1">
+                        {{ lic_info.label if lic_info else file.license }}
+                        {% if lic_info %}
+                        <i class="ti ti-info-circle" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="{{ lic_info.plain_summary }}" aria-label="{{ lic_info.plain_summary }}"></i>
+                        {% endif %}
+                        <a href="{{ url_for('pages.terms_page') }}#licences" class="text-body-secondary text-decoration-underline ms-1">Licences explained</a>
+                    </span>
                     {% endif %}
                 </div>
                 <span class="text-body-secondary small">Uploaded {{ file.created_at[:10] if file.created_at else '' }}</span>

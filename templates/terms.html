@@ -79,6 +79,36 @@
                     </ul>
                 </div>
 
+                <div id="licences" class="mb-4">
+                    <h2 class="h6 fw-semibold text-body">6. Licences Explained</h2>
+                    <p class="text-body-secondary small mb-2">
+                        Publicly shared materials require one of the following licences:
+                    </p>
+                    <div class="table-responsive mb-2">
+                        <table class="table table-sm align-middle small">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Option</th>
+                                    <th scope="col">What it means</th>
+                                    <th scope="col">Pick it when</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lic in licences %}
+                                <tr>
+                                    <td class="fw-medium">{{ lic.label }}</td>
+                                    <td class="text-body-secondary">{{ lic.plain_summary }}</td>
+                                    <td class="text-body-secondary">{{ lic.choose_when }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="border rounded-3 p-3 bg-body-tertiary small text-body-secondary">
+                        <i class="ti ti-alert-triangle text-warning me-1" aria-hidden="true"></i>{{ licence_warning }}
+                    </div>
+                </div>
+
                 <div class="pt-3 border-top">
                     <a href="{{ url_for('library.browse') if current_user else url_for('pages.index') }}"
                         class="btn btn-outline-secondary btn-sm">

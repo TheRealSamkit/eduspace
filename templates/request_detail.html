@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_licence_select.html" as lic_ui %}
 
 {% block title %}{{ req.title }} - Requests - EduSpace{% endblock %}
 {% block topbar_title %}Resource Request{% endblock %}
@@ -144,13 +145,14 @@
                 </div>
                 {% if req.visibility == 'public' %}
                 <div class="col-md-6">
-                    <label for="subLicense" class="form-label fw-medium">Licence <span class="text-danger">*</span></label>
-                    <select class="form-select" id="subLicense" name="license" required>
-                        <option value="" disabled selected>Select licence</option>
-                        {% for code, label in config.LICENSE_CHOICES %}
-                        <option value="{{ code }}">{{ label }}</option>
-                        {% endfor %}
-                    </select>
+                    {{ lic_ui.licence_select(
+                        select_id='subLicense',
+                        select_name='license',
+                        required=True,
+                        small=False,
+                        collapse_id='requestLicenceGuide',
+                        label_class='form-label fw-medium'
+                    ) }}
                 </div>
                 {% endif %}
                 <div class="col-12">

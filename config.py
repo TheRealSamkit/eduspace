@@ -1,4 +1,5 @@
 import os
+from eduspace.services.licences import LICENCE_CHOICES as _LICENCE_CHOICES
 
 class Config:
     # Allowed university email domains mapped to University Name
@@ -33,13 +34,7 @@ class Config:
     MAX_REQUEST_REWARDS_PER_DAY = 2
 
     # Licensing Choices for Public Uploads
-    LICENSE_CHOICES = [
-        ("own_work", "Own original work"),
-        ("cc_by", "Open licence: CC BY 4.0"),
-        ("cc_by_sa", "Open licence: CC BY-SA 4.0"),
-        ("cc0", "Open licence: CC0 (No Rights Reserved)"),
-        ("public_domain", "Public Domain"),
-    ]
+    LICENSE_CHOICES = _LICENCE_CHOICES
 
     # File Upload Limits
     MAX_FILE_MB = 10
