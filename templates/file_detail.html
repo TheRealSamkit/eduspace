@@ -89,14 +89,18 @@
                             </div>
                         </div>
 
+                        {% set is_unlocked = (is_uploader or already_downloaded or current_user.is_admin) %}
                         <div class="col-md-6 text-md-end">
-                            {% if is_uploader %}
-                            <div class="small text-body-secondary mb-2">
-                                <i class="ti ti-check text-success me-1" aria-hidden="true"></i>You uploaded this file
-                            </div>
-                            {% elif already_downloaded %}
-                            <div class="small text-body-secondary mb-2">
-                                <i class="ti ti-history text-primary me-1" aria-hidden="true"></i>Previously unlocked
+                            {% if is_unlocked %}
+                            <div class="d-flex flex-wrap justify-content-md-end align-items-center gap-2 mb-2">
+                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle d-inline-flex align-items-center gap-1">
+                                    <i class="ti ti-lock-open" aria-hidden="true"></i>Unlocked
+                                </span>
+                                {% if is_uploader %}
+                                <span class="small text-body-secondary">You uploaded this file</span>
+                                {% elif already_downloaded %}
+                                <span class="small text-body-secondary">Previously unlocked</span>
+                                {% endif %}
                             </div>
                             {% else %}
                             <div class="small text-body-secondary mb-2">
@@ -105,14 +109,16 @@
                             </div>
                             {% endif %}
                             <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                                {% if is_unlocked %}
                                 <button type="button" class="btn btn-outline-secondary btn-preview"
                                     data-file-id="{{ file.id }}"
                                     data-file-title="{{ file.title }}"
                                     data-file-ext="{{ file.original_name.rsplit('.', 1)[-1].lower() if '.' in file.original_name else '' }}"
-                                    data-locked="{{ 'false' if (is_uploader or already_downloaded or current_user.is_admin) else 'true' }}"
-                                    aria-label="Preview {{ file.title }}">
-                                    <i class="ti ti-eye me-1" aria-hidden="true"></i>Preview
+                                    aria-label="View file {{ file.title }}"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="View online">
+                                    <i class="ti ti-eye me-1" aria-hidden="true"></i>View file
                                 </button>
+                                {% endif %}
                                 {% if is_uploader %}
                                 <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
                                     <i class="ti ti-download me-1" aria-hidden="true"></i>Download Your File (Free)
@@ -121,12 +127,20 @@
                                 <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
                                     <i class="ti ti-download me-1" aria-hidden="true"></i>Download Again (Free)
                                 </a>
-                                {% else %}
+                                {% elif current_user.is_admin %}
                                 <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary">
-                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Download ({{ config.DOWNLOAD_COST }} credits)
+                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Download
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary"
+                                    data-unlock-download="true">
+                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Unlock and download, {{ config.DOWNLOAD_COST }} credits
                                 </a>
                                 {% endif %}
                             </div>
+                            {% if not is_unlocked %}
+                            <div class="small text-body-secondary mt-1">Unlock to view or download</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -1,52 +1,40 @@
 """
-Tests for Phase 3: Server-enforced PDF & image preview, caching, and error handling.
+Tests for Phase 4: Unlock-gated /view/<id> endpoint and removal of limited preview config.
 """
 
-import io
 import os
 import tempfile
 import pytest
-from PIL import Image
-from pypdf import PdfReader, PdfWriter
 
 from app import create_app
+from config import Config
 from db import get_db
-
-
-def _make_multipage_pdf(num_pages):
-    writer = PdfWriter()
-    for _ in range(num_pages):
-        writer.add_blank_page(width=200, height=200)
-    buf = io.BytesIO()
-    writer.write(buf)
-    return buf.getvalue()
-
-
-def _make_png(width, height):
-    img = Image.new('RGB', (width, height), color=(20, 90, 180))
-    buf = io.BytesIO()
-    img.save(buf, format='PNG')
-    return buf.getvalue()
 
 
 @pytest.fixture
 def app():
-    """Create isolated test app with multi-page PDF, large PNG, corrupt PDF, and DOCX."""
+    """Create isolated test app with multiple universities, users, and files."""
     db_fd, db_path = tempfile.mkstemp(suffix='.db')
     upload_dir = tempfile.mkdtemp()
     test_app = create_app({
         'TESTING': True,
         'DATABASE': db_path,
         'UPLOAD_FOLDER': upload_dir,
-        'SECRET_KEY': 'preview-test-secret',
+        'SECRET_KEY': 'view-test-secret',
         'ADMIN_EMAIL': 'admin@xyz.edu',
-        'ALLOWED_DOMAINS': {'xyz.edu': 'XYZ University'},
+        'ALLOWED_DOMAINS': {
+            'xyz.edu': 'XYZ University',
+            'abc.edu': 'ABC College',
+        },
     })
     with test_app.app_context():
         db = get_db()
         from werkzeug.security import generate_password_hash
         pwd = generate_password_hash('password123')
         xyz_id = db.execute("SELECT id FROM universities WHERE domain = 'xyz.edu'").fetchone()['id']
+        abc_id = db.execute("SELECT id FROM universities WHERE domain = 'abc.edu'").fetchone()['id']
+
+        # 1: uploader@xyz.edu, 2: viewer@xyz.edu, 3: admin@xyz.edu, 4: outsider@abc.edu
         db.execute(
             "INSERT INTO users (email, username, password_hash, university_id, credits, is_admin) VALUES (?, ?, ?, ?, 30, 0)",
             ('uploader@xyz.edu', 'uploader', pwd, xyz_id)
@@ -55,38 +43,31 @@ def app():
             "INSERT INTO users (email, username, password_hash, university_id, credits, is_admin) VALUES (?, ?, ?, ?, 30, 0)",
             ('viewer@xyz.edu', 'viewer', pwd, xyz_id)
         )
-        db.execute("INSERT INTO consents (user_id) VALUES (1)")
-        db.execute("INSERT INTO consents (user_id) VALUES (2)")
+        db.execute(
+            "INSERT INTO users (email, username, password_hash, university_id, credits, is_admin) VALUES (?, ?, ?, ?, 30, 1)",
+            ('admin@xyz.edu', 'admin', pwd, xyz_id)
+        )
+        db.execute(
+            "INSERT INTO users (email, username, password_hash, university_id, credits, is_admin) VALUES (?, ?, ?, ?, 30, 0)",
+            ('outsider@abc.edu', 'outsider', pwd, abc_id)
+        )
+        for uid in (1, 2, 3, 4):
+            db.execute("INSERT INTO consents (user_id) VALUES (?)", (uid,))
 
-        pdf_bytes = _make_multipage_pdf(6)
-        with open(os.path.join(upload_dir, 'six.pdf'), 'wb') as f:
+        pdf_bytes = b'%PDF-1.4\nFULL_PDF_CONTENT_BYTES\n%%EOF'
+        with open(os.path.join(upload_dir, 'notes.pdf'), 'wb') as f:
             f.write(pdf_bytes)
-        img_bytes = _make_png(1800, 1200)
-        with open(os.path.join(upload_dir, 'big.png'), 'wb') as f:
-            f.write(img_bytes)
-        with open(os.path.join(upload_dir, 'corrupt.pdf'), 'wb') as f:
-            f.write(b'%PDF-1.4\nnot-actually-valid-pdf')
         with open(os.path.join(upload_dir, 'slides.pptx'), 'wb') as f:
-            f.write(b'PK\x03\x04dummy')
+            f.write(b'PK\x03\x04dummy_pptx')
 
         db.execute(
             "INSERT INTO files (uploader_id, university_id, title, subject, semester, type, stored_name, original_name, size, status, visibility, content_hash) "
-            "VALUES (1, ?, 'Six Page PDF', 'CS', 1, 'Lecture Notes', 'six.pdf', 'six.pdf', ?, 'active', 'university', 'hash_six')",
+            "VALUES (1, ?, 'Full PDF Notes', 'CS', 1, 'Lecture Notes', 'notes.pdf', 'notes.pdf', ?, 'active', 'university', 'hash_pdf')",
             (xyz_id, len(pdf_bytes))
         )
         db.execute(
             "INSERT INTO files (uploader_id, university_id, title, subject, semester, type, stored_name, original_name, size, status, visibility, content_hash) "
-            "VALUES (1, ?, 'Big Diagram', 'CS', 1, 'Summaries', 'big.png', 'big.png', ?, 'active', 'university', 'hash_big')",
-            (xyz_id, len(img_bytes))
-        )
-        db.execute(
-            "INSERT INTO files (uploader_id, university_id, title, subject, semester, type, stored_name, original_name, size, status, visibility, content_hash) "
-            "VALUES (1, ?, 'Corrupt PDF', 'CS', 1, 'Summaries', 'corrupt.pdf', 'corrupt.pdf', 30, 'active', 'university', 'hash_corrupt')",
-            (xyz_id,)
-        )
-        db.execute(
-            "INSERT INTO files (uploader_id, university_id, title, subject, semester, type, stored_name, original_name, size, status, visibility, content_hash) "
-            "VALUES (1, ?, 'Slides PPTX', 'CS', 1, 'Lecture Notes', 'slides.pptx', 'slides.pptx', 10, 'active', 'university', 'hash_pptx')",
+            "VALUES (1, ?, 'Slides PPTX', 'CS', 1, 'Lecture Notes', 'slides.pptx', 'slides.pptx', 14, 'active', 'university', 'hash_pptx')",
             (xyz_id,)
         )
         db.commit()
@@ -96,43 +77,63 @@ def app():
         os.unlink(db_path)
 
 
-def test_locked_and_unlocked_pdf_and_image_preview(app):
-    """Locked PDF has only 3 pages; unlocked/downloaded has 6; locked image is downscaled."""
-    client = app.test_client()
-    client.post('/login', data={'email': 'viewer@xyz.edu', 'password': 'password123'})
+def test_config_has_no_preview_constants():
+    """PREVIEW_LOCKED_PAGES and PREVIEW_IMAGE_MAX_PX are removed from Config."""
+    assert not hasattr(Config, 'PREVIEW_LOCKED_PAGES')
+    assert not hasattr(Config, 'PREVIEW_IMAGE_MAX_PX')
 
-    # Locked PDF preview -> 3 pages, headers set, credits unchanged
-    res_pdf = client.get('/preview/1')
-    assert res_pdf.status_code == 200
-    assert 'no-store' in res_pdf.headers.get('Cache-Control', '')
-    assert res_pdf.headers.get('X-Content-Type-Options') == 'nosniff'
-    reader = PdfReader(io.BytesIO(res_pdf.data))
-    assert len(reader.pages) == 3
 
-    # Locked image preview -> max 900px on longest side
-    res_img = client.get('/preview/2')
-    assert res_img.status_code == 200
-    with Image.open(io.BytesIO(res_img.data)) as img:
-        assert max(img.size) <= 900
+def test_view_file_access_matrix(app):
+    """Verify /view/<id> across guest, other-uni, locked, uploader, downloader, and admin."""
+    # 1. Guest -> login redirect
+    guest_client = app.test_client()
+    res_guest = guest_client.get('/view/1')
+    assert res_guest.status_code == 302
+    assert '/login' in res_guest.headers.get('Location', '')
 
-    # Corrupt PDF -> 422, not 500
-    res_corrupt = client.get('/preview/3')
-    assert res_corrupt.status_code == 422
+    # 2. Other university -> 404
+    abc_client = app.test_client()
+    abc_client.post('/login', data={'email': 'outsider@abc.edu', 'password': 'password123'})
+    assert abc_client.get('/view/1').status_code == 404
 
-    # Unsupported PPTX -> 415
-    res_pptx = client.get('/preview/4')
-    assert res_pptx.status_code == 415
+    # 3. Same-scope locked -> redirect to detail with warning toast and NO file bytes
+    viewer_client = app.test_client()
+    viewer_client.post('/login', data={'email': 'viewer@xyz.edu', 'password': 'password123'})
+    res_locked = viewer_client.get('/view/1', follow_redirects=False)
+    assert res_locked.status_code == 302
+    assert '/file/1' in res_locked.headers.get('Location', '')
+    assert b'FULL_PDF_CONTENT_BYTES' not in res_locked.data
+    res_detail = viewer_client.get('/file/1')
+    assert b'Unlock this file to view it' in res_detail.data
 
-    # Download file 1 -> unlocks full 6 pages for preview
-    dl_res = client.get('/download/1')
+    # 4. Uploader -> 200 with full file and security headers
+    uploader_client = app.test_client()
+    uploader_client.post('/login', data={'email': 'uploader@xyz.edu', 'password': 'password123'})
+    res_up = uploader_client.get('/view/1')
+    assert res_up.status_code == 200
+    assert b'FULL_PDF_CONTENT_BYTES' in res_up.data
+    assert 'no-store' in res_up.headers.get('Cache-Control', '')
+    assert res_up.headers.get('X-Content-Type-Options') == 'nosniff'
+
+    # 5. Admin -> 200 with full file
+    admin_client = app.test_client()
+    admin_client.post('/login', data={'email': 'admin@xyz.edu', 'password': 'password123'})
+    res_admin = admin_client.get('/view/1')
+    assert res_admin.status_code == 200
+    assert b'FULL_PDF_CONTENT_BYTES' in res_admin.data
+
+    # 6. Unsupported type (for unlocked uploader) -> 415
+    assert uploader_client.get('/view/2').status_code == 415
+
+    # 7. Downloader -> downloads then views full file; 'file_view' event logged
+    dl_res = viewer_client.get('/download/1')
     assert dl_res.status_code == 200
-    assert len(PdfReader(io.BytesIO(dl_res.data)).pages) == 6
-
-    res_unlocked = client.get('/preview/1')
+    assert b'FULL_PDF_CONTENT_BYTES' in dl_res.data
+    res_unlocked = viewer_client.get('/view/1')
     assert res_unlocked.status_code == 200
-    assert len(PdfReader(io.BytesIO(res_unlocked.data)).pages) == 6
+    assert b'FULL_PDF_CONTENT_BYTES' in res_unlocked.data
 
     with app.app_context():
         db = get_db()
-        evt = db.execute("SELECT * FROM events WHERE event_type = 'preview_open'").fetchone()
+        evt = db.execute("SELECT * FROM events WHERE event_type = 'file_view'").fetchone()
         assert evt is not None

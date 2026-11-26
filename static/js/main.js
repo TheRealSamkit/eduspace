@@ -228,6 +228,11 @@
                 // If downloading a file, schedule instant credit chip sync
                 const href = target.getAttribute('href') || '';
                 if (href.indexOf('/download/') !== -1) {
+                    if (target.dataset.unlockDownload === 'true' && window.showToast) {
+                        setTimeout(function () {
+                            window.showToast('Unlocked. You can view or download this file any time.', 'success');
+                        }, 400);
+                    }
                     setTimeout(window.refreshCredits, 600);
                     setTimeout(window.refreshCredits, 2000);
                 }

@@ -22,8 +22,7 @@ from eduspace.services.files import (
 from eduspace.services.credits import process_download_transaction
 from eduspace.services.visibility import can_view_file, is_public_member
 from eduspace.services.preview import (
-    is_file_unlocked, get_preview_kind,
-    get_or_create_locked_pdf, get_or_create_locked_image
+    is_file_unlocked, get_unlocked_file_ids, get_view_kind
 )
 from eduspace.services.telemetry import log_event_entry
 
@@ -75,7 +74,8 @@ def browse():
         type_filter=type_filter,
         sort_by=sort_by,
         subjects=result['subjects'],
-        bookmarked_ids=get_bookmarked_file_ids(db, g.user['id'])
+        bookmarked_ids=get_bookmarked_file_ids(db, g.user['id']),
+        unlocked_ids=get_unlocked_file_ids(db, g.user, [f['id'] for f in result['files']])
     )
 
 
@@ -102,7 +102,8 @@ def saved():
         total_pages=result['total_pages'],
         search_query=search_query,
         sort_by=sort_by,
-        bookmarked_ids=get_bookmarked_file_ids(db, g.user['id'])
+        bookmarked_ids=get_bookmarked_file_ids(db, g.user['id']),
+        unlocked_ids=get_unlocked_file_ids(db, g.user, [f['id'] for f in result['files']])
     )
 
 
@@ -289,57 +290,44 @@ def download_file(file_id):
     )
 
 
-@bp.route('/preview/<int:file_id>')
+@bp.route('/view/<int:file_id>')
 @login_required
-def preview_file(file_id):
+def view_file(file_id):
     """
-    Serve an inline preview of a study material (server-enforced lock for unpaid users).
+    Serve an unlocked study material inline (PDF or image) with no-store headers.
 
-    Returns:
-        Response: Inline PDF/image stream with no-store and nosniff headers, or JSON error.
+    Guests are redirected to login. Files outside the user's scope return 404.
+    Locked files redirect to the detail page with a warning toast and no bytes.
     """
     db = get_db()
     file = db.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
     if not can_view_file(g.user, file):
         abort(404, description="Material not found or access restricted.")
 
-    kind = get_preview_kind(file['original_name'])
+    if not is_file_unlocked(db, g.user, file):
+        flash("Unlock this file to view it", "warning")
+        return redirect(url_for('library.file_detail', file_id=file_id))
+
+    kind = get_view_kind(file['original_name'])
     if kind == 'unsupported':
-        return jsonify({'error': 'Preview not available for this file type.'}), 415
+        return jsonify({'error': 'View not available for this file type.'}), 415
 
     upload_folder = current_app.config.get('UPLOAD_FOLDER', Config.UPLOAD_FOLDER)
     source_path = os.path.join(upload_folder, file['stored_name'])
     if not os.path.isfile(source_path):
         return jsonify({'error': 'File not found on server.'}), 404
 
-    unlocked = is_file_unlocked(db, g.user, file)
-    content_hash = file['content_hash'] or file['stored_name']
-    cache_dir = os.path.join(os.path.dirname(os.path.abspath(upload_folder)), 'previews')
     ext = file['original_name'].rsplit('.', 1)[-1].lower()
-
-    if unlocked:
-        target_path = source_path
-    else:
-        try:
-            if kind == 'pdf':
-                max_pages = current_app.config.get('PREVIEW_LOCKED_PAGES', Config.PREVIEW_LOCKED_PAGES)
-                target_path = get_or_create_locked_pdf(source_path, content_hash, cache_dir, max_pages)
-            else:
-                max_px = current_app.config.get('PREVIEW_IMAGE_MAX_PX', Config.PREVIEW_IMAGE_MAX_PX)
-                target_path = get_or_create_locked_image(source_path, content_hash, ext, cache_dir, max_px)
-        except ValueError as exc:
-            return jsonify({'error': str(exc)}), 422
-
     try:
         log_event_entry(
             db, g.session_id, g.user['id'],
-            'preview_open', request.path, f"file_id={file_id},locked={not unlocked}"
+            'file_view', request.path, f"file_id={file_id}"
         )
     except Exception:
         pass
 
     mimetype = 'application/pdf' if kind == 'pdf' else ('image/png' if ext == 'png' else 'image/jpeg')
-    resp = send_file(target_path, mimetype=mimetype, as_attachment=False)
+    resp = send_file(source_path, mimetype=mimetype, as_attachment=False)
     resp.headers['Cache-Control'] = 'private, no-store'
     resp.headers['X-Content-Type-Options'] = 'nosniff'
     return resp

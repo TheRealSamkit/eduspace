@@ -8,6 +8,7 @@ study materials while requiring authentication for preview, download, and action
 from flask import Blueprint, render_template, request, redirect, url_for, g, abort
 from db import get_db
 from eduspace.services.files import query_browse_materials, get_bookmarked_file_ids
+from eduspace.services.preview import get_unlocked_file_ids
 from eduspace.services.telemetry import log_event_entry
 
 bp = Blueprint('public', __name__)
@@ -49,6 +50,7 @@ def public_library():
             pass
 
     bookmarked_ids = get_bookmarked_file_ids(db, g.user['id']) if g.user else set()
+    unlocked_ids = get_unlocked_file_ids(db, g.user, [f['id'] for f in result['files']]) if g.user else set()
 
     return render_template(
         'public_library.html',
@@ -62,7 +64,8 @@ def public_library():
         type_filter=type_filter,
         sort_by=sort_by,
         subjects=result['subjects'],
-        bookmarked_ids=bookmarked_ids
+        bookmarked_ids=bookmarked_ids,
+        unlocked_ids=unlocked_ids
     )
 
 

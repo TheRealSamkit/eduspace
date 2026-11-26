@@ -1,10 +1,10 @@
-{# Accessible Document & Image Preview Modal #}
+{# Accessible Document & Image Viewer Modal #}
 <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-fullscreen-sm-down modal-dialog-scrollable" id="previewModalDialog">
         <div class="modal-content">
             <div class="modal-header py-2 px-3 border-bottom gap-2 flex-wrap">
                 <h2 class="modal-title h6 fw-semibold text-body text-truncate mb-0 me-auto" id="previewModalTitle">
-                    Document Preview
+                    View file
                 </h2>
                 <div id="previewPageControls" class="d-none d-flex align-items-center gap-1">
                     <button type="button" class="btn btn-outline-secondary btn-sm" id="previewPrevPage"
@@ -38,31 +38,21 @@
                         aria-label="Toggle fullscreen" data-bs-toggle="tooltip" title="Fullscreen (F)">
                         <i class="ti ti-maximize fs-5" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Close preview"></button>
+                    <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Close viewer"></button>
                 </div>
-            </div>
-
-            <div id="previewLockedBanner" class="d-none px-3 py-2 bg-body-tertiary border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
-                <span class="small text-body-secondary">
-                    <i class="ti ti-lock me-1" aria-hidden="true"></i>
-                    Preview shows the first {{ config.PREVIEW_LOCKED_PAGES }} pages. Unlock to see everything.
-                </span>
-                <a href="#" id="previewUnlockBtn" class="btn btn-primary btn-sm">
-                    <i class="ti ti-download me-1" aria-hidden="true"></i>Unlock ({{ config.DOWNLOAD_COST }} credits)
-                </a>
             </div>
 
             <div class="modal-body bg-body-tertiary p-3 d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
                 <div id="previewLoading" class="text-center py-5">
                     <div class="spinner-border text-primary mb-2" role="status">
-                        <span class="visually-hidden">Loading preview...</span>
+                        <span class="visually-hidden">Loading file...</span>
                     </div>
-                    <div class="small text-body-secondary">Loading preview...</div>
+                    <div class="small text-body-secondary">Loading file...</div>
                 </div>
 
                 <div id="previewError" class="d-none text-center py-5">
                     <i class="ti ti-file-off fs-1 text-body-secondary mb-2 d-block" aria-hidden="true"></i>
-                    <p class="text-body-secondary mb-0" id="previewErrorMsg">Preview not available for this file type.</p>
+                    <p class="text-body-secondary mb-0" id="previewErrorMsg">View not available for this file type.</p>
                 </div>
 
                 <div id="previewPdfWrap" class="d-none w-100 overflow-auto text-center">

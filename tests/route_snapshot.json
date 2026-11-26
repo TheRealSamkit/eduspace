@@ -161,12 +161,6 @@
     ]
   },
   {
-    "rule": "/preview/<int:file_id>",
-    "methods": [
-      "GET"
-    ]
-  },
-  {
     "rule": "/register",
     "methods": [
       "GET",
@@ -253,6 +247,12 @@
     "methods": [
       "GET",
       "POST"
+    ]
+  },
+  {
+    "rule": "/view/<int:file_id>",
+    "methods": [
+      "GET"
     ]
   }
 ]

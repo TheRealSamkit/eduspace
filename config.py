@@ -22,9 +22,7 @@ class Config:
     PUBLIC_SIGNUP_BONUS = 10
     PUBLIC_SIGNUPS_PER_HOUR_PER_IP = 5
 
-    # Preview & Moderation Settings
-    PREVIEW_LOCKED_PAGES = 3
-    PREVIEW_IMAGE_MAX_PX = 900
+    # Moderation Settings
     REPORTS_TO_AUTOHIDE = 3
 
     # Resource Requests Settings

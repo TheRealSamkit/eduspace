@@ -92,8 +92,8 @@ def test_guest_library_and_detail_access(app):
     res_priv = client.get('/library/1')
     assert res_priv.status_code == 404
 
-    # Guest cannot preview or download
-    assert client.get('/preview/2').status_code == 302
+    # Guest cannot view or download
+    assert client.get('/view/2').status_code == 302
     assert client.get('/download/2').status_code == 302
 
     # Landing page shows real public count
@@ -133,7 +133,7 @@ def test_public_signup_honeypot_ratelimit_and_isolation(app):
     # Consent and check isolation
     client.post('/consent', data={'agree_consent': 'on'}, follow_redirects=True)
     assert client.get('/file/1').status_code == 404
-    assert client.get('/preview/1').status_code == 404
+    assert client.get('/view/1').status_code == 404
     assert client.get('/download/1').status_code == 404
     assert client.get('/file/2').status_code == 200
     dash = client.get('/dashboard')

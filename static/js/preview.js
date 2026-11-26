@@ -22,8 +22,6 @@
             modal: document.getElementById('previewModal'),
             dialog: document.getElementById('previewModalDialog'),
             title: document.getElementById('previewModalTitle'),
-            lockedBanner: document.getElementById('previewLockedBanner'),
-            unlockLink: document.getElementById('previewUnlockBtn'),
             spinner: document.getElementById('previewLoading'),
             errorBox: document.getElementById('previewError'),
             errorMsg: document.getElementById('previewErrorMsg'),
@@ -116,11 +114,9 @@
         lastTrigger = trigger;
 
         const fileId = trigger.dataset.fileId;
-        const title = trigger.dataset.fileTitle || 'Document Preview';
+        const title = trigger.dataset.fileTitle || 'View file';
         const ext = (trigger.dataset.fileExt || '').toLowerCase();
-        const locked = trigger.dataset.locked === 'true';
-        const previewUrl = `/preview/${encodeURIComponent(fileId)}`;
-        const downloadUrl = `/download/${encodeURIComponent(fileId)}`;
+        const viewUrl = `/view/${encodeURIComponent(fileId)}`;
 
         els.title.textContent = title;
         els.errorBox.classList.add('d-none');
@@ -128,8 +124,6 @@
         els.imgWrap.classList.add('d-none');
         els.pageControls.classList.add('d-none');
         els.spinner.classList.remove('d-none');
-        els.unlockLink.href = downloadUrl;
-        els.lockedBanner.classList.toggle('d-none', !locked);
 
         const bsModal = bootstrap.Modal.getOrCreateInstance(els.modal);
         bsModal.show();
@@ -142,11 +136,11 @@
                 return;
             }
             window.pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER_SRC;
-            fetch(previewUrl, { credentials: 'same-origin' })
+            fetch(viewUrl, { credentials: 'same-origin' })
                 .then(function (res) {
                     if (!res.ok) {
                         return res.json().catch(function () { return {}; }).then(function (d) {
-                            throw new Error(d.error || 'Preview not available for this file.');
+                            throw new Error(d.error || 'View not available for this file.');
                         });
                     }
                     return res.arrayBuffer();
@@ -170,11 +164,11 @@
             imgFit = true;
             imgScale = 1.0;
             els.btnZoom100.classList.remove('d-none');
-            fetch(previewUrl, { credentials: 'same-origin' })
+            fetch(viewUrl, { credentials: 'same-origin' })
                 .then(function (res) {
                     if (!res.ok) {
                         return res.json().catch(function () { return {}; }).then(function (d) {
-                            throw new Error(d.error || 'Preview not available for this file.');
+                            throw new Error(d.error || 'View not available for this file.');
                         });
                     }
                     return res.blob();

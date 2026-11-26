@@ -47,7 +47,7 @@
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-4">
     {% for f in files %}
     <div class="col">
-        {{ ui.file_card(f, config, bookmarked_ids=bookmarked_ids, show_bookmark=(not is_guest), is_guest=is_guest) }}
+        {{ ui.file_card(f, config, bookmarked_ids=bookmarked_ids, show_bookmark=(not is_guest), is_guest=is_guest, unlocked_ids=unlocked_ids) }}
     </div>
     {% endfor %}
 </div>

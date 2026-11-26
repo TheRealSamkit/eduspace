@@ -90,13 +90,16 @@
                         </td>
                         <td class="text-end">
                             <div class="d-inline-flex gap-2">
+                                {% if req.requester_id == current_user.id or sub.submitter_id == current_user.id or current_user.is_admin %}
                                 <button type="button" class="btn btn-outline-secondary btn-sm btn-preview"
                                     data-file-id="{{ sub.file_id }}"
                                     data-file-title="{{ sub.file_title }}"
                                     data-file-ext="{{ sub.original_name.rsplit('.', 1)[-1].lower() if '.' in sub.original_name else 'pdf' }}"
-                                    data-locked="{{ 'false' if (req.requester_id == current_user.id or sub.submitter_id == current_user.id or current_user.is_admin) else 'true' }}">
-                                    <i class="ti ti-eye me-1" aria-hidden="true"></i>Preview
+                                    aria-label="View file {{ sub.file_title }}"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="View online">
+                                    <i class="ti ti-eye me-1" aria-hidden="true"></i>View file
                                 </button>
+                                {% endif %}
                                 <a href="{{ url_for('library.download_file', file_id=sub.file_id) }}" class="btn btn-outline-secondary btn-sm">
                                     <i class="ti ti-download me-1" aria-hidden="true"></i>{{ 'Download (Free)' if req.requester_id == current_user.id else 'Download' }}
                                 </a>
