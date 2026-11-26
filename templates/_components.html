@@ -118,7 +118,7 @@
                     <span class="text-body-secondary">({{ f.rating_count }})</span>
                 </div>
                 <span class="badge border text-body fw-medium">
-                    {{ config.DOWNLOAD_COST }} credits
+                    {{ pluralize(config.DOWNLOAD_COST, 'credit') }}
                 </span>
             </div>
         </div>
@@ -144,7 +144,7 @@
                 <a href="{{ url_for('library.download_file', file_id=f.id) }}"
                     class="btn btn-outline-secondary btn-sm flex-grow-1"
                     data-unlock-download="true">
-                    Unlock and download, {{ config.DOWNLOAD_COST }} credits
+                    Unlock and download, {{ pluralize(config.DOWNLOAD_COST, 'credit') }}
                 </a>
                 {% endif %}
                 {% if show_bookmark %}

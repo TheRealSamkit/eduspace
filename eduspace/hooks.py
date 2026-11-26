@@ -13,6 +13,13 @@ from eduspace.security import get_csrf_token
 from eduspace.services.licences import LICENCES, LICENCES_BY_KEY, LICENCE_WARNING
 
 
+def pluralize(count, singular, plural=None):
+    """Return '1 <singular>' or '<count> <plural>' with proper English singular/plural."""
+    n = int(count or 0)
+    word = singular if n == 1 else (plural or f"{singular}s")
+    return f"{n} {word}"
+
+
 def init_hooks(app):
     """
     Register context processors and request lifecycle hooks on the Flask application.
@@ -20,6 +27,7 @@ def init_hooks(app):
     Args:
         app (Flask): The Flask application instance.
     """
+    app.jinja_env.globals['pluralize'] = pluralize
 
     @app.context_processor
     def inject_global_template_data():

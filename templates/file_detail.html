@@ -60,7 +60,7 @@
                     </span>
                     <span>&middot;</span>
                     <span>
-                        <i class="ti ti-download me-1" aria-hidden="true"></i>{{ file.download_count }} downloads
+                        <i class="ti ti-download me-1" aria-hidden="true"></i>{{ pluralize(file.download_count, 'download') }}
                     </span>
                 </div>
 
@@ -93,8 +93,7 @@
                                             {% endfor %}
                                     </div>
                                     <div class="small text-body-secondary">
-                                        {{ file.rating_count }} student rating{{ 's' if file.rating_count != 1 else ''
-                                        }}
+                                        {{ pluralize(file.rating_count, 'student rating') }}
                                     </div>
                                 </div>
                             </div>
@@ -145,7 +144,7 @@
                                 {% else %}
                                 <a href="{{ url_for('library.download_file', file_id=file.id) }}" class="btn btn-primary"
                                     data-unlock-download="true">
-                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Unlock and download, {{ config.DOWNLOAD_COST }} credits
+                                    <i class="ti ti-download me-1" aria-hidden="true"></i>Unlock and download, {{ pluralize(config.DOWNLOAD_COST, 'credit') }}
                                 </a>
                                 {% endif %}
                             </div>

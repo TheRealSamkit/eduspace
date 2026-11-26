@@ -35,7 +35,7 @@
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
             <div class="small text-body-secondary">
                 Requested by <strong>{{ req.requester_username }}</strong> &middot;
-                <span class="req-interest-count" data-req-id="{{ req.id }}">{{ req.interest_count }}</span> students interested
+                <span class="req-interest-count" data-req-id="{{ req.id }}">{{ req.interest_count }}</span> <span class="req-interest-word" data-req-id="{{ req.id }}">{{ 'student' if req.interest_count == 1 else 'students' }}</span> interested
             </div>
             <div class="d-flex align-items-center gap-2">
                 {% if req.requester_id != current_user.id and req.status in ('open', 'answered') %}

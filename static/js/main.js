@@ -377,6 +377,9 @@
                     document.querySelectorAll('.req-interest-count[data-req-id="' + reqId + '"]').forEach(function (el) {
                         el.textContent = data.count;
                     });
+                    document.querySelectorAll('.req-interest-word[data-req-id="' + reqId + '"]').forEach(function (el) {
+                        el.textContent = (Number(data.count) === 1) ? 'student' : 'students';
+                    });
                     document.querySelectorAll('.req-reward-val[data-req-id="' + reqId + '"]').forEach(function (el) {
                         el.textContent = data.reward;
                     });
