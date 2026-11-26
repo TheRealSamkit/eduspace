@@ -5,58 +5,10 @@
 {% block extra_head %}
 <meta name="description"
     content="EduSpace is a peer-to-peer academic resource platform where verified university students share course notes, past exams, and study guides within their institution.">
-<meta name="color-scheme" content="light">
 <meta property="og:title" content="EduSpace - Peer-to-Peer Academic Resource Exchange">
 <meta property="og:description"
     content="Exchange course notes, past papers, and study guides with students in your university courses.">
 <meta property="og:type" content="website">
-{% endblock %}
-
-{% block body_attrs %}data-no-theme-toggle="true"{% endblock %}
-
-{% block guest_header %}
-<header class="border-bottom bg-body sticky-top">
-    <nav class="navbar navbar-expand-lg py-2" aria-label="Main landing navigation">
-        <div class="container-xl">
-            <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 text-body text-decoration-none"
-                href="{{ url_for('pages.index') }}">
-                <span class="fs-4 fw-bold"><span class="text-primary">Edu</span><span
-                        class="text-success">Space</span></span>
-            </a>
-
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
-                data-bs-target="#landingNavbar" aria-controls="landingNavbar" aria-expanded="false"
-                aria-label="Toggle navigation menu">
-                <i class="ti ti-menu-2 fs-4" aria-hidden="true"></i>
-            </button>
-
-            <div class="collapse navbar-collapse" id="landingNavbar">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-body-secondary" href="{{ url_for('public.public_library') }}">Public library</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-body-secondary" href="#how-it-works">How it works</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-body-secondary" href="#credits">Credits</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-body-secondary" href="#your-university">Your university</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-body-secondary" href="#faq">FAQ</a>
-                    </li>
-                </ul>
-
-                <div class="d-flex align-items-center gap-2 pt-2 pt-lg-0 border-top border-lg-0">
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-secondary">Sign in</a>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-outline-secondary">Register</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-</header>
 {% endblock %}
 
 {% block guest_main %}
@@ -589,28 +541,4 @@
     </section>
 
 </main>
-{% endblock %}
-
-{% block guest_footer %}
-<footer class="py-4 border-top bg-dark mt-auto">
-    <div class="container-xl">
-        <div class="row g-3 align-items-center justify-content-between">
-            <div class="col-md-6 text-body-secondary small">
-                <div>&copy; 2026 EduSpace. Peer-to-peer academic resource exchange.</div>
-                <div class="mt-1">Student academic project. Built for institutional note exchange.</div>
-                <div class="mt-1 text-white opacity-75">AI Tools Disclosure: Built with the help of an AI coding
-                    agent.</div>
-            </div>
-            <div class="col-md-6 text-md-end text-body-secondary small">
-                <div class="d-flex flex-wrap gap-3 justify-content-md-end">
-                    <a href="{{ url_for('pages.terms_page') }}" class="text-body-secondary text-decoration-none">Terms
-                        and Copyright</a>
-                    <a href="{{ url_for('auth.login') }}" class="text-body-secondary text-decoration-none">Sign in</a>
-                    <a href="{{ url_for('auth.register') }}" class="text-body-secondary text-decoration-none">Create
-                        account</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
 {% endblock %}

@@ -150,19 +150,11 @@ def test_landing_page_logged_out(client):
 
     assert '!' not in all_text, "Exclamation mark '!' found in landing page text"
 
-    # 5. NO theme toggle element (no .btn-theme-toggle, no ti-moon or ti-sun icon)
-    assert inspector.btn_theme_toggle_count == 0, f"Expected 0 theme toggle buttons, found {inspector.btn_theme_toggle_count}"
-    assert inspector.theme_icon_count == 0, f"Expected 0 moon/sun icons, found {inspector.theme_icon_count}"
+    # 5. Shared guest header includes theme toggle on all guest pages
+    assert inspector.btn_theme_toggle_count >= 1, f"Expected theme toggle buttons in shared guest header, found {inspector.btn_theme_toggle_count}"
+    assert inspector.theme_icon_count >= 1, f"Expected moon/sun icons in shared guest header, found {inspector.theme_icon_count}"
 
-    # 6. Page flag disabling T shortcut is present on body
-    assert inspector.body_attrs.get('data-no-theme-toggle') == 'true', "Expected data-no-theme-toggle='true' on <body>"
-
-    # 7. Forced light theme: meta tag present, head script sets light without reading localStorage
-    assert '<meta content="light" name="color-scheme"/>' in html or '<meta name="color-scheme" content="light">' in html
-    assert "document.documentElement.setAttribute('data-bs-theme', 'light');" in html
-    assert "localStorage.getItem('theme')" not in html, "Landing page inline script must not depend on localStorage"
-
-    # 8. Credit numbers match config.py
+    # 6. Credit numbers match config.py
     assert str(Config.SIGNUP_BONUS) in html
     assert str(Config.UPLOAD_REWARD) in html
     assert str(Config.DOWNLOAD_COST) in html
@@ -187,7 +179,7 @@ def test_login_page_resolves_theme_automatically(client):
     html = res.data.decode('utf-8')
     assert "localStorage.getItem('theme')" in html, "/login must read stored theme"
     assert "prefers-color-scheme" in html, "/login must fall back to prefers-color-scheme"
-    assert "btn-theme-toggle" not in html, "/login must omit the manual theme toggle"
+    assert "btn-theme-toggle" in html, "/login must include the shared guest header theme toggle"
     assert 'data-no-theme-toggle="true"' not in html, "/login must not have data-no-theme-toggle"
     assert '<meta name="color-scheme" content="light">' not in html, "/login must not force light color-scheme"
 

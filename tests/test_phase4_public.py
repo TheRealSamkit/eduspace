@@ -82,7 +82,8 @@ def test_guest_library_and_detail_access(app):
     assert res_list.status_code == 200
     assert b'Public Open Guide' in res_list.data
     assert b'Private XYZ Doc' not in res_list.data
-    assert b'Sign in to unlock' in res_list.data
+    assert b'Sign in' in res_list.data
+    assert b'Sign in to unlock' not in res_list.data
 
     res_pub = client.get('/library/2')
     assert res_pub.status_code == 200

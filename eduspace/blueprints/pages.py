@@ -42,7 +42,6 @@ def index():
     ).fetchall()
     return render_template(
         'landing.html',
-        force_light=True,
         public_count=public_count,
         recent_public_files=recent_public_files
     )

@@ -397,6 +397,18 @@
                 }
             });
         });
+
+        // Close guest navigation offcanvas when clicking an anchor link inside it
+        const guestNavOffcanvas = document.getElementById('guestNavOffcanvas');
+        if (guestNavOffcanvas) {
+            guestNavOffcanvas.addEventListener('click', function (e) {
+                const link = e.target.closest('a[href*="#"]');
+                if (link) {
+                    const inst = bootstrap.Offcanvas.getInstance(guestNavOffcanvas);
+                    if (inst) inst.hide();
+                }
+            });
+        }
     });
 
     // Make TaskTracker available globally

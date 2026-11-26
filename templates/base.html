@@ -365,29 +365,13 @@
 
     {% else %}
     <!-- ========================================================
-         PUBLIC / LOGGED-OUT NAVIGATION (Landing, Login, Register)
+         PUBLIC / LOGGED-OUT NAVIGATION (Shared Guest Shell)
          ======================================================== -->
-    {% block guest_header %}
-    <header class="border-bottom bg-body py-2">
-        <div class="px-3 px-lg-4 d-flex justify-content-between align-items-center">
-            <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 text-body text-decoration-none"
-                href="{{ url_for('pages.index') }}">
-                <div class="wrapper fw-bold fs-3"><span class="text-primary">Edu</span><span
-                        class="text-success">Space</span></div>
-            </a>
-
-            <div class="d-flex align-items-center gap-2">
-                <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-secondary">Sign in</a>
-                <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-primary">Create account</a>
-            </div>
-        </div>
-    </header>
-    {% endblock %}
+    {% include "_guest_header.html" %}
 
     {% block guest_main %}
-    <!-- Main Content for Guests: Consistent px-3 px-lg-4 py-4 wrapper -->
-    <main id="main-content" class="flex-grow-1 px-3 px-lg-4 py-4">
-        <div class="container-fluid p-0">
+    <main id="main-content" class="flex-grow-1 py-4">
+        <div class="container-xl">
             {% block content_guest %}
             {{ self.content() }}
             {% endblock %}
@@ -395,20 +379,7 @@
     </main>
     {% endblock %}
 
-    {% block guest_footer %}
-    <!-- Public Footer -->
-    <footer class="py-3 px-3 px-lg-4 border-top bg-body mt-auto">
-        <div class="d-flex flex-wrap justify-content-between align-items-center small text-body-secondary gap-2">
-            <span>&copy; 2026 EduSpace. Peer-to-Peer Academic Resource Exchange.</span>
-            <div class="d-flex gap-3">
-                <a href="{{ url_for('pages.terms_page') }}" class="text-body-secondary text-decoration-none">Terms &
-                    Copyright</a>
-                <a href="{{ url_for('auth.login') }}" class="text-body-secondary text-decoration-none">Sign In</a>
-                <a href="{{ url_for('auth.register') }}" class="text-body-secondary text-decoration-none">Register</a>
-            </div>
-        </div>
-    </footer>
-    {% endblock %}
+    {% include "_guest_footer.html" %}
     {% endif %}
 
     <!-- Toast Notification Container (Positioned Below Topbar) -->
