@@ -1,11 +1,12 @@
 /**
- * EduSpace Document & Image Preview Modal Controller
- * Uses vendored pdf.js (3.11.174) for PDFs and native zoom/pan for images.
+ * EduSpace Document & Image Viewer Modal Controller
+ * Uses vendored pdf.js (3.11.174) for PDFs and native zoom/fit for images.
  */
 (function () {
     'use strict';
 
     const WORKER_SRC = '/static/vendor/pdfjs/pdf.worker.min.js';
+    const MAX_FIT_SCALE = 2.2;
     let pdfDoc = null;
     let currentPage = 1;
     let totalPages = 1;
@@ -16,11 +17,13 @@
     let activeKind = null;
     let lastTrigger = null;
     let renderTask = null;
+    let resizeTimer = null;
 
     function getEls() {
         return {
             modal: document.getElementById('previewModal'),
             dialog: document.getElementById('previewModalDialog'),
+            body: document.getElementById('previewModalBody'),
             title: document.getElementById('previewModalTitle'),
             spinner: document.getElementById('previewLoading'),
             errorBox: document.getElementById('previewError'),
@@ -41,6 +44,14 @@
         };
     }
 
+    function canUseFullscreenApi(modalEl) {
+        return Boolean(
+            modalEl &&
+            typeof modalEl.requestFullscreen === 'function' &&
+            document.fullscreenEnabled !== false
+        );
+    }
+
     function showError(msg) {
         const els = getEls();
         els.spinner.classList.add('d-none');
@@ -58,18 +69,27 @@
         els.btnNext.disabled = currentPage >= totalPages;
     }
 
+    function getAvailableWidth(els) {
+        const wrapW = els.pdfWrap && els.pdfWrap.clientWidth ? els.pdfWrap.clientWidth : 0;
+        const bodyW = els.body && els.body.clientWidth ? els.body.clientWidth : 0;
+        const dialogW = els.dialog && els.dialog.clientWidth ? els.dialog.clientWidth : 0;
+        const raw = wrapW || bodyW || dialogW || 720;
+        return Math.max(280, raw - 32);
+    }
+
     function renderPdfPage(num) {
         if (!pdfDoc) return;
         const els = getEls();
         if (renderTask) {
             try { renderTask.cancel(); } catch (e) { }
         }
+        els.pdfWrap.classList.remove('d-none');
         pdfDoc.getPage(num).then(function (page) {
             const unscaled = page.getViewport({ scale: 1 });
             let scale = pdfScale;
             if (fitMode === 'width') {
-                const avail = Math.max(300, els.pdfWrap.clientWidth - 32);
-                scale = avail / unscaled.width;
+                const avail = getAvailableWidth(els);
+                scale = Math.min(MAX_FIT_SCALE, Math.max(0.5, avail / unscaled.width));
                 pdfScale = scale;
             }
             const dpr = window.devicePixelRatio || 1;
@@ -100,12 +120,42 @@
         if (!imgEl) return;
         if (imgFit) {
             imgEl.style.maxWidth = '100%';
+            const bodyH = els.body && els.body.clientHeight ? Math.max(240, els.body.clientHeight - 32) : 0;
+            imgEl.style.maxHeight = bodyH ? bodyH + 'px' : '75vh';
             imgEl.style.width = 'auto';
+            imgEl.style.height = 'auto';
         } else {
             imgEl.style.maxWidth = 'none';
+            imgEl.style.maxHeight = 'none';
             const natW = imgEl.naturalWidth || 800;
             imgEl.style.width = Math.round(natW * imgScale) + 'px';
+            imgEl.style.height = 'auto';
         }
+    }
+
+    function refitActiveContent() {
+        if (activeKind === 'pdf' && pdfDoc && fitMode === 'width') {
+            renderPdfPage(currentPage);
+        } else if (activeKind === 'image' && imgFit) {
+            applyImageZoom();
+        }
+    }
+
+    function syncFullscreenUI(isFs) {
+        const els = getEls();
+        if (!els.modal) return;
+        els.modal.classList.toggle('viewer-modal-fs', isFs);
+        if (els.btnFullscreen) {
+            els.btnFullscreen.setAttribute('aria-pressed', isFs ? 'true' : 'false');
+            const icon = els.btnFullscreen.querySelector('i.ti');
+            if (icon) {
+                icon.classList.toggle('ti-maximize', !isFs);
+                icon.classList.toggle('ti-minimize', isFs);
+            }
+        }
+        requestAnimationFrame(function () {
+            refitActiveContent();
+        });
     }
 
     function openPreview(trigger) {
@@ -157,7 +207,7 @@
                     renderPdfPage(currentPage);
                 })
                 .catch(function (err) {
-                    showError(err.message || 'Preview not available for this file.');
+                    showError(err.message || 'View not available for this file.');
                 });
         } else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') {
             activeKind = 'image';
@@ -179,7 +229,7 @@
                     if (!imgEl) {
                         imgEl = document.createElement('img');
                         imgEl.id = 'previewImgEl';
-                        imgEl.alt = 'Document preview';
+                        imgEl.alt = title;
                         imgEl.className = 'border shadow-sm';
                         els.imgWrap.appendChild(imgEl);
                     }
@@ -192,36 +242,41 @@
                     imgEl.src = objUrl;
                 })
                 .catch(function (err) {
-                    showError(err.message || 'Preview not available for this image.');
+                    showError(err.message || 'View not available for this image.');
                 });
         } else {
             activeKind = null;
-            showError('Preview not available for this file type.');
+            showError('View not available for this file type.');
         }
     }
 
     function toggleFullscreen() {
         const els = getEls();
         if (!els.modal) return;
-        if (document.fullscreenElement) {
-            document.exitFullscreen().catch(function () { });
-            els.dialog.classList.remove('modal-fullscreen');
-        } else if (els.modal.requestFullscreen) {
-            els.modal.requestFullscreen().catch(function () {
-                els.dialog.classList.toggle('modal-fullscreen');
-            });
+        if (canUseFullscreenApi(els.modal)) {
+            if (document.fullscreenElement === els.modal) {
+                document.exitFullscreen().catch(function () {
+                    syncFullscreenUI(false);
+                });
+            } else {
+                els.modal.requestFullscreen().catch(function () {
+                    syncFullscreenUI(!els.modal.classList.contains('viewer-modal-fs'));
+                });
+            }
         } else {
-            els.dialog.classList.toggle('modal-fullscreen');
+            syncFullscreenUI(!els.modal.classList.contains('viewer-modal-fs'));
         }
     }
 
     function cleanupModal() {
         const els = getEls();
-        if (document.fullscreenElement && document.exitFullscreen) {
+        if (document.fullscreenElement === els.modal && typeof document.exitFullscreen === 'function') {
             document.exitFullscreen().catch(function () { });
         }
-        if (els.dialog) {
-            els.dialog.classList.remove('modal-fullscreen');
+        syncFullscreenUI(false);
+        if (renderTask) {
+            try { renderTask.cancel(); } catch (e) { }
+            renderTask = null;
         }
         if (pdfDoc) {
             try { pdfDoc.destroy(); } catch (e) { }
@@ -304,7 +359,33 @@
             }
         });
         els.btnFullscreen.addEventListener('click', toggleFullscreen);
+
+        // Track fullscreen state via fullscreenchange event
+        document.addEventListener('fullscreenchange', function () {
+            syncFullscreenUI(document.fullscreenElement === els.modal);
+        });
+
+        // Re-fit when modal finishes opening (accurate container width)
+        els.modal.addEventListener('shown.bs.modal', function () {
+            refitActiveContent();
+        });
+
         els.modal.addEventListener('hidden.bs.modal', cleanupModal);
+
+        // Re-fit on window resize when fit mode is active
+        window.addEventListener('resize', function () {
+            if (!els.modal.classList.contains('show')) return;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(refitActiveContent, 100);
+        });
+
+        // Capture Escape when in browser fullscreen so first Esc exits fullscreen only
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && document.fullscreenElement === els.modal) {
+                e.stopPropagation();
+                return;
+            }
+        }, true);
 
         document.addEventListener('keydown', function (e) {
             if (!els.modal.classList.contains('show')) return;
