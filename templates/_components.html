@@ -38,7 +38,7 @@
 {% endmacro %}
 
 {# 3. Empty State: Clear, polite invitation to act #}
-{% macro empty_state(icon, title, message, action_url=None, action_text=None) %}
+{% macro empty_state(icon, title, message, action_url=None, action_text=None, action_class="btn-primary") %}
 <div class="empty-state-card text-center p-4 p-md-5 my-3">
     <div class="mb-3">
         <i class="ti {{ icon }} fs-1 text-body-secondary" aria-hidden="true"></i>
@@ -47,7 +47,7 @@
     <p class="text-body-secondary mb-4 mx-auto" style="max-width: 480px;">{{ message }}</p>
     {% if action_url and action_text %}
     <div>
-        <a href="{{ action_url }}" class="btn btn-primary">
+        <a href="{{ action_url }}" class="btn {{ action_class }}">
             {{ action_text }}
         </a>
     </div>

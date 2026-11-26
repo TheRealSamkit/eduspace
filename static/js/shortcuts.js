@@ -214,13 +214,30 @@
         }
     }
 
+    function getShortcutTargets() {
+        const el = document.getElementById('shortcut-targets');
+        if (!el) return {};
+        try {
+            return JSON.parse(el.textContent || '{}');
+        } catch (e) {
+            return {};
+        }
+    }
+
     function triggerNavigation(shortcutKey) {
         const link = document.querySelector(`[data-shortcut="${shortcutKey}"]`);
-        if (link && link.href) {
+        let href = link && link.href ? link.href : null;
+        if (!href) {
+            const targets = getShortcutTargets();
+            if (targets[shortcutKey]) {
+                href = targets[shortcutKey];
+            }
+        }
+        if (href) {
             if (window.logEvent) {
                 window.logEvent('shortcut', window.location.pathname, shortcutKey);
             }
-            window.location.href = link.href;
+            window.location.href = href;
             return true;
         }
         return false;
