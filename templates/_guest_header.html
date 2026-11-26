@@ -1,5 +1,5 @@
 {% set is_landing = (request.endpoint == 'pages.index') %}
-{% set reg_btn_class = guest_register_btn_class | default('btn-outline-secondary') %}
+{% set reg_btn_class = 'btn-primary' if guest_header_register_primary else 'btn-outline-secondary' %}
 <header class="border-bottom bg-body sticky-top">
     <nav class="navbar navbar-expand-lg py-2" aria-label="Main navigation">
         <div class="container-xl">

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_components.html" as ui %}
 {% import "_filter_bar.html" as fb %}
-{% set guest_register_btn_class = 'btn-primary' if (not current_user and files) else 'btn-outline-secondary' %}
+{% set guest_header_register_primary = (not current_user and files|length > 0) %}
 
 {% block title %}Public Library - EduSpace{% endblock %}
 {% block topbar_title %}Public Library{% endblock %}
