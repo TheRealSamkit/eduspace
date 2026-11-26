@@ -108,11 +108,12 @@ def test_shortcuts_markup_for_student(client):
     assert 'shortcuts.js' in html
     assert 'toast.js' in html
 
-    # Student navigation shortcuts present
-    student_shortcuts = ['g b', 'g p', 'g v', 'g r', 'g u', 'g d', 'g t', 'g s', 'g f']
+    # Student navigation shortcuts present (g p is in #shortcut-targets JSON map)
+    student_shortcuts = ['g b', 'g v', 'g r', 'g u', 'g d', 'g t', 'g s', 'g f']
     for sc in student_shortcuts:
         assert f'data-shortcut="{sc}"' in html, f"Missing data-shortcut='{sc}' for student"
         assert f'aria-keyshortcuts="{sc}"' in html, f"Missing aria-keyshortcuts='{sc}' for student"
+    assert '"g p": "/library"' in html, "Missing g p target in #shortcut-targets JSON map"
 
     # Admin navigation shortcuts NOT present
     assert 'data-shortcut="g a"' not in html
